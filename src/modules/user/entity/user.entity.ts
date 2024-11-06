@@ -24,10 +24,10 @@ export class User {
   password: string;
 
   @Column()
-  first_name: string;
+  firstName: string;
 
   @Column()
-  last_name: string;
+  lastName: string;
 
   @Column({
     type: 'enum',
@@ -40,11 +40,11 @@ export class User {
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP',
   })
-  created_at: Date;
+  createdAt: Date;
 
   @UpdateDateColumn({
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP',
   })
-  updated_at: Date;
+  updatedAt: Date;
 }
