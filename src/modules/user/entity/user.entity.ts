@@ -5,7 +5,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Roles } from '../../../shared/constants/user-roles.constants';
+import { Roles } from 'shared/constants/user-roles.constants';
 
 @Entity()
 export class User {
@@ -24,10 +24,10 @@ export class User {
   password: string;
 
   @Column()
-  firstName: string;
+  first_name: string;
 
   @Column()
-  lastName: string;
+  last_name: string;
 
   @Column({
     type: 'enum',
@@ -40,11 +40,11 @@ export class User {
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP',
   })
-  createdAt: Date;
+  created_at: Date;
 
   @UpdateDateColumn({
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP',
   })
-  updatedAt: Date;
+  updated_at: Date;
 }
