@@ -1,8 +1,8 @@
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Module } from '@nestjs/common';
-import { Accommodation } from './entities/accom.entity';
-import { AccommodationController } from './accom.controller';
-import { AccommodationService } from './accom.service';
+import { Accommodation } from './entities/accommodations.entity';
+import { AccommodationController } from './accommodations.controller';
+import { AccommodationService } from './accommodations.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Accommodation])],

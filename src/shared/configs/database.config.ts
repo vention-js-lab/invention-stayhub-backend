@@ -1,8 +1,8 @@
 import { ConfigService } from '@nestjs/config';
 import { DataSourceOptions } from 'typeorm';
 import { EnvConfig } from './env.config';
-import { User } from '../../modules/user/entities/user.entity';
-import { Accommodation } from '../../modules/accommodation/entities/accom.entity';
+import { User } from '#/modules/user/entities/user.entity';
+import { Accommodation } from '#/modules/accommodations/entities/accommodations.entity';
 
 export const databaseConfig = (
   configService: ConfigService<EnvConfig>,

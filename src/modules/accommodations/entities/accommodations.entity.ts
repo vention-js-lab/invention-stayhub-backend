@@ -6,12 +6,18 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { User } from '../../user/entities/user.entity';
+import { User } from '#/modules/user/entities/user.entity';
+
+export enum AccommodationStatus {
+  AVAILABLE = 'available',
+  OCCUPIED = 'occupied',
+  NOT_AVAILABLE = 'not available',
+}
 
 @Entity('accommodations')
 export class Accommodation {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @ManyToOne(() => User, (user) => user.accommodations)
   user: User;
@@ -26,7 +32,7 @@ export class Accommodation {
   location: string;
 
   @Column({ type: 'decimal', precision: 10, scale: 2 })
-  price_per_night: number;
+  pricePerNight: number;
 
   @Column()
   type: string;
@@ -34,8 +40,12 @@ export class Accommodation {
   @Column('simple-array')
   amenities: string[];
 
-  @Column({ default: 'available' })
-  status: string;
+  @Column({
+    type: 'enum',
+    enum: AccommodationStatus,
+    default: AccommodationStatus.AVAILABLE,
+  })
+  status: AccommodationStatus;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

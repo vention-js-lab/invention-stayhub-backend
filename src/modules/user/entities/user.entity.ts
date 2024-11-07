@@ -7,7 +7,7 @@ import {
   OneToMany,
 } from 'typeorm';
 import { Roles } from 'shared/constants/user-roles.constants';
-import { Accommodation } from '../../accommodation/entities/accom.entity';
+import { Accommodation } from '#/modules/accommodations/entities/accommodations.entity';
 
 @Entity()
 export class User {
