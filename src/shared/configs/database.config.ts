@@ -1,16 +1,17 @@
 import { ConfigService } from '@nestjs/config';
 import { DataSourceOptions } from 'typeorm';
+import { EnvConfig } from './env.config';
+import { User } from '../../modules/user/entities/user.entity';
 
 export const databaseConfig = (
-  configService: ConfigService,
+  configService: ConfigService<EnvConfig>,
 ): DataSourceOptions => ({
   type: 'postgres',
-  host: configService.getOrThrow('DB_HOST'),
-  port: configService.getOrThrow('DB_PORT'),
-  username: configService.getOrThrow('DB_USER'),
-  password: configService.getOrThrow('DB_PASSWORD'),
-  database: configService.getOrThrow('DB_NAME'),
-  entities: ['dist/**/*.entity{.ts,.js}'],
-  migrations: ['dist/database/migrations/*{.ts,.js}'],
+  host: configService.get('DB_HOST'),
+  port: configService.get('DB_PORT'),
+  username: configService.get('DB_USER'),
+  password: configService.get('DB_PASSWORD'),
+  database: configService.get('DB_NAME'),
+  entities: [User],
   synchronize: false,
 });

@@ -9,8 +9,8 @@ import { Roles } from 'shared/constants/user-roles.constants';
 
 @Entity()
 export class User {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column({
     unique: true,
@@ -20,14 +20,19 @@ export class User {
 
   @Column({
     nullable: false,
+    name: 'password',
   })
   password: string;
 
-  @Column()
-  first_name: string;
+  @Column({
+    name: 'first_name',
+  })
+  firstName: string;
 
-  @Column()
-  last_name: string;
+  @Column({
+    name: 'last_name',
+  })
+  lastName: string;
 
   @Column({
     type: 'enum',
@@ -37,14 +42,16 @@ export class User {
   role: Roles;
 
   @CreateDateColumn({
+    name: 'created_at',
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP',
   })
-  created_at: Date;
+  createdAt: Date;
 
   @UpdateDateColumn({
+    name: 'update_at',
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP',
   })
-  updated_at: Date;
+  updatedAt: Date;
 }
