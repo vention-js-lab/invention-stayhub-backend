@@ -4,8 +4,10 @@ import {
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
 import { Roles } from 'shared/constants/user-roles.constants';
+import { Accommodation } from '../../accommodation/entities/accom.entity';
 
 @Entity()
 export class User {
@@ -54,4 +56,7 @@ export class User {
     default: () => 'CURRENT_TIMESTAMP',
   })
   updatedAt: Date;
+
+  @OneToMany(() => Accommodation, (accommodation) => accommodation.user)
+  accommodations: Accommodation[];
 }
