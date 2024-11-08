@@ -11,7 +11,10 @@ export class AuthController {
   @Post('register')
   @ApiOperation({ summary: 'Register a new user' })
   @ApiResponse({ status: 201, description: 'User registered successfully' })
-  @ApiResponse({ status: 409, description: 'User with email already exists' })
+  @ApiResponse({
+    status: 409,
+    description: 'User with this email already exists',
+  })
   register(@Body() registerDto: RegisterDto) {
     return this.authService.register(registerDto);
   }
