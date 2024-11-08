@@ -1,7 +1,7 @@
 import {
-  BadRequestException,
   ConflictException,
   Injectable,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { RegisterDto } from './dto/register.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -12,7 +12,6 @@ import { AuthTokenPayload } from './types/auth-payload.type';
 import { ConfigService } from '@nestjs/config';
 import { EnvConfig } from '#/shared/configs/env.config';
 import { JwtService } from '@nestjs/jwt';
-import { Roles } from '#/shared/constants/user-roles.constants';
 import { LoginDto } from './dto/login.dto';
 
 @Injectable()
@@ -67,18 +66,18 @@ export class AuthService {
     });
 
     if (!user) {
-      throw new BadRequestException('Invalid email or password');
+      throw new UnauthorizedException('Invalid email or password');
     }
 
     const isPasswordValid = await Hasher.verifyHash(user.password, password);
     if (!isPasswordValid) {
-      throw new BadRequestException('Invalid email or password');
+      throw new UnauthorizedException('Invalid email or password');
     }
 
     const payload = {
       sub: user.id,
       userEmail: user.email,
-      userRole: user.role as Roles,
+      userRole: user.role,
     };
     const accessToken = await this.generateAuthToken(payload, 'access');
     const refreshToken = await this.generateAuthToken(payload, 'refresh');

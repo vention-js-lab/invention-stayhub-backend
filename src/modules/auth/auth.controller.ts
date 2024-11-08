@@ -25,7 +25,7 @@ export class AuthController {
   @ApiOperation({ summary: 'User log in' })
   @ApiResponse({ status: 200, description: 'User logged in successfully' })
   @ApiResponse({
-    status: 400,
+    status: 401,
     description: 'Invalid email or password',
   })
   login(@Body() loginDto: LoginDto) {
