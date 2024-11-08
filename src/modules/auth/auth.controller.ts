@@ -1,5 +1,6 @@
 import { Controller, Post, Body, HttpCode } from '@nestjs/common';
 import { AuthService } from './auth.service';
+import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { RegisterDto } from './dto/register.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { LoginDto } from './dto/login.dto';
@@ -18,6 +19,13 @@ export class AuthController {
   })
   register(@Body() registerDto: RegisterDto) {
     return this.authService.register(registerDto);
+  @Post('refresh-token')
+  async refreshTokens(@Body() requestBody: RefreshTokenDto) {
+    const newTokens = await this.authService.issueNewTokens(
+      requestBody.refreshToken,
+    );
+
+    return newTokens;
   }
 
   @Post('login')

@@ -111,10 +111,40 @@ export class AuthService {
             infer: true,
           });
 
-    const authToken = await this.jwtService.signAsync(payload, {
+    const accessToken = await this.jwtService.signAsync(payload, {
       secret,
       expiresIn,
     });
-    return authToken;
+
+    return accessToken;
+  }
+
+  private async generateRefreshToken(payload: RefreshTokenPayload) {
+    const secret = this.configService.get('JWT_REFRESH_TOKEN_SECRET', {
+      infer: true,
+    });
+    const expiresIn = this.configService.get('JWT_REFRESH_TOKEN_EXPIRY', {
+      infer: true,
+    });
+
+    const refreshToken = await this.jwtService.signAsync(payload, {
+      secret,
+      expiresIn,
+    });
+
+    return refreshToken;
+  }
+
+  private createeRefreshTokenEntity(refreshToken: string) {
+    const decodedRefreshToken = this.jwtService.decode(refreshToken);
+    const expiresAt = new Date(decodedRefreshToken.exp * 1000);
+
+    const refreshTokenEntity = this.refreshTokenRepository.create({
+      userId: decodedRefreshToken.sub,
+      token: refreshToken,
+      expiresAt: expiresAt,
+    });
+
+    return refreshTokenEntity;
   }
 }
