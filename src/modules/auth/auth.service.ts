@@ -1,26 +1,67 @@
-import { Injectable } from '@nestjs/common';
-import { CreateAuthDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
+import { ConflictException, Injectable } from '@nestjs/common';
+import { RegisterDto } from './dto/register.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { User } from '../user/entities/user.entity';
+import { Repository } from 'typeorm';
+import { Hasher } from '#/shared/libs/hasher.lib';
+import { AuthTokenPayload } from './types/auth-payload.type';
+import { ConfigService } from '@nestjs/config';
+import { EnvConfig } from '#/shared/configs/env.config';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
-  create(createAuthDto: CreateAuthDto) {
-    return 'This action adds a new auth';
-  }
+  constructor(
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
+    private configService: ConfigService<EnvConfig, true>,
+    private jwtService: JwtService,
+  ) {}
 
-  findAll() {
-    return `This action returns all auth`;
-  }
+  async register(registerDto: RegisterDto) {
+    const { email, password, ...rest } = registerDto;
 
-  findOne(id: number) {
-    return `This action returns a #${id} auth`;
-  }
+    const existingUser = await this.userRepository.findOne({
+      where: { email },
+    });
+    if (existingUser) {
+      throw new ConflictException('User with this email already exists');
+    }
+    const hashedPassword = await Hasher.hashValue(password);
+    const user = this.userRepository.create({
+      email,
+      password: hashedPassword,
+      ...rest,
+    });
+    await this.userRepository.save(user);
 
-  update(id: number, updateAuthDto: UpdateAuthDto) {
-    return `This action updates a #${id} auth`;
-  }
+    const { ...result } = user;
+    delete result.password;
 
-  remove(id: number) {
-    return `This action removes a #${id} auth`;
+    const authToken = await this.generateAuthToken({
+      sub: user.id,
+      userEmail: user.email,
+      userRole: user.role,
+    });
+    const data = {
+      result: result,
+      token: authToken,
+    };
+
+    return data;
+  }
+  async generateAuthToken(payload: AuthTokenPayload) {
+    const secret = this.configService.get('JWT_ACCESS_TOKEN_SECRET', {
+      infer: true,
+    });
+    const expiresIn = this.configService.get('JWT_ACCESS_TOKEN_EXPIRY', {
+      infer: true,
+    });
+
+    const authToken = await this.jwtService.signAsync(payload, {
+      secret,
+      expiresIn,
+    });
+    return authToken;
   }
 }
