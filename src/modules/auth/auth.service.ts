@@ -1,16 +1,21 @@
 import { ConflictException, Injectable } from '@nestjs/common';
 import { RegisterDto } from './dto/register.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../user/entities/user.entity';
 import { Repository } from 'typeorm';
 import { Hasher } from '#/shared/libs/hasher.lib';
+import { AuthTokenPayload } from './types/auth-payload.type';
+import { ConfigService } from '@nestjs/config';
+import { EnvConfig } from '#/shared/configs/env.config';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
+    private configService: ConfigService<EnvConfig, true>,
+    private jwtService: JwtService,
   ) {}
 
   async register(registerDto: RegisterDto) {
@@ -30,26 +35,33 @@ export class AuthService {
     });
     await this.userRepository.save(user);
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { password: _, ...result } = user;
+    const { ...result } = user;
+    delete result.password;
 
-    return result;
+    const authToken = await this.generateAuthToken({
+      sub: user.id,
+      userEmail: user.email,
+      userRole: user.role,
+    });
+    const data = {
+      result: result,
+      token: authToken,
+    };
+
+    return data;
   }
+  async generateAuthToken(payload: AuthTokenPayload) {
+    const secret = this.configService.get('JWT_ACCESS_TOKEN_SECRET', {
+      infer: true,
+    });
+    const expiresIn = this.configService.get('JWT_ACCESS_TOKEN_EXPIRY', {
+      infer: true,
+    });
 
-  findAll() {
-    return `This action returns all auth`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} auth`;
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  update(id: number, updateAuthDto: UpdateAuthDto) {
-    return `This action updates a #${id} auth`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} auth`;
+    const authToken = await this.jwtService.signAsync(payload, {
+      secret,
+      expiresIn,
+    });
+    return authToken;
   }
 }
