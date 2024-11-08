@@ -44,17 +44,18 @@ export class AuthService {
     const { ...result } = user;
     delete result.password;
 
-    const authToken = await this.generateAuthToken(
-      {
-        sub: user.id,
-        userEmail: user.email,
-        userRole: user.role,
-      },
-      'access',
-    );
+    const payload = {
+      sub: user.id,
+      userEmail: user.email,
+      userRole: user.role,
+    };
+
+    const accessToken = await this.generateAuthToken(payload, 'access');
+    const refreshToken = await this.generateAuthToken(payload, 'refresh');
     const data = {
       result: result,
-      token: authToken,
+      accessToken,
+      refreshToken,
     };
 
     return data;
