@@ -1,9 +1,9 @@
-import { AccommodationService } from './accommodations.service';
+import { AccommodationsService } from './accommodations.service';
 import { Controller, Get, Post, Put, Delete } from '@nestjs/common';
 
 @Controller('accommodation')
-export class AccommodationController {
-  constructor(private readonly AccommodationService: AccommodationService) {}
+export class AccommodationsController {
+  constructor(private readonly AccommodationService: AccommodationsService) {}
 
   @Post()
   create() {

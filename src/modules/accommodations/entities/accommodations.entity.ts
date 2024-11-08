@@ -7,12 +7,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { User } from '#/modules/user/entities/user.entity';
-
-export enum AccommodationStatus {
-  AVAILABLE = 'available',
-  OCCUPIED = 'occupied',
-  NOT_AVAILABLE = 'not available',
-}
+import { AccommodationStatus } from '#/shared/constants/accommodation-status.constants';
 
 @Entity('accommodations')
 export class Accommodation {
@@ -31,7 +26,7 @@ export class Accommodation {
   @Column({ type: 'varchar', length: 255 })
   location: string;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2 })
+  @Column({ type: 'decimal', precision: 10, scale: 2, name: 'price_per_night' })
   pricePerNight: number;
 
   @Column()
