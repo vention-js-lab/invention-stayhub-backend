@@ -1,4 +1,8 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { RegisterDto } from './dto/register.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../user/entities/user.entity';
@@ -8,6 +12,7 @@ import { AuthTokenPayload } from './types/auth-payload.type';
 import { ConfigService } from '@nestjs/config';
 import { EnvConfig } from '#/shared/configs/env.config';
 import { JwtService } from '@nestjs/jwt';
+import { LoginDto } from './dto/login.dto';
 
 @Injectable()
 export class AuthService {
@@ -38,25 +43,73 @@ export class AuthService {
     const { ...result } = user;
     delete result.password;
 
-    const authToken = await this.generateAuthToken({
+    const payload = {
       sub: user.id,
       userEmail: user.email,
       userRole: user.role,
-    });
+    };
+
+    const accessToken = await this.generateAuthToken(payload, 'access');
+    const refreshToken = await this.generateAuthToken(payload, 'refresh');
     const data = {
       result: result,
-      token: authToken,
+      accessToken,
+      refreshToken,
     };
 
     return data;
   }
-  async generateAuthToken(payload: AuthTokenPayload) {
-    const secret = this.configService.get('JWT_ACCESS_TOKEN_SECRET', {
-      infer: true,
+
+  async login({ email, password }: LoginDto) {
+    const user = await this.userRepository.findOne({
+      where: { email },
     });
-    const expiresIn = this.configService.get('JWT_ACCESS_TOKEN_EXPIRY', {
-      infer: true,
-    });
+
+    if (!user) {
+      throw new UnauthorizedException('Invalid email or password');
+    }
+
+    const isPasswordValid = await Hasher.verifyHash(user.password, password);
+    if (!isPasswordValid) {
+      throw new UnauthorizedException('Invalid email or password');
+    }
+
+    const payload = {
+      sub: user.id,
+      userEmail: user.email,
+      userRole: user.role,
+    };
+    const accessToken = await this.generateAuthToken(payload, 'access');
+    const refreshToken = await this.generateAuthToken(payload, 'refresh');
+
+    return {
+      message: 'User logged in successfully',
+      accessToken,
+      refreshToken,
+    };
+  }
+
+  async generateAuthToken(
+    payload: AuthTokenPayload,
+    type: 'access' | 'refresh',
+  ) {
+    const secret =
+      type === 'access'
+        ? this.configService.get('JWT_ACCESS_TOKEN_SECRET', {
+            infer: true,
+          })
+        : this.configService.get('JWT_REFRESH_TOKEN_SECRET', {
+            infer: true,
+          });
+
+    const expiresIn =
+      type === 'access'
+        ? this.configService.get('JWT_ACCESS_TOKEN_EXPIRY', {
+            infer: true,
+          })
+        : this.configService.get('JWT_REFRESH_TOKEN_EXPIRY', {
+            infer: true,
+          });
 
     const authToken = await this.jwtService.signAsync(payload, {
       secret,
