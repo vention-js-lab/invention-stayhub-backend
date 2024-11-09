@@ -9,7 +9,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-@Entity('refresh_tokens')
+@Entity('account_refresh_token')
 export class RefreshToken {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -18,11 +18,14 @@ export class RefreshToken {
   token: string;
 
   @ManyToOne(() => User, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'user_id' })
+  @JoinColumn({ name: 'account_id' })
   user: User;
 
-  @Column({ name: 'user_id' })
+  @Column({ name: 'account_id' })
   userId: string;
+
+  @Column({ name: 'is_deleted', default: 'false' })
+  isDeleted: boolean;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
