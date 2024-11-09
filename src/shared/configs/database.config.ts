@@ -24,7 +24,7 @@ export const databaseConfig = (
     AccommodationImage,
     AccommodationAmenity,
     AccommodationAddress,
-    RefreshToken,
+    AccountRefreshToken,
   ],
   synchronize: false,
 });
