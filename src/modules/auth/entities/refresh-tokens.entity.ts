@@ -10,7 +10,7 @@ import {
 } from 'typeorm';
 
 @Entity('account_refresh_token')
-export class RefreshToken {
+export class AccountRefreshToken {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 

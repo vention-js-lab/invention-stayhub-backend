@@ -13,15 +13,15 @@ import { ConfigService } from '@nestjs/config';
 import { EnvConfig } from '#/shared/configs/env.config';
 import { JwtService } from '@nestjs/jwt';
 import { LoginDto } from './dto/login.dto';
-import { RefreshToken } from './entities/refresh-tokens.entity';
+import { AccountRefreshToken } from './entities/refresh-tokens.entity';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
-    @InjectRepository(RefreshToken)
-    private refreshTokenRepository: Repository<RefreshToken>,
+    @InjectRepository(AccountRefreshToken)
+    private refreshTokenRepository: Repository<AccountRefreshToken>,
     private configService: ConfigService<EnvConfig, true>,
     private jwtService: JwtService,
   ) {}
