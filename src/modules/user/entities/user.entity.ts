@@ -21,7 +21,7 @@ export class User {
   email: string;
 
   @Column({
-    nullable: false,
+    nullable: true,
     name: 'password',
   })
   password: string;
@@ -42,6 +42,12 @@ export class User {
     default: Roles.USER,
   })
   role: Roles;
+
+  @Column({ unique: true, name: 'googleId', nullable: true })
+  googleId: string;
+
+  @Column({ nullable: true, name: 'picture' })
+  picture: string;
 
   @CreateDateColumn({
     name: 'created_at',

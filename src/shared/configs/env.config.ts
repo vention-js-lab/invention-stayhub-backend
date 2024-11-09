@@ -15,6 +15,9 @@ const envConfigSchema = z.object({
   JWT_ACCESS_TOKEN_EXPIRY: z.string(),
   JWT_REFRESH_TOKEN_SECRET: z.string(),
   JWT_REFRESH_TOKEN_EXPIRY: z.string(),
+  GOOGLE_CLIENT_ID: z.string(),
+  GOOGLE_CLIENT_SECRET: z.string(),
+  GOOGLE_CALLBACK_URL: z.string(),
 
   COOKIES_REFRESH_MS: z.coerce.number().int().positive(),
 });
