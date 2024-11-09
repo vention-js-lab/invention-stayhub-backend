@@ -117,4 +117,34 @@ export class AuthService {
     });
     return authToken;
   }
+
+  async googleLogin(req: any) {
+    if (!req.user) {
+      return { message: 'No user from Google' };
+    }
+
+    const { googleId, email, firstName, lastName, picture } = req.user;
+
+    let user = await this.findByGoogleId(googleId);
+
+    if (!user) {
+      user = this.userRepository.create({
+        googleId,
+        email,
+        firstName,
+        lastName,
+        picture,
+      });
+      await this.userRepository.save(user);
+    }
+    return {
+      message: 'User info From Google',
+      user,
+    };
+  }
+
+  async findByGoogleId(id: string) {
+    const user = await this.userRepository.findOne({ where: { googleId: id } });
+    return user;
+  }
 }

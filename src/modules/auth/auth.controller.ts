@@ -1,8 +1,17 @@
-import { Controller, Post, Body, HttpCode } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  HttpCode,
+  Get,
+  UseGuards,
+  Req,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { LoginDto } from './dto/login.dto';
+import { AuthGuard } from '@nestjs/passport';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -30,5 +39,40 @@ export class AuthController {
   })
   login(@Body() loginDto: LoginDto) {
     return this.authService.login(loginDto);
+  }
+
+  @Get('google')
+  @UseGuards(AuthGuard('google')) // Use Google OAuth2 strategy guard
+  @ApiOperation({
+    summary: 'Google Authentication',
+    description: 'Redirects to Google for OAuth2 login',
+  })
+  @ApiResponse({ status: 302, description: 'Redirects to Google login' })
+  googleAuth() {}
+
+  @Get('google/redirect')
+  @UseGuards(AuthGuard('google'))
+  @ApiOperation({
+    summary: 'Google Authentication Callback',
+    description: 'Callback for Google OAuth2 login',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'User info from Google',
+    schema: {
+      example: {
+        message: 'User info From Google',
+        user: {
+          email: 'example@gmail.com',
+          firstName: 'John',
+          lastName: 'Doe',
+          picture: 'https://example.com/photo.jpg',
+          googleId: '1234567890',
+        },
+      },
+    },
+  })
+  async googleAuthRedirect(@Req() req) {
+    return this.authService.googleLogin(req);
   }
 }
