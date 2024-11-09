@@ -13,12 +13,15 @@ import { ConfigService } from '@nestjs/config';
 import { EnvConfig } from '#/shared/configs/env.config';
 import { JwtService } from '@nestjs/jwt';
 import { LoginDto } from './dto/login.dto';
+import { RefreshToken } from './entities/refresh-tokens.entity';
 
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectRepository(Account)
-    private userRepository: Repository<Account>,
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
+    @InjectRepository(RefreshToken)
+    private refreshTokenRepository: Repository<RefreshToken>,
     private configService: ConfigService<EnvConfig, true>,
     private jwtService: JwtService,
   ) {}
@@ -51,6 +54,10 @@ export class AuthService {
 
     const accessToken = await this.generateAuthToken(payload, 'access');
     const refreshToken = await this.generateAuthToken(payload, 'refresh');
+
+    const refreshTokenEntity = this.createRefreshTokenEntity(refreshToken);
+    await this.refreshTokenRepository.insert(refreshTokenEntity);
+
     const data = {
       result: result,
       accessToken,
@@ -82,10 +89,51 @@ export class AuthService {
     const accessToken = await this.generateAuthToken(payload, 'access');
     const refreshToken = await this.generateAuthToken(payload, 'refresh');
 
+    const refreshTokenEntity = this.createRefreshTokenEntity(refreshToken);
+    await this.refreshTokenRepository.insert(refreshTokenEntity);
+
     return {
       message: 'User logged in successfully',
       accessToken,
       refreshToken,
+    };
+  }
+
+  async issueNewTokens(refreshToken: string) {
+    const decodedRefreshToken =
+      this.jwtService.decode<AuthTokenPayload>(refreshToken);
+
+    const existingRefreshTokenEntity =
+      await this.refreshTokenRepository.findOne({
+        where: { userId: decodedRefreshToken.sub, token: refreshToken },
+        relations: {
+          user: true,
+        },
+      });
+
+    if (!existingRefreshTokenEntity) {
+      throw new UnauthorizedException('Invalid or expired token');
+    }
+
+    const { user } = existingRefreshTokenEntity;
+    const payload = {
+      sub: user.id,
+      userEmail: user.email,
+      userRole: user.role,
+    };
+    const newAccessToken = await this.generateAuthToken(payload, 'access');
+    const newRefreshToken = await this.generateAuthToken(payload, 'refresh');
+
+    const newRefreshTokenEntity =
+      this.createRefreshTokenEntity(newRefreshToken);
+
+    existingRefreshTokenEntity.token = newRefreshToken;
+    existingRefreshTokenEntity.expiresAt = newRefreshTokenEntity.expiresAt;
+    await this.refreshTokenRepository.save(existingRefreshTokenEntity);
+
+    return {
+      accessToken: newAccessToken,
+      refreshToken: newRefreshToken,
     };
   }
 
@@ -111,33 +159,16 @@ export class AuthService {
             infer: true,
           });
 
-    const accessToken = await this.jwtService.signAsync(payload, {
+    const authToken = await this.jwtService.signAsync(payload, {
       secret,
       expiresIn,
     });
-
-    return accessToken;
+    return authToken;
   }
 
-  private async generateRefreshToken(payload: RefreshTokenPayload) {
-    const secret = this.configService.get('JWT_REFRESH_TOKEN_SECRET', {
-      infer: true,
-    });
-    const expiresIn = this.configService.get('JWT_REFRESH_TOKEN_EXPIRY', {
-      infer: true,
-    });
-
-    const refreshToken = await this.jwtService.signAsync(payload, {
-      secret,
-      expiresIn,
-    });
-
-    return refreshToken;
-  }
-
-  private createeRefreshTokenEntity(refreshToken: string) {
+  private createRefreshTokenEntity(refreshToken: string) {
     const decodedRefreshToken = this.jwtService.decode(refreshToken);
-    const expiresAt = new Date(decodedRefreshToken.exp * 1000);
+    const expiresAt = new Date(decodedRefreshToken.exp * 1000).valueOf();
 
     const refreshTokenEntity = this.refreshTokenRepository.create({
       userId: decodedRefreshToken.sub,
