@@ -118,24 +118,20 @@ export class AuthService {
     return authToken;
   }
 
-  async googleLogin(req: any) {
-    if (!req.user) {
-      return { message: 'No user from Google' };
-    }
+  async googleLogin(user: User) {
+    const { googleId, email, firstName, lastName, picture } = user;
 
-    const { googleId, email, firstName, lastName, picture } = req.user;
+    const existingUser = await this.findByGoogleId(googleId);
 
-    let user = await this.findByGoogleId(googleId);
-
-    if (!user) {
-      user = this.userRepository.create({
+    if (!existingUser) {
+      const newUser = this.userRepository.create({
         googleId,
         email,
         firstName,
         lastName,
         picture,
       });
-      await this.userRepository.save(user);
+      await this.userRepository.save(newUser);
     }
     return {
       message: 'User info From Google',

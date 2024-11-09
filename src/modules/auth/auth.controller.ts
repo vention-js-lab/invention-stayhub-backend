@@ -5,13 +5,15 @@ import {
   HttpCode,
   Get,
   UseGuards,
-  Req,
+  NotFoundException,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { LoginDto } from './dto/login.dto';
 import { AuthGuard } from '@nestjs/passport';
+import { GetUser } from './decorators/getUser';
+import { User } from '../user/entities/user.entity';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -41,15 +43,6 @@ export class AuthController {
     return this.authService.login(loginDto);
   }
 
-  @Get('google')
-  @UseGuards(AuthGuard('google')) // Use Google OAuth2 strategy guard
-  @ApiOperation({
-    summary: 'Google Authentication',
-    description: 'Redirects to Google for OAuth2 login',
-  })
-  @ApiResponse({ status: 302, description: 'Redirects to Google login' })
-  googleAuth() {}
-
   @Get('google/redirect')
   @UseGuards(AuthGuard('google'))
   @ApiOperation({
@@ -59,20 +52,11 @@ export class AuthController {
   @ApiResponse({
     status: 200,
     description: 'User info from Google',
-    schema: {
-      example: {
-        message: 'User info From Google',
-        user: {
-          email: 'example@gmail.com',
-          firstName: 'John',
-          lastName: 'Doe',
-          picture: 'https://example.com/photo.jpg',
-          googleId: '1234567890',
-        },
-      },
-    },
   })
-  async googleAuthRedirect(@Req() req) {
-    return this.authService.googleLogin(req);
+  async googleAuthRedirect(@GetUser() user: User) {
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    return this.authService.googleLogin(user);
   }
 }
