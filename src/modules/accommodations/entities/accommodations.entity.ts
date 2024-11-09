@@ -1,50 +1,73 @@
 import {
   Entity,
-  Column,
   PrimaryGeneratedColumn,
-  ManyToOne,
+  Column,
+  OneToMany,
+  OneToOne,
+  JoinColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  ManyToOne,
 } from 'typeorm';
-import { User } from '#/modules/user/entities/user.entity';
-import { AccommodationStatus } from '#/shared/constants/accommodation-status.constants';
+import { AccommodationImage } from '#/modules/acccommodation_image/entities/accommodation_image.entity';
+import { AccommodationAmenity } from '#/modules/acccommodation_amenity/entities/accommodation_amenity.entity';
+import { AccommodationAddress } from '#/modules/acccommodation_address/entities/accommodation_address.entity';
+import { User } from '../../user/entities/user.entity';
 
-@Entity('accommodations')
+@Entity('accommodation')
 export class Accommodation {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne(() => User, (user) => user.accommodations)
-  user: User;
-
   @Column()
   name: string;
 
-  @Column({ type: 'text' })
+  @Column()
   description: string;
 
-  @Column({ type: 'varchar', length: 255 })
-  location: string;
+  @Column({ name: 'cover_image' })
+  coverImage: string;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2, name: 'price_per_night' })
-  pricePerNight: number;
+  @Column('decimal')
+  price: number;
 
   @Column()
-  type: string;
+  available: boolean;
 
-  @Column('simple-array')
-  amenities: string[];
+  @Column({ name: 'available_from' })
+  availableFrom: Date;
 
-  @Column({
-    type: 'enum',
-    enum: AccommodationStatus,
-    default: AccommodationStatus.AVAILABLE,
-  })
-  status: AccommodationStatus;
+  @Column({ name: 'available_to' })
+  availableTo: Date;
+
+  @Column({ name: 'square_meters' })
+  squareMeters: number;
+
+  @Column({ name: 'number_of_rooms' })
+  numberOfRooms: number;
+
+  @Column({ name: 'allowed_number_of_people' })
+  allowedNumberOfPeople: number;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
+
+  @ManyToOne(() => User, (user) => user.accommodations, {
+    onDelete: 'CASCADE',
+  })
+  owner_id: string;
+
+  @OneToMany(() => AccommodationImage, (image) => image.accommodation)
+  images: AccommodationImage[];
+
+  @OneToOne(() => AccommodationAmenity, (amenity) => amenity.accommodation)
+  @JoinColumn()
+  amenity: AccommodationAmenity;
+
+  @OneToOne(() => AccommodationAddress, (address) => address.accommodation)
+  @JoinColumn()
+  address: AccommodationAddress;
 }
