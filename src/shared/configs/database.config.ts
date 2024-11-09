@@ -14,5 +14,5 @@ export const databaseConfig = (
   password: configService.get('DB_PASSWORD'),
   database: configService.get('DB_NAME'),
   entities: [User, Accommodation],
-  synchronize: false,
+  synchronize: true,
 });
