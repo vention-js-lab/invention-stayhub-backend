@@ -1,9 +1,9 @@
 import { Controller, Post, Body, HttpCode } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { RegisterDto } from './dto/register.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { LoginDto } from './dto/login.dto';
+import { RefreshTokenDto } from './dto/refresh-token.dto';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -19,13 +19,6 @@ export class AuthController {
   })
   register(@Body() registerDto: RegisterDto) {
     return this.authService.register(registerDto);
-  @Post('refresh-token')
-  async refreshTokens(@Body() requestBody: RefreshTokenDto) {
-    const newTokens = await this.authService.issueNewTokens(
-      requestBody.refreshToken,
-    );
-
-    return newTokens;
   }
 
   @Post('login')
@@ -38,5 +31,27 @@ export class AuthController {
   })
   login(@Body() loginDto: LoginDto) {
     return this.authService.login(loginDto);
+  }
+
+  @Post('refresh-token')
+  @HttpCode(200)
+  @ApiOperation({ summary: 'Get new access and refresh tokens' })
+  @ApiResponse({
+    status: 200,
+    description: 'New tokens retrieved successfully',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Invalid or expired token',
+  })
+  async issueNewTokens(@Body() refreshTokenDto: RefreshTokenDto) {
+    const newTokens = await this.authService.issueNewTokens(
+      refreshTokenDto.refreshToken,
+    );
+
+    return {
+      message: 'New tokens retrieved successfully',
+      data: newTokens,
+    };
   }
 }

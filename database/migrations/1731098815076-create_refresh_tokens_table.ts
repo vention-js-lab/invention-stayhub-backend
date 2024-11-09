@@ -5,7 +5,7 @@ import {
   TableForeignKey,
 } from 'typeorm';
 
-export class CreateRefreshTokensTable1731055253675
+export class CreateRefreshTokensTable1731098815076
   implements MigrationInterface
 {
   public async up(queryRunner: QueryRunner): Promise<void> {
@@ -33,8 +33,18 @@ export class CreateRefreshTokensTable1731055253675
             default: 'CURRENT_TIMESTAMP',
           },
           {
-            name: 'expires_at',
+            name: 'updated_at',
             type: 'timestamp',
+            default: 'CURRENT_TIMESTAMP',
+          },
+          {
+            name: 'expires_at',
+            type: 'bigint',
+          },
+        ],
+        indices: [
+          {
+            columnNames: ['user_id', 'token'],
           },
         ],
       }),

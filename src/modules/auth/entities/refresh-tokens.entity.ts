@@ -6,6 +6,7 @@ import {
   ManyToOne,
   CreateDateColumn,
   JoinColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 
 @Entity('refresh_tokens')
@@ -26,6 +27,9 @@ export class RefreshToken {
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
+  @UpdateDateColumn({ name: 'updated_at' })
+  updatedAt: Date;
+
   @Column({ type: 'timestamp', name: 'expires_at' })
-  expiresAt: Date;
+  expiresAt: number;
 }
