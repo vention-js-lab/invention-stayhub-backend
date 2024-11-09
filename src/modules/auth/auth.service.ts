@@ -13,7 +13,7 @@ import { ConfigService } from '@nestjs/config';
 import { EnvConfig } from '#/shared/configs/env.config';
 import { JwtService } from '@nestjs/jwt';
 import { LoginDto } from './dto/login.dto';
-import { AccountRefreshToken } from './entities/refresh-tokens.entity';
+import { AccountRefreshToken } from './entities/account-refresh-token.entity';
 
 @Injectable()
 export class AuthService {
