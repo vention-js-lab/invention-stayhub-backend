@@ -4,7 +4,7 @@ import { AuthController } from './auth.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Account } from '../user/entities/account.entity';
 import { JwtModule } from '@nestjs/jwt';
-import { AccountRefreshToken } from './entities/refresh-tokens.entity';
+import { AccountRefreshToken } from './entities/account-refresh-token.entity';
 
 @Module({
   imports: [JwtModule, TypeOrmModule.forFeature([Account])],
