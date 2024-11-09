@@ -1,7 +1,8 @@
 import { UpdateProfileDto } from './dto/requests/update-profile.dto';
 import {
-  BadRequestException,
+  ConflictException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -26,9 +27,6 @@ export class UserService {
         'updatedAt',
       ],
     });
-    if (!users) {
-      throw new NotFoundException('Users are empty');
-    }
 
     return users;
   }
@@ -67,7 +65,7 @@ export class UserService {
       });
 
       if (existingUser && existingUser.id !== userId) {
-        throw new BadRequestException('Email is already in use');
+        throw new ConflictException('Email is already in use');
       }
       user.email = updateProfileDto.email;
     }
@@ -83,21 +81,14 @@ export class UserService {
   }
 
   async deleteUserById(userId: string) {
-    const user = await this.userRepository.findOne({
-      where: {
-        id: userId,
-      },
-    });
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
+    const result = await this.userRepository.delete(userId);
 
-    const deletedUser = await this.userRepository.delete({ id: userId });
-
-    if (deletedUser.affected) {
-      return user;
+    if (result.affected) {
+      return 'User succesfully deleted';
     } else {
-      throw new NotFoundException('User could not be deleted');
+      throw new InternalServerErrorException(
+        'User not found or could not be deleted',
+      );
     }
   }
 }
