@@ -1,8 +1,9 @@
-import { Controller, Post, Body, HttpCode } from '@nestjs/common';
+import { Controller, Post, Body, HttpCode, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { LoginDto } from './dto/login.dto';
+import { AccessTokenGuard } from '#/shared/guards/access-token.guard';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -16,6 +17,7 @@ export class AuthController {
     status: 409,
     description: 'User with this email already exists',
   })
+  @UseGuards(AccessTokenGuard)
   register(@Body() registerDto: RegisterDto) {
     return this.authService.register(registerDto);
   }
