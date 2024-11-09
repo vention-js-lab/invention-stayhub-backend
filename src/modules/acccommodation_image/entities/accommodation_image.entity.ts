@@ -5,6 +5,7 @@ import {
   ManyToOne,
   CreateDateColumn,
   UpdateDateColumn,
+  JoinColumn,
 } from 'typeorm';
 import { Accommodation } from '#/modules/accommodations/entities/accommodations.entity';
 
@@ -25,5 +26,8 @@ export class AccommodationImage {
   @ManyToOne(() => Accommodation, (accommodation) => accommodation.images, {
     onDelete: 'CASCADE',
   })
+  @JoinColumn({ name: 'accommodation_id' })
   accommodation: Accommodation;
+  @Column({ name: 'accommodation_id' })
+  accommodationId: string;
 }

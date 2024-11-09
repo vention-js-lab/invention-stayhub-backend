@@ -17,7 +17,6 @@ export class CreateAccommodationAmenityTable1731152706420
           },
           { name: 'has_wifi', type: 'boolean', default: false },
           { name: 'has_parking', type: 'boolean', default: false },
-
           { name: 'has_swimming_pool', type: 'boolean', default: false },
           { name: 'has_pet_allowance', type: 'boolean', default: false },
           { name: 'has_backyard', type: 'boolean', default: false },

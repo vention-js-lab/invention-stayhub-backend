@@ -12,9 +12,9 @@ import {
 import { AccommodationImage } from '#/modules/acccommodation_image/entities/accommodation_image.entity';
 import { AccommodationAmenity } from '#/modules/acccommodation_amenity/entities/accommodation_amenity.entity';
 import { AccommodationAddress } from '#/modules/acccommodation_address/entities/accommodation_address.entity';
-import { User } from '../../user/entities/user.entity';
+import { User } from '#/modules/user/entities/user.entity';
 
-@Entity('accommodation')
+@Entity('accommodations')
 export class Accommodation {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -58,7 +58,10 @@ export class Accommodation {
   @ManyToOne(() => User, (user) => user.accommodations, {
     onDelete: 'CASCADE',
   })
-  owner_id: string;
+  @JoinColumn({ name: 'owner_id' })
+  owner: User;
+  @Column({ name: 'owner_id' })
+  ownerId: string;
 
   @OneToMany(() => AccommodationImage, (image) => image.accommodation)
   images: AccommodationImage[];

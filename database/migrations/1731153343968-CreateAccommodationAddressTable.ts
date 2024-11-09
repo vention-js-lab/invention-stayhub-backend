@@ -24,7 +24,7 @@ export class CreateAccommodationAddressTable1731153343968
           { name: 'street', type: 'varchar', isNullable: false },
           { name: 'city', type: 'varchar', isNullable: false },
           { name: 'country', type: 'varchar', isNullable: false },
-          { name: 'zipCode', type: 'varchar', isNullable: true },
+          { name: 'zip_code', type: 'varchar', isNullable: true },
           {
             name: 'latitude',
             type: 'decimal',

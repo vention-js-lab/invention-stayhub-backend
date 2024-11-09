@@ -5,6 +5,7 @@ import {
   OneToOne,
   CreateDateColumn,
   UpdateDateColumn,
+  JoinColumn,
 } from 'typeorm';
 import { Accommodation } from '#/modules/accommodations/entities/accommodations.entity';
 
@@ -22,7 +23,7 @@ export class AccommodationAddress {
   @Column()
   country: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, name: 'zip_code' })
   zipCode: string;
 
   @Column('decimal', { precision: 10, scale: 6, nullable: true })
@@ -40,5 +41,8 @@ export class AccommodationAddress {
   @OneToOne(() => Accommodation, (accommodation) => accommodation.address, {
     onDelete: 'CASCADE',
   })
+  @JoinColumn({ name: 'accommodation_id' })
   accommodation: Accommodation;
+  @Column({ name: 'accommodation_id' })
+  accommodationId: string;
 }
