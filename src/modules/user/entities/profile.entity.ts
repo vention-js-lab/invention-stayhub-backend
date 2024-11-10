@@ -1,11 +1,16 @@
 import {
   Column,
   CreateDateColumn,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
+  JoinColumn,
+  Entity,
 } from 'typeorm';
-import { Gender } from '../../../shared/constants/gender.constant';
+import { Gender } from '#/shared/constants/gender.constant';
+import { Account } from './account.entity';
 
+@Entity('profile')
 export class Profile {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -20,11 +25,22 @@ export class Profile {
   })
   lastName: string;
 
-  @Column({ nullable: true, name: 'picture' })
+  @Column({ nullable: true })
   picture: string;
 
-  @Column({ nullable: true, name: 'gender', type: 'enum', enum: Gender })
+  @Column({ nullable: true, type: 'enum', enum: Gender })
   gender: Gender;
+
+  @Column()
+  country: string;
+
+  @Column()
+  description: string;
+
+  @Column({
+    name: 'phone_number',
+  })
+  phoneNumber: string;
 
   @CreateDateColumn({
     name: 'created_at',
@@ -39,4 +55,10 @@ export class Profile {
     default: () => 'CURRENT_TIMESTAMP',
   })
   updatedAt: Date;
+
+  @OneToOne(() => Account, (account) => account.profile, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'account_id' })
+  accountId: Account;
 }

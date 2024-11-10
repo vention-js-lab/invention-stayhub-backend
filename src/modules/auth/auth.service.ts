@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { RegisterDto } from './dto/register.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from '../user/entities/user.entity';
+import { Account } from '../user/entities/account.entity';
 import { Repository } from 'typeorm';
 import { Hasher } from '#/shared/libs/hasher.lib';
 import { AuthTokenPayload } from './types/auth-payload.type';
@@ -17,8 +17,8 @@ import { LoginDto } from './dto/login.dto';
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectRepository(User)
-    private userRepository: Repository<User>,
+    @InjectRepository(Account)
+    private userRepository: Repository<Account>,
     private configService: ConfigService<EnvConfig, true>,
     private jwtService: JwtService,
   ) {}

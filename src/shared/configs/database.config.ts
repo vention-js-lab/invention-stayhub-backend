@@ -1,7 +1,7 @@
 import { ConfigService } from '@nestjs/config';
 import { DataSourceOptions } from 'typeorm';
 import { EnvConfig } from './env.config';
-import { User } from '#/modules/user/entities/user.entity';
+import { Account } from '#/modules/user/entities/account.entity';
 import { Accommodation } from '#/modules/accommodations/entities/accommodations.entity';
 import { AccommodationImage } from '#/modules/accommodations/entities/accommodation-image.entity';
 import { AccommodationAmenity } from '#/modules/accommodations/entities/accommodation-amenity.entity';
@@ -17,7 +17,7 @@ export const databaseConfig = (
   password: configService.get('DB_PASSWORD'),
   database: configService.get('DB_NAME'),
   entities: [
-    User,
+    Account,
     Accommodation,
     AccommodationImage,
     AccommodationAmenity,

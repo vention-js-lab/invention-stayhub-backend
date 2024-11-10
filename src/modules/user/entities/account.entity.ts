@@ -2,13 +2,17 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Roles } from '@shared/constants/user-roles.constants';
-import { AccountType } from '@shared/constants/user-account.constant';
+import { Roles } from '#/shared/constants/user-roles.constants';
+import { AccountType } from '#/shared/constants/user-account.constant';
+import { Accommodation } from '#/modules/accommodations/entities/accommodations.entity';
+import { Profile } from './profile.entity';
 
-@Entity()
+@Entity('account')
 export class Account {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -21,22 +25,24 @@ export class Account {
 
   @Column({
     nullable: true,
-    name: 'password',
   })
   password: string;
 
   @Column({
     type: 'enum',
     enum: Roles,
-    default: Roles.USER,
+    default: Roles.User,
   })
   role: Roles;
 
-  @Column({ unique: true, name: 'googleId', nullable: true })
+  @Column({ unique: true, name: 'google_id', nullable: true })
   googleId: string;
 
-  @Column({ type: 'enum', name: 'acccount_type', enum: AccountType })
+  @Column({ type: 'enum', name: 'account_type', enum: AccountType })
   accountType: AccountType;
+
+  @Column({ type: 'boolean', name: 'is_deleted', nullable: true })
+  isDeleted: boolean;
 
   @CreateDateColumn({
     name: 'created_at',
@@ -51,4 +57,10 @@ export class Account {
     default: () => 'CURRENT_TIMESTAMP',
   })
   updatedAt: Date;
+
+  @OneToMany(() => Accommodation, (accommodation) => accommodation.owner)
+  accommodations: Accommodation[];
+
+  @OneToOne(() => Profile, (profile) => profile.accountId)
+  profile: Profile;
 }
