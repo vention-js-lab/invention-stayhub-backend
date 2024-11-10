@@ -33,6 +33,6 @@ export class AccountRefreshToken {
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
 
-  @Column({ type: 'timestamp', name: 'expires_at' })
+  @Column({ name: 'expires_at' })
   expiresAt: number;
 }

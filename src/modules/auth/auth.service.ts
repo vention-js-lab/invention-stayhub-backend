@@ -18,8 +18,8 @@ import { AccountRefreshToken } from './entities/account-refresh-token.entity';
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectRepository(User)
-    private userRepository: Repository<User>,
+    @InjectRepository(Account)
+    private userRepository: Repository<Account>,
     @InjectRepository(AccountRefreshToken)
     private refreshTokenRepository: Repository<AccountRefreshToken>,
     private configService: ConfigService<EnvConfig, true>,
