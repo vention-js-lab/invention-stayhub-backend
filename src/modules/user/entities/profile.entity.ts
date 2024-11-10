@@ -1,30 +1,16 @@
 import {
-  Entity,
   Column,
-  PrimaryGeneratedColumn,
   CreateDateColumn,
-  UpdateDateColumn,
   OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
-import { Roles } from 'shared/constants/user-roles.constants';
-import { Accommodation } from '#/modules/accommodations/entities/accommodations.entity';
+import { Accommodation } from '@accommodations/entities/accommodations.entity';
+import { Gender } from '../../../shared/constants/gender.constant';
 
-@Entity()
-export class User {
+export class Profile {
   @PrimaryGeneratedColumn('uuid')
   id: string;
-
-  @Column({
-    unique: true,
-    nullable: false,
-  })
-  email: string;
-
-  @Column({
-    nullable: true,
-    name: 'password',
-  })
-  password: string;
 
   @Column({
     name: 'first_name',
@@ -36,18 +22,11 @@ export class User {
   })
   lastName: string;
 
-  @Column({
-    type: 'enum',
-    enum: Roles,
-    default: Roles.USER,
-  })
-  role: Roles;
-
-  @Column({ unique: true, name: 'googleId', nullable: true })
-  googleId: string;
-
   @Column({ nullable: true, name: 'picture' })
   picture: string;
+
+  @Column({ nullable: true, name: 'gender', type: 'enum', enum: Gender })
+  gender: Gender;
 
   @CreateDateColumn({
     name: 'created_at',

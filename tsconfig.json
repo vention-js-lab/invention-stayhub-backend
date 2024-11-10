@@ -12,7 +12,8 @@
     "baseUrl": "./src",
     "paths": {
       "#/*": ["*"],
-      "@shared/*": ["shared/*"]
+      "@shared/*": ["shared/*"],
+      "@accommodations/*": ["modules/accommodations/*"]
     },
     "incremental": true,
     "skipLibCheck": true,
