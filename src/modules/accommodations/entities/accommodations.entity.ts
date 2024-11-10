@@ -12,7 +12,7 @@ import {
 import { AccommodationImage } from '#/modules/acccommodation_image/entities/accommodation_image.entity';
 import { AccommodationAmenity } from '#/modules/acccommodation_amenity/entities/accommodation_amenity.entity';
 import { AccommodationAddress } from '#/modules/acccommodation_address/entities/accommodation_address.entity';
-import { Account } from '../../user/entities/account.entity';
+import { Account } from '#/modules/user/entities/account.entity';
 
 @Entity('accommodations')
 export class Accommodation {
