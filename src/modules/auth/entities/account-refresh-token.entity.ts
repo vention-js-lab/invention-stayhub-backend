@@ -1,4 +1,4 @@
-import { User } from '#/modules/user/entities/user.entity';
+import { Account } from '#/modules/user/entities/account.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -17,9 +17,9 @@ export class AccountRefreshToken {
   @Column()
   token: string;
 
-  @ManyToOne(() => User, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Account, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'account_id' })
-  user: User;
+  user: Account;
 
   @Column({ name: 'account_id' })
   userId: string;

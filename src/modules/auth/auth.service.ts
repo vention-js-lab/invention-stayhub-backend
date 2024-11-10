@@ -130,7 +130,11 @@ export class AuthService {
         },
       });
 
-    if (!existingRefreshTokenEntity) {
+    if (
+      !existingRefreshTokenEntity ||
+      existingRefreshTokenEntity.isDeleted ||
+      existingRefreshTokenEntity.user.isDeleted
+    ) {
       throw new UnauthorizedException('Invalid or expired token');
     }
 
