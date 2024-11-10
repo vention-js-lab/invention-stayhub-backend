@@ -63,6 +63,6 @@ export class User {
   })
   updatedAt: Date;
 
-  @OneToMany(() => Accommodation, (accommodation) => accommodation.user)
+  @OneToMany(() => Accommodation, (accommodation) => accommodation.owner)
   accommodations: Accommodation[];
 }
