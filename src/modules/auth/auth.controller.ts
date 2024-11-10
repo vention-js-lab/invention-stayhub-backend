@@ -5,7 +5,7 @@ import {
   HttpCode,
   Get,
   UseGuards,
-  NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
@@ -55,7 +55,7 @@ export class AuthController {
   })
   async googleAuthRedirect(@GetUser() user: GoogleUser) {
     if (!user) {
-      throw new NotFoundException('User not found');
+      throw new UnauthorizedException('User not found');
     }
     return this.authService.googleLogin(user);
   }
