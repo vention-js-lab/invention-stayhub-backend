@@ -1,5 +1,5 @@
 import { PassportStrategy } from '@nestjs/passport';
-import { Strategy, VerifyCallback } from 'passport-google-oauth20';
+import { Strategy, Profile, VerifyCallback } from 'passport-google-oauth20';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { EnvConfig } from '@shared/configs/env.config';
@@ -8,12 +8,8 @@ import { EnvConfig } from '@shared/configs/env.config';
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
   constructor(private configService: ConfigService<EnvConfig, true>) {
     super({
-      clientID: configService.get('GOOGLE_CLIENT_ID', {
-        infer: true,
-      }),
-      clientSecret: configService.get('GOOGLE_CLIENT_SECRET', {
-        infer: true,
-      }),
+      clientID: configService.get('GOOGLE_CLIENT_ID', { infer: true }),
+      clientSecret: configService.get('GOOGLE_CLIENT_SECRET', { infer: true }),
       callbackURL: configService.get('GOOGLE_CALLBACK_URL', { infer: true }),
       scope: ['email', 'profile'],
     });
@@ -22,10 +18,11 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
   async validate(
     accessToken: string,
     refreshToken: string,
-    profile: any,
+    profile: Profile,
     done: VerifyCallback,
   ): Promise<any> {
     const { name, emails, photos, id } = profile;
+
     const user = {
       email: emails?.[0]?.value || '',
       firstName: name?.givenName || '',
@@ -34,6 +31,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
       accessToken,
       googleId: id,
     };
-    done(null, user);
+
+    return done(null, user);
   }
 }
