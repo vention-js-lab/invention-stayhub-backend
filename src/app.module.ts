@@ -6,7 +6,7 @@ import { DatabaseModule } from './modules/database/database.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from './modules/user/user.module';
 import { validateEnv } from './shared/configs/env.config';
-import { AccommodationModule } from './modules/accommodations/modules/accommodations.module';
+import { AccommodationModule } from './modules/accommodations/accommodations.module';
 
 @Module({
   imports: [
