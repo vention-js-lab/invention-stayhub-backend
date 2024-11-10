@@ -1,0 +1,47 @@
+version: '3.9'
+
+services:
+  invention:
+    container_name: invention
+    image: invention/airbnb:1.0.0
+    build: .
+    ports:
+      - '${APP_PORT}:${APP_PORT}'
+    environment:
+      APP_ENV: ${APP_ENV}
+      APP_PORT: ${APP_PORT}
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+      JWT_SECRET_TOKEN: ${JWT_SECRET_TOKEN}
+      JWT_ACCESS_TOKEN_SECRET: ${JWT_ACCESS_TOKEN_SECRET}
+      JWT_ACCESS_TOKEN_EXPIRY: ${JWT_ACCESS_TOKEN_EXPIRY}
+      JWT_REFRESH_TOKEN_SECRET: ${JWT_REFRESH_TOKEN_SECRET}
+      JWT_REFRESH_TOKEN_EXPIRY: ${JWT_REFRESH_TOKEN_EXPIRY}
+      COOKIES_REFRESH_MS: ${COOKIES_REFRESH_MS}
+    depends_on:
+      - db
+    networks:
+      - app-network
+
+  db:
+    container_name: db
+    image: postgres:14
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - app-network
+volumes:
+  pgdata: {}
+
+networks:
+  app-network:
+    driver: bridge

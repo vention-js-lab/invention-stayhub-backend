@@ -28,3 +28,17 @@ npm run migration:run
 ```bash
 npm run migration:revert
 ```
+
+## Docker
+
+### Run build and run container
+
+```bash
+docker compose up -d
+```
+
+### Run for check
+
+```bash
+docker ps -a
+```
