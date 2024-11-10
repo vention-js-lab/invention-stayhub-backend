@@ -7,7 +7,10 @@ import { JwtModule } from '@nestjs/jwt';
 import { AccountRefreshToken } from './entities/account-refresh-token.entity';
 
 @Module({
-  imports: [JwtModule, TypeOrmModule.forFeature([Account])],
+  imports: [
+    JwtModule,
+    TypeOrmModule.forFeature([Account, AccountRefreshToken]),
+  ],
   controllers: [AuthController],
   providers: [AuthService],
 })

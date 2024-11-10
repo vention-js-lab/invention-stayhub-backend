@@ -7,6 +7,7 @@ import { AccommodationImage } from '#/modules/accommodations/entities/accommodat
 import { AccommodationAmenity } from '#/modules/accommodations/entities/accommodation-amenity.entity';
 import { AccommodationAddress } from '#/modules/accommodations/entities/accommodation-address.entity';
 import { Profile } from '#/modules/user/entities/profile.entity';
+import { AccountRefreshToken } from '#/modules/auth/entities/account-refresh-token.entity';
 
 export const databaseConfig = (
   configService: ConfigService<EnvConfig>,

@@ -1,6 +1,6 @@
 import { MigrationInterface, QueryRunner, Table } from 'typeorm';
 
-export class CreateRefreshTokenTable1731179395285
+export class CreateRefreshTokenTable1731272202991
   implements MigrationInterface
 {
   public async up(queryRunner: QueryRunner): Promise<void> {
@@ -47,7 +47,7 @@ export class CreateRefreshTokenTable1731179395285
           {
             columnNames: ['account_id'],
             referencedColumnNames: ['id'],
-            referencedTableName: 'user',
+            referencedTableName: 'account',
             onDelete: 'CASCADE',
           },
         ],
