@@ -14,6 +14,7 @@ import { EnvConfig } from '#/shared/configs/env.config';
 import { JwtService, TokenExpiredError } from '@nestjs/jwt';
 import { LoginDto } from './dto/login.dto';
 import { AccountRefreshToken } from './entities/account-refresh-token.entity';
+import { AccountRefreshToken } from './entities/account-refresh-token.entity';
 
 @Injectable()
 export class AuthService {
@@ -58,6 +59,9 @@ export class AuthService {
     const refreshTokenEntity = this.createRefreshTokenEntity(refreshToken);
     await this.refreshTokenRepository.insert(refreshTokenEntity);
 
+    const refreshTokenEntity = this.createRefreshTokenEntity(refreshToken);
+    await this.refreshTokenRepository.insert(refreshTokenEntity);
+
     const data = {
       result: result,
       accessToken,
@@ -88,6 +92,9 @@ export class AuthService {
     };
     const accessToken = await this.generateAuthToken(payload, 'access');
     const refreshToken = await this.generateAuthToken(payload, 'refresh');
+
+    const refreshTokenEntity = this.createRefreshTokenEntity(refreshToken);
+    await this.refreshTokenRepository.insert(refreshTokenEntity);
 
     const refreshTokenEntity = this.createRefreshTokenEntity(refreshToken);
     await this.refreshTokenRepository.insert(refreshTokenEntity);
@@ -187,6 +194,19 @@ export class AuthService {
       expiresIn,
     });
     return authToken;
+  }
+
+  private createRefreshTokenEntity(refreshToken: string) {
+    const decodedRefreshToken = this.jwtService.decode(refreshToken);
+    const expiresAt = new Date(decodedRefreshToken.exp * 1000).valueOf();
+
+    const refreshTokenEntity = this.refreshTokenRepository.create({
+      userId: decodedRefreshToken.sub,
+      token: refreshToken,
+      expiresAt: expiresAt,
+    });
+
+    return refreshTokenEntity;
   }
 
   private createRefreshTokenEntity(refreshToken: string) {
