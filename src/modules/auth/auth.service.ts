@@ -13,6 +13,7 @@ import { ConfigService } from '@nestjs/config';
 import { EnvConfig } from '#/shared/configs/env.config';
 import { JwtService } from '@nestjs/jwt';
 import { LoginDto } from './dto/login.dto';
+import { GoogleUser } from './types/google-user-type';
 
 @Injectable()
 export class AuthService {
@@ -118,7 +119,7 @@ export class AuthService {
     return authToken;
   }
 
-  async googleLogin(user: User) {
+  async googleLogin(user: GoogleUser) {
     const { googleId, email, firstName, lastName, picture } = user;
 
     const existingUser = await this.findByGoogleId(googleId);
@@ -140,7 +141,7 @@ export class AuthService {
   }
 
   async findByGoogleId(id: string) {
-    const user = await this.userRepository.findOne({ where: { googleId: id } });
+    const user = await this.userRepository.findOneBy({ googleId: id });
     return user;
   }
 }

@@ -13,7 +13,7 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { LoginDto } from './dto/login.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { GetUser } from './decorators/getUser';
-import { User } from '../user/entities/user.entity';
+import { GoogleUser } from './types/google-user-type';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -53,7 +53,7 @@ export class AuthController {
     status: 200,
     description: 'User info from Google',
   })
-  async googleAuthRedirect(@GetUser() user: User) {
+  async googleAuthRedirect(@GetUser() user: GoogleUser) {
     if (!user) {
       throw new NotFoundException('User not found');
     }
