@@ -9,9 +9,9 @@ import {
   UpdateDateColumn,
   ManyToOne,
 } from 'typeorm';
-import { AccommodationImage } from '#/modules/acccommodation_image/entities/accommodation_image.entity';
-import { AccommodationAmenity } from '#/modules/acccommodation_amenity/entities/accommodation_amenity.entity';
-import { AccommodationAddress } from '#/modules/acccommodation_address/entities/accommodation_address.entity';
+import { AccommodationImage } from '#/modules/accommodations/entities/accommodation-image.entity';
+import { AccommodationAmenity } from '#/modules/accommodations/entities/accommodation-amenity.entity';
+import { AccommodationAddress } from '#/modules/accommodations/entities/accommodation-address.entity';
 import { User } from '#/modules/user/entities/user.entity';
 
 @Entity('accommodations')
