@@ -9,10 +9,10 @@ import {
   UpdateDateColumn,
   ManyToOne,
 } from 'typeorm';
-import { AccommodationImage } from '#/modules/accommodations/entities/accommodation-image.entity';
-import { AccommodationAmenity } from '#/modules/accommodations/entities/accommodation-amenity.entity';
-import { AccommodationAddress } from '#/modules/accommodations/entities/accommodation-address.entity';
-import { User } from '#/modules/user/entities/user.entity';
+import { AccommodationImage } from '#/modules/acccommodation_image/entities/accommodation_image.entity';
+import { AccommodationAmenity } from '#/modules/acccommodation_amenity/entities/accommodation_amenity.entity';
+import { AccommodationAddress } from '#/modules/acccommodation_address/entities/accommodation_address.entity';
+import { Account } from '#/modules/user/entities/account.entity';
 
 @Entity('accommodations')
 export class Accommodation {
@@ -55,11 +55,12 @@ export class Accommodation {
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
 
-  @ManyToOne(() => User, (user) => user.accommodations, {
+  @ManyToOne(() => Account, (account) => account.accommodations, {
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'owner_id' })
-  owner: User;
+  owner: Account;
+
   @Column({ name: 'owner_id' })
   ownerId: string;
 
