@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { MigrationInterface, QueryRunner, TableColumn } from 'typeorm';
 
 export class UpdateUserTable1731253332135 implements MigrationInterface {
