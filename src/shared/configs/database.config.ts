@@ -6,6 +6,7 @@ import { Accommodation } from '#/modules/accommodations/entities/accommodations.
 import { AccommodationImage } from '#/modules/accommodations/entities/accommodation-image.entity';
 import { AccommodationAmenity } from '#/modules/accommodations/entities/accommodation-amenity.entity';
 import { AccommodationAddress } from '#/modules/accommodations/entities/accommodation-address.entity';
+import { Profile } from '#/modules/user/entities/profile.entity';
 
 export const databaseConfig = (
   configService: ConfigService<EnvConfig>,
@@ -17,6 +18,7 @@ export const databaseConfig = (
   password: configService.get('DB_PASSWORD'),
   database: configService.get('DB_NAME'),
   entities: [
+    Profile,
     Account,
     Accommodation,
     AccommodationImage,
