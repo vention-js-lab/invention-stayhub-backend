@@ -5,8 +5,8 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { Account } from '../../user/entities/account.entity';
-import { Accommodation } from '../../accommodations/entities/accommodations.entity';
+import { Account } from '#/modules/user/entities/account.entity';
+import { Accommodation } from '#/modules/accommodations/entities/accommodations.entity';
 
 @Entity('wishlist')
 export class Wishlist {
