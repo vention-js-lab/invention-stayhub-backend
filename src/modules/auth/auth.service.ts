@@ -13,7 +13,7 @@ import { ConfigService } from '@nestjs/config';
 import { EnvConfig } from '#/shared/configs/env.config';
 import { JwtService } from '@nestjs/jwt';
 import { LoginDto } from './dto/login.dto';
-import { GoogleUser } from './types/google-user-type';
+import { GoogleUser } from './types/google-user.type';
 import { Profile } from '../user/entities/profile.entity';
 import { AccountType } from '../../shared/constants/user-account.constant';
 import { AccountRefreshToken } from './entities/account-refresh-token.entity';
@@ -25,7 +25,6 @@ export class AuthService {
     private accountRepository: Repository<Account>,
     @InjectRepository(Profile)
     private profileRepository: Repository<Profile>,
-    private userRepository: Repository<Account>,
     @InjectRepository(AccountRefreshToken)
     private refreshTokenRepository: Repository<AccountRefreshToken>,
     private configService: ConfigService<EnvConfig, true>,

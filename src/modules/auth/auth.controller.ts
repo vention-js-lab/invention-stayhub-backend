@@ -12,7 +12,7 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { LoginDto } from './dto/login.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { GetUser } from './decorators/get-user.decorator';
-import { GoogleUser } from './types/google-user-type';
+import { GoogleUser } from './types/google-user.type';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 
 @ApiTags('auth')
