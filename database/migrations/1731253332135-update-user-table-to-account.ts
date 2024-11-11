@@ -26,6 +26,15 @@ export class UpdateUserTable1731253332135 implements MigrationInterface {
         isNullable: true,
       }),
     ]);
+    await queryRunner.changeColumn(
+      'account',
+      'password',
+      new TableColumn({
+        name: 'password',
+        type: 'varchar',
+        isNullable: true,
+      }),
+    );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {

@@ -14,12 +14,16 @@ import { EnvConfig } from '#/shared/configs/env.config';
 import { JwtService } from '@nestjs/jwt';
 import { LoginDto } from './dto/login.dto';
 import { GoogleUser } from './types/google-user-type';
+import { Profile } from '../user/entities/profile.entity';
+import { AccountType } from '../../shared/constants/user-account.constant';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(Account)
-    private userRepository: Repository<Account>,
+    private accountRepository: Repository<Account>,
+    @InjectRepository(Profile)
+    private profileRepository: Repository<Profile>,
     private configService: ConfigService<EnvConfig, true>,
     private jwtService: JwtService,
   ) {}
@@ -27,19 +31,19 @@ export class AuthService {
   async register(registerDto: RegisterDto) {
     const { email, password, ...rest } = registerDto;
 
-    const existingUser = await this.userRepository.findOne({
+    const existingUser = await this.accountRepository.findOne({
       where: { email },
     });
     if (existingUser) {
       throw new ConflictException('User with this email already exists');
     }
     const hashedPassword = await Hasher.hashValue(password);
-    const user = this.userRepository.create({
+    const user = this.accountRepository.create({
       email,
       password: hashedPassword,
       ...rest,
     });
-    await this.userRepository.save(user);
+    await this.accountRepository.save(user);
 
     const { ...result } = user;
     delete result.password;
@@ -62,7 +66,7 @@ export class AuthService {
   }
 
   async login({ email, password }: LoginDto) {
-    const user = await this.userRepository.findOne({
+    const user = await this.accountRepository.findOne({
       where: { email },
     });
 
@@ -125,14 +129,21 @@ export class AuthService {
     const existingUser = await this.findByGoogleId(googleId);
 
     if (!existingUser) {
-      const newUser = this.userRepository.create({
+      const newAccount = this.accountRepository.create({
         googleId,
         email,
+        type: AccountType.Google,
+      });
+      const newProfile = this.profileRepository.create({
         firstName,
         lastName,
-        picture,
+        image: picture,
       });
-      await this.userRepository.save(newUser);
+      await this.accountRepository.save(newAccount);
+
+      newProfile.accountId = newAccount;
+
+      await this.profileRepository.save(newProfile);
     }
     return {
       message: 'User info From Google',
@@ -141,7 +152,7 @@ export class AuthService {
   }
 
   async findByGoogleId(id: string) {
-    const user = await this.userRepository.findOneBy({ googleId: id });
+    const user = await this.accountRepository.findOneBy({ googleId: id });
     return user;
   }
 }

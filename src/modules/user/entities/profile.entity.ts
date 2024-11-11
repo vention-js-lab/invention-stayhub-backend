@@ -26,7 +26,7 @@ export class Profile {
   lastName: string;
 
   @Column({ nullable: true })
-  picture: string;
+  image: string;
 
   @Column({ nullable: true, type: 'enum', enum: Gender })
   gender: Gender;
