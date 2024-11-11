@@ -1,8 +1,13 @@
 import { ConfigService } from '@nestjs/config';
 import { DataSourceOptions } from 'typeorm';
 import { EnvConfig } from './env.config';
-import { User } from '#/modules/user/entities/user.entity';
+import { Account } from '#/modules/user/entities/account.entity';
 import { Accommodation } from '#/modules/accommodations/entities/accommodations.entity';
+import { AccommodationImage } from '#/modules/accommodations/entities/accommodation-image.entity';
+import { AccommodationAmenity } from '#/modules/accommodations/entities/accommodation-amenity.entity';
+import { AccommodationAddress } from '#/modules/accommodations/entities/accommodation-address.entity';
+import { Profile } from '#/modules/user/entities/profile.entity';
+import { AccountRefreshToken } from '#/modules/auth/entities/account-refresh-token.entity';
 
 export const databaseConfig = (
   configService: ConfigService<EnvConfig>,
@@ -13,6 +18,14 @@ export const databaseConfig = (
   username: configService.get('DB_USER'),
   password: configService.get('DB_PASSWORD'),
   database: configService.get('DB_NAME'),
-  entities: [User, Accommodation],
+  entities: [
+    Profile,
+    Account,
+    Accommodation,
+    AccommodationImage,
+    AccommodationAmenity,
+    AccommodationAddress,
+    AccountRefreshToken,
+  ],
   synchronize: false,
 });

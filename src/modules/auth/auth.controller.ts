@@ -1,8 +1,20 @@
+import {
+  Controller,
+  Post,
+  Body,
+  HttpCode,
+  Get,
+  UseGuards,
+} from '@nestjs/common';
 import { Controller, Post, Body, HttpCode, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { LoginDto } from './dto/login.dto';
+import { AuthGuard } from '@nestjs/passport';
+import { GetUser } from './decorators/get-user.decorator';
+import { GoogleUser } from './types/google-user.type';
+import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { AccessTokenGuard } from '#/shared/guards/access-token.guard';
 
 @ApiTags('auth')
@@ -32,5 +44,41 @@ export class AuthController {
   })
   login(@Body() loginDto: LoginDto) {
     return this.authService.login(loginDto);
+  }
+
+  @Get('google/redirect')
+  @UseGuards(AuthGuard('google'))
+  @ApiOperation({
+    summary: 'Google Authentication Callback',
+    description: 'Callback for Google OAuth2 login',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'User info from Google',
+  })
+  async googleAuthRedirect(@GetUser() user: GoogleUser) {
+    return this.authService.googleLogin(user);
+  }
+
+  @Post('refresh-token')
+  @HttpCode(200)
+  @ApiOperation({ summary: 'Get new access and refresh tokens' })
+  @ApiResponse({
+    status: 200,
+    description: 'New tokens retrieved successfully',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Invalid or expired token',
+  })
+  async issueNewTokens(@Body() refreshTokenDto: RefreshTokenDto) {
+    const newTokens = await this.authService.issueNewTokens(
+      refreshTokenDto.refreshToken,
+    );
+
+    return {
+      message: 'New tokens retrieved successfully',
+      data: newTokens,
+    };
   }
 }

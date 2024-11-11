@@ -11,9 +11,7 @@
     "outDir": "./dist",
     "baseUrl": "./src",
     "paths": {
-      "#/*": [
-        "*"
-      ]
+      "#/*": ["*"],
     },
     "incremental": true,
     "skipLibCheck": true,
@@ -24,3 +22,4 @@
     "noFallthroughCasesInSwitch": false
   }
 }
+

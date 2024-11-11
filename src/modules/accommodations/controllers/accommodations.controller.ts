@@ -1,4 +1,4 @@
-import { AccommodationsService } from './accommodations.service';
+import { AccommodationsService } from '../services/accommodations.service';
 import { Controller, Get, Post, Put, Delete } from '@nestjs/common';
 
 @Controller('accommodation')
