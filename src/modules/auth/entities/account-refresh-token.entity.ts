@@ -19,10 +19,10 @@ export class AccountRefreshToken {
 
   @ManyToOne(() => Account, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'account_id' })
-  user: Account;
+  account: Account;
 
   @Column({ name: 'account_id' })
-  userId: string;
+  accountId: string;
 
   @Column({ name: 'is_deleted', default: 'false' })
   isDeleted: boolean;

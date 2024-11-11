@@ -6,12 +6,12 @@ import {
 import { RegisterDto } from './dto/register.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Account } from '../user/entities/account.entity';
-import { Repository } from 'typeorm';
+import { MoreThan, Repository } from 'typeorm';
 import { Hasher } from '#/shared/libs/hasher.lib';
 import { AuthTokenPayload } from './types/auth-payload.type';
 import { ConfigService } from '@nestjs/config';
 import { EnvConfig } from '#/shared/configs/env.config';
-import { JwtService, TokenExpiredError } from '@nestjs/jwt';
+import { JwtService } from '@nestjs/jwt';
 import { LoginDto } from './dto/login.dto';
 import { AccountRefreshToken } from './entities/account-refresh-token.entity';
 
@@ -100,59 +100,49 @@ export class AuthService {
   }
 
   async issueNewTokens(refreshToken: string) {
-    let decodedRefreshToken: AuthTokenPayload;
-
     try {
-      decodedRefreshToken = await this.jwtService.verifyAsync<AuthTokenPayload>(
-        refreshToken,
-        { secret: this.configService.get<string>('JWT_REFRESH_TOKEN_SECRET') },
-      );
+      await this.jwtService.verifyAsync(refreshToken, {
+        secret: this.configService.get<string>('JWT_REFRESH_TOKEN_SECRET'),
+      });
     } catch (error: unknown) {
-      if (error instanceof TokenExpiredError) {
-        decodedRefreshToken =
-          this.jwtService.decode<AuthTokenPayload>(refreshToken);
-        this.refreshTokenRepository.update(
-          {
-            userId: decodedRefreshToken.sub,
-            token: refreshToken,
-          },
-          { isDeleted: true },
-        );
-      }
       throw new UnauthorizedException('Invalid or expired token');
     }
 
+    const decodedRefreshToken =
+      this.jwtService.decode<AuthTokenPayload>(refreshToken);
     const existingRefreshTokenEntity =
       await this.refreshTokenRepository.findOne({
-        where: { userId: decodedRefreshToken.sub, token: refreshToken },
+        where: {
+          accountId: decodedRefreshToken.sub,
+          token: refreshToken,
+          expiresAt: MoreThan(Date.now()),
+          isDeleted: false,
+        },
         relations: {
-          user: true,
+          account: true,
         },
       });
 
     if (
       !existingRefreshTokenEntity ||
-      existingRefreshTokenEntity.isDeleted ||
-      existingRefreshTokenEntity.user.isDeleted
+      existingRefreshTokenEntity.account.isDeleted
     ) {
       throw new UnauthorizedException('Invalid or expired token');
     }
 
-    const { user } = existingRefreshTokenEntity;
+    const { account } = existingRefreshTokenEntity;
     const payload = {
-      sub: user.id,
-      userEmail: user.email,
-      userRole: user.role,
+      sub: account.id,
+      userEmail: account.email,
+      userRole: account.role,
     };
     const newAccessToken = await this.generateAuthToken(payload, 'access');
     const newRefreshToken = await this.generateAuthToken(payload, 'refresh');
 
     const newRefreshTokenEntity =
       this.createRefreshTokenEntity(newRefreshToken);
-
-    existingRefreshTokenEntity.token = newRefreshToken;
-    existingRefreshTokenEntity.expiresAt = newRefreshTokenEntity.expiresAt;
-    await this.refreshTokenRepository.save(existingRefreshTokenEntity);
+    await this.refreshTokenRepository.remove(existingRefreshTokenEntity);
+    await this.refreshTokenRepository.insert(newRefreshTokenEntity);
 
     return {
       accessToken: newAccessToken,
@@ -194,7 +184,7 @@ export class AuthService {
     const expiresAt = new Date(decodedRefreshToken.exp * 1000).valueOf();
 
     const refreshTokenEntity = this.refreshTokenRepository.create({
-      userId: decodedRefreshToken.sub,
+      accountId: decodedRefreshToken.sub,
       token: refreshToken,
       expiresAt: expiresAt,
     });
