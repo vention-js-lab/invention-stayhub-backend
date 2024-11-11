@@ -1,8 +1,18 @@
-import { Controller, Post, Body, HttpCode } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  HttpCode,
+  Get,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { LoginDto } from './dto/login.dto';
+import { AuthGuard } from '@nestjs/passport';
+import { GetUser } from './decorators/get-user.decorator';
+import { GoogleUser } from './types/google-user-type';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -30,5 +40,19 @@ export class AuthController {
   })
   login(@Body() loginDto: LoginDto) {
     return this.authService.login(loginDto);
+  }
+
+  @Get('google/redirect')
+  @UseGuards(AuthGuard('google'))
+  @ApiOperation({
+    summary: 'Google Authentication Callback',
+    description: 'Callback for Google OAuth2 login',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'User info from Google',
+  })
+  async googleAuthRedirect(@GetUser() user: GoogleUser) {
+    return this.authService.googleLogin(user);
   }
 }
