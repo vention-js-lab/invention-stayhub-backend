@@ -6,7 +6,7 @@ import {
 import { RegisterDto } from './dto/register.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Account } from '../user/entities/account.entity';
-import { MoreThan, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { Hasher } from '#/shared/libs/hasher.lib';
 import { AuthTokenPayload } from './types/auth-payload.type';
 import { ConfigService } from '@nestjs/config';
@@ -104,36 +104,18 @@ export class AuthService {
     };
   }
 
-  async issueNewTokens(refreshToken: string) {
-    try {
-      await this.jwtService.verifyAsync(refreshToken, {
-        secret: this.configService.get<string>('JWT_REFRESH_TOKEN_SECRET'),
-      });
-    } catch (error: unknown) {
-      throw new UnauthorizedException('Invalid or expired token');
-    }
-
-    const decodedRefreshToken =
-      this.jwtService.decode<AuthTokenPayload>(refreshToken);
+  async issueNewTokens(refreshToken: string, accountId: string) {
     const existingRefreshTokenEntity =
       await this.refreshTokenRepository.findOne({
         where: {
-          accountId: decodedRefreshToken.sub,
+          accountId: accountId,
           token: refreshToken,
-          expiresAt: MoreThan(Date.now()),
           isDeleted: false,
         },
         relations: {
           account: true,
         },
       });
-
-    if (
-      !existingRefreshTokenEntity ||
-      existingRefreshTokenEntity.account.isDeleted
-    ) {
-      throw new UnauthorizedException('Invalid or expired token');
-    }
 
     const { account } = existingRefreshTokenEntity;
     const payload = {

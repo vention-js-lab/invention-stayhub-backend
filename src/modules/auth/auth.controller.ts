@@ -6,7 +6,6 @@ import {
   Get,
   UseGuards,
 } from '@nestjs/common';
-import { Controller, Post, Body, HttpCode, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -15,7 +14,8 @@ import { AuthGuard } from '@nestjs/passport';
 import { GetUser } from './decorators/get-user.decorator';
 import { GoogleUser } from './types/google-user.type';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
-import { AccessTokenGuard } from '#/shared/guards/access-token.guard';
+import { RefreshTokenGuard } from '#/shared/guards/refresh-token.guard';
+import { AccountId } from '#/shared/extractors/request-account.extractor';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -29,7 +29,6 @@ export class AuthController {
     status: 409,
     description: 'User with this email already exists',
   })
-  @UseGuards(AccessTokenGuard)
   register(@Body() registerDto: RegisterDto) {
     return this.authService.register(registerDto);
   }
@@ -71,9 +70,14 @@ export class AuthController {
     status: 401,
     description: 'Invalid or expired token',
   })
-  async issueNewTokens(@Body() refreshTokenDto: RefreshTokenDto) {
+  @UseGuards(RefreshTokenGuard)
+  async issueNewTokens(
+    @Body() refreshTokenDto: RefreshTokenDto,
+    @AccountId() accountId: string,
+  ) {
     const newTokens = await this.authService.issueNewTokens(
       refreshTokenDto.refreshToken,
+      accountId,
     );
 
     return {
