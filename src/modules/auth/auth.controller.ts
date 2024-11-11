@@ -15,7 +15,7 @@ import { GetUser } from './decorators/get-user.decorator';
 import { GoogleUser } from './types/google-user.type';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { RefreshTokenGuard } from '#/shared/guards/refresh-token.guard';
-import { AccountId } from '#/shared/extractors/request-account.extractor';
+import { AccountId } from '#/shared/extractors/account-id.extractor';
 
 @ApiTags('auth')
 @Controller('auth')
