@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   CanActivate,
   ExecutionContext,
   Injectable,
@@ -24,6 +25,9 @@ export class RolesGuard implements CanActivate {
 
     const request = context.switchToHttp().getRequest();
     const user = request.user;
+    if (!user) {
+      throw new BadRequestException('User does not exist');
+    }
 
     return allowedRoles.includes(user.role);
   }
