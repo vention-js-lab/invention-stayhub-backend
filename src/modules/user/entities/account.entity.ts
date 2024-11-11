@@ -39,6 +39,8 @@ export class Account {
   googleId: string;
 
   @Column({ type: 'enum', name: 'type', enum: AccountType })
+  type: AccountType;
+  @Column({ type: 'enum', name: 'type', enum: AccountType })
   accountType: AccountType;
 
   @Column({ type: 'boolean', name: 'is_deleted', nullable: true })
