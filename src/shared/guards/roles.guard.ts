@@ -1,9 +1,9 @@
 import {
-  BadRequestException,
   CanActivate,
   ExecutionContext,
   Injectable,
   SetMetadata,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Roles } from '../constants/user-roles.constants';
@@ -26,7 +26,7 @@ export class RolesGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const user = request.user;
     if (!user) {
-      throw new BadRequestException('User does not exist');
+      throw new UnauthorizedException('User is not authenticated');
     }
 
     return allowedRoles.includes(user.role);
