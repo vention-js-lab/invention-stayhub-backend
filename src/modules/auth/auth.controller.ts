@@ -11,9 +11,10 @@ import { RegisterDto } from './dto/register.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { LoginDto } from './dto/login.dto';
 import { AuthGuard } from '@nestjs/passport';
-import { GetUser } from './decorators/get-user.decorator';
+import { GetAccount } from './decorators/get-account.decorator';
 import { GoogleUser } from './types/google-user.type';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
+import { RefreshTokenGuard } from '#/shared/guards/refresh-token.guard';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -53,7 +54,7 @@ export class AuthController {
     status: 200,
     description: 'User info from Google',
   })
-  async googleAuthRedirect(@GetUser() user: GoogleUser) {
+  async googleAuthRedirect(@GetAccount() user: GoogleUser) {
     return this.authService.googleLogin(user);
   }
 
@@ -68,9 +69,14 @@ export class AuthController {
     status: 401,
     description: 'Invalid or expired token',
   })
-  async issueNewTokens(@Body() refreshTokenDto: RefreshTokenDto) {
+  @UseGuards(RefreshTokenGuard)
+  async issueNewTokens(
+    @Body() refreshTokenDto: RefreshTokenDto,
+    @GetAccount('accountId') accountId: string,
+  ) {
     const newTokens = await this.authService.issueNewTokens(
       refreshTokenDto.refreshToken,
+      accountId,
     );
 
     return {
