@@ -29,13 +29,12 @@ export class AccessTokenStrategy extends PassportStrategy(
   }
 
   public async validate({ sub, userEmail, userRole }: AuthTokenPayload) {
-    const existingAccount = await this.accountRepository.findOneBy({ id: sub });
+    const existingAccount = await this.accountRepository.findOneBy({
+      id: sub,
+      isDeleted: false,
+    });
 
-    if (
-      !existingAccount ||
-      existingAccount.isDeleted ||
-      existingAccount.role != userRole
-    ) {
+    if (!existingAccount || existingAccount.role != userRole) {
       throw new UnauthorizedException();
     }
 

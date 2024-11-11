@@ -15,6 +15,14 @@ export const GetAccount = createParamDecorator(
       throw new UnauthorizedException();
     }
 
-    return data ? account[data] : account;
+    if (!data) {
+      return account;
+    }
+
+    if (!account[data]) {
+      throw new UnauthorizedException();
+    }
+
+    return account[data];
   },
 );
