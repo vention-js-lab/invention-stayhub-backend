@@ -5,14 +5,13 @@ import {
   HttpCode,
   Get,
   UseGuards,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { LoginDto } from './dto/login.dto';
 import { AuthGuard } from '@nestjs/passport';
-import { GetUser } from './decorators/getUser';
+import { GetUser } from './decorators/get-user.decorator';
 import { GoogleUser } from './types/google-user-type';
 
 @ApiTags('auth')
@@ -54,9 +53,6 @@ export class AuthController {
     description: 'User info from Google',
   })
   async googleAuthRedirect(@GetUser() user: GoogleUser) {
-    if (!user) {
-      throw new UnauthorizedException('User not found');
-    }
     return this.authService.googleLogin(user);
   }
 }
