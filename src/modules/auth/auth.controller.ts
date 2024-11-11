@@ -15,7 +15,6 @@ import { GetUser } from './decorators/get-user.decorator';
 import { GoogleUser } from './types/google-user.type';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { RefreshTokenGuard } from '#/shared/guards/refresh-token.guard';
-import { AccountId } from '#/shared/extractors/account-id.extractor';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -73,7 +72,7 @@ export class AuthController {
   @UseGuards(RefreshTokenGuard)
   async issueNewTokens(
     @Body() refreshTokenDto: RefreshTokenDto,
-    @AccountId() accountId: string,
+    @GetUser('id') accountId: string,
   ) {
     const newTokens = await this.authService.issueNewTokens(
       refreshTokenDto.refreshToken,

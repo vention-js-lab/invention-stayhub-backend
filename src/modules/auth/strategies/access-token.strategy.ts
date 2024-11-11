@@ -30,8 +30,12 @@ export class AccessTokenStrategy extends PassportStrategy(
   public async validate({ sub, userEmail, userRole }: AuthTokenPayload) {
     const existingAccount = await this.accountRepository.findOneBy({ id: sub });
 
-    if (!existingAccount || existingAccount.isDeleted) {
-      throw new UnauthorizedException('Account was deleted or is inactive');
+    if (
+      !existingAccount ||
+      existingAccount.isDeleted ||
+      existingAccount.role != userRole
+    ) {
+      throw new UnauthorizedException('Invalid or expired token');
     }
 
     return {

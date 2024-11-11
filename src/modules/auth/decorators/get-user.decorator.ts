@@ -5,11 +5,13 @@ import {
 } from '@nestjs/common';
 
 export const GetUser = createParamDecorator(
-  (data: unknown, ctx: ExecutionContext) => {
+  (data: string | undefined, ctx: ExecutionContext) => {
     const request = ctx.switchToHttp().getRequest();
+
     if (!request.user) {
-      throw new UnauthorizedException('User not found');
+      throw new UnauthorizedException('User');
     }
-    return request.user;
+
+    return data ? request.user['data'] : request.user;
   },
 );

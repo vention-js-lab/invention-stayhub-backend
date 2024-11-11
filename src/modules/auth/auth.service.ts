@@ -104,11 +104,11 @@ export class AuthService {
     };
   }
 
-  async issueNewTokens(refreshToken: string, accountId: string) {
+  async issueNewTokens(refreshToken: string, sub: string) {
     const existingRefreshTokenEntity =
       await this.refreshTokenRepository.findOne({
         where: {
-          accountId: accountId,
+          accountId: sub,
           token: refreshToken,
           isDeleted: false,
         },
@@ -116,6 +116,13 @@ export class AuthService {
           account: true,
         },
       });
+
+    if (
+      !existingRefreshTokenEntity ||
+      existingRefreshTokenEntity.account.isDeleted
+    ) {
+      throw new UnauthorizedException('Invalid or expired token');
+    }
 
     const { account } = existingRefreshTokenEntity;
     const payload = {
