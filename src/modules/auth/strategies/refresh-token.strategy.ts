@@ -50,7 +50,7 @@ export class RefreshTokenStrategy extends PassportStrategy(
       !existingRefreshTokenEntity ||
       existingRefreshTokenEntity.account.isDeleted
     ) {
-      throw new UnauthorizedException('Invalid or expired token');
+      throw new UnauthorizedException();
     }
 
     return {

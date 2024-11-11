@@ -8,6 +8,7 @@ import { JwtAuthConfig } from '#/shared/configs/jwt-auth.config';
 import { Account } from '#/modules/user/entities/account.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { RequestAccount } from '../types/request-account.type';
 
 @Injectable()
 export class AccessTokenStrategy extends PassportStrategy(
@@ -35,13 +36,15 @@ export class AccessTokenStrategy extends PassportStrategy(
       existingAccount.isDeleted ||
       existingAccount.role != userRole
     ) {
-      throw new UnauthorizedException('Invalid or expired token');
+      throw new UnauthorizedException();
     }
 
-    return {
+    const requestAccount: RequestAccount = {
       accountId: sub,
       accountEmail: userEmail,
       accountRole: userRole,
     };
+
+    return requestAccount;
   }
 }

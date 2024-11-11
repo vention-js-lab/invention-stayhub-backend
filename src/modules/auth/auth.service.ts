@@ -121,7 +121,7 @@ export class AuthService {
       !existingRefreshTokenEntity ||
       existingRefreshTokenEntity.account.isDeleted
     ) {
-      throw new UnauthorizedException('Invalid or expired token');
+      throw new UnauthorizedException();
     }
 
     const { account } = existingRefreshTokenEntity;
