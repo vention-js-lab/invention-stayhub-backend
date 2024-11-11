@@ -8,6 +8,7 @@ import { AccommodationAmenity } from '#/modules/accommodations/entities/accommod
 import { AccommodationAddress } from '#/modules/accommodations/entities/accommodation-address.entity';
 import { Profile } from '#/modules/user/entities/profile.entity';
 import { AccountRefreshToken } from '#/modules/auth/entities/account-refresh-token.entity';
+import { Wishlist } from '#/modules/wishlists/entities/wishlist.entity';
 
 export const databaseConfig = (
   configService: ConfigService<EnvConfig>,
@@ -26,6 +27,7 @@ export const databaseConfig = (
     AccommodationAmenity,
     AccommodationAddress,
     AccountRefreshToken,
+    Wishlist,
   ],
   synchronize: false,
 });
