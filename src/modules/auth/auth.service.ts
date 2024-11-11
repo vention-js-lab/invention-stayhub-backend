@@ -6,16 +6,17 @@ import {
 import { RegisterDto } from './dto/register.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Account } from '../user/entities/account.entity';
-import { Repository } from 'typeorm';
+import { MoreThan, Repository } from 'typeorm';
 import { Hasher } from '#/shared/libs/hasher.lib';
 import { AuthTokenPayload } from './types/auth-payload.type';
 import { ConfigService } from '@nestjs/config';
 import { EnvConfig } from '#/shared/configs/env.config';
 import { JwtService } from '@nestjs/jwt';
 import { LoginDto } from './dto/login.dto';
-import { GoogleUser } from './types/google-user-type';
+import { GoogleUser } from './types/google-user.type';
 import { Profile } from '../user/entities/profile.entity';
 import { AccountType } from '../../shared/constants/user-account.constant';
+import { AccountRefreshToken } from './entities/account-refresh-token.entity';
 
 @Injectable()
 export class AuthService {
@@ -24,6 +25,8 @@ export class AuthService {
     private accountRepository: Repository<Account>,
     @InjectRepository(Profile)
     private profileRepository: Repository<Profile>,
+    @InjectRepository(AccountRefreshToken)
+    private refreshTokenRepository: Repository<AccountRefreshToken>,
     private configService: ConfigService<EnvConfig, true>,
     private jwtService: JwtService,
   ) {}
@@ -56,6 +59,10 @@ export class AuthService {
 
     const accessToken = await this.generateAuthToken(payload, 'access');
     const refreshToken = await this.generateAuthToken(payload, 'refresh');
+
+    const refreshTokenEntity = this.createRefreshTokenEntity(refreshToken);
+    await this.refreshTokenRepository.insert(refreshTokenEntity);
+
     const data = {
       result: result,
       accessToken,
@@ -87,10 +94,64 @@ export class AuthService {
     const accessToken = await this.generateAuthToken(payload, 'access');
     const refreshToken = await this.generateAuthToken(payload, 'refresh');
 
+    const refreshTokenEntity = this.createRefreshTokenEntity(refreshToken);
+    await this.refreshTokenRepository.insert(refreshTokenEntity);
+
     return {
       message: 'User logged in successfully',
       accessToken,
       refreshToken,
+    };
+  }
+
+  async issueNewTokens(refreshToken: string) {
+    try {
+      await this.jwtService.verifyAsync(refreshToken, {
+        secret: this.configService.get<string>('JWT_REFRESH_TOKEN_SECRET'),
+      });
+    } catch (error: unknown) {
+      throw new UnauthorizedException('Invalid or expired token');
+    }
+
+    const decodedRefreshToken =
+      this.jwtService.decode<AuthTokenPayload>(refreshToken);
+    const existingRefreshTokenEntity =
+      await this.refreshTokenRepository.findOne({
+        where: {
+          accountId: decodedRefreshToken.sub,
+          token: refreshToken,
+          expiresAt: MoreThan(Date.now()),
+          isDeleted: false,
+        },
+        relations: {
+          account: true,
+        },
+      });
+
+    if (
+      !existingRefreshTokenEntity ||
+      existingRefreshTokenEntity.account.isDeleted
+    ) {
+      throw new UnauthorizedException('Invalid or expired token');
+    }
+
+    const { account } = existingRefreshTokenEntity;
+    const payload = {
+      sub: account.id,
+      userEmail: account.email,
+      userRole: account.role,
+    };
+    const newAccessToken = await this.generateAuthToken(payload, 'access');
+    const newRefreshToken = await this.generateAuthToken(payload, 'refresh');
+
+    const newRefreshTokenEntity =
+      this.createRefreshTokenEntity(newRefreshToken);
+    await this.refreshTokenRepository.remove(existingRefreshTokenEntity);
+    await this.refreshTokenRepository.insert(newRefreshTokenEntity);
+
+    return {
+      accessToken: newAccessToken,
+      refreshToken: newRefreshToken,
     };
   }
 
@@ -154,5 +215,18 @@ export class AuthService {
   async findByGoogleId(id: string) {
     const user = await this.accountRepository.findOneBy({ googleId: id });
     return user;
+  }
+
+  private createRefreshTokenEntity(refreshToken: string) {
+    const decodedRefreshToken = this.jwtService.decode(refreshToken);
+    const expiresAt = new Date(decodedRefreshToken.exp * 1000).valueOf();
+
+    const refreshTokenEntity = this.refreshTokenRepository.create({
+      accountId: decodedRefreshToken.sub,
+      token: refreshToken,
+      expiresAt: expiresAt,
+    });
+
+    return refreshTokenEntity;
   }
 }
