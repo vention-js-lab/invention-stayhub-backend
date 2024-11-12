@@ -14,7 +14,7 @@ import { AccommodationAmenity } from './accommodation-amenity.entity';
 import { AccommodationAddress } from './accommodation-address.entity';
 import { Account } from '#/modules/user/entities/account.entity';
 
-@Entity('accommodations')
+@Entity('accommodation')
 export class Accommodation {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -67,11 +67,9 @@ export class Accommodation {
   @OneToMany(() => AccommodationImage, (image) => image.accommodation)
   images: AccommodationImage[];
 
-  @OneToOne(() => AccommodationAmenity, (amenity) => amenity.accommodation)
-  @JoinColumn()
+  @OneToOne(() => AccommodationAmenity)
   amenity: AccommodationAmenity;
 
   @OneToOne(() => AccommodationAddress, (address) => address.accommodation)
-  @JoinColumn()
   address: AccommodationAddress;
 }

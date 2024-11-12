@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Roles } from '../constants/user-roles.constants';
+import { extractRequestAccount } from '../extractors/request-account.extractor';
 
 const ROLES_DECORATOR_KEY = 'roles';
 @Injectable()
@@ -24,12 +25,17 @@ export class RolesGuard implements CanActivate {
     }
 
     const request = context.switchToHttp().getRequest();
-    const user = request.user;
-    if (!user) {
-      throw new UnauthorizedException('User is not authenticated');
+    const account = extractRequestAccount(request);
+
+    if (!account) {
+      throw new UnauthorizedException();
     }
 
-    return allowedRoles.includes(user.role);
+    if (!account.accountRole) {
+      throw new UnauthorizedException();
+    }
+
+    return allowedRoles.includes(account.accountRole);
   }
 }
 
