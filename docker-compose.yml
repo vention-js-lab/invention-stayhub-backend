@@ -20,6 +20,9 @@ services:
       JWT_ACCESS_TOKEN_EXPIRY: ${JWT_ACCESS_TOKEN_EXPIRY}
       JWT_REFRESH_TOKEN_SECRET: ${JWT_REFRESH_TOKEN_SECRET}
       JWT_REFRESH_TOKEN_EXPIRY: ${JWT_REFRESH_TOKEN_EXPIRY}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      GOOGLE_CALLBACK_URL: ${GOOGLE_CALLBACK_URL}
       COOKIES_REFRESH_MS: ${COOKIES_REFRESH_MS}
     depends_on:
       - db
@@ -28,7 +31,7 @@ services:
 
   db:
     container_name: db
-    image: postgres:14
+    image: postgres:17
     ports:
       - '5432:5432'
     environment:
