@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Accommodation } from '../entities/accommodations.entity';
 import { ListAccommodationsParamsDto } from '../dto/requests/list-accommodations-params.dto';
 import { Repository } from 'typeorm';
-import { SortOrder } from '#/shared/constants/sort-order.constants';
+import { SortOrder } from '#/shared/constants/sort-order.constant';
 
 @Injectable()
 export class AccommodationsService {

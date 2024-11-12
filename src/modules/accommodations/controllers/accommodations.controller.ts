@@ -17,12 +17,12 @@ export class AccommodationsController {
     summary: 'Get list of accommodations that match filtering and sorting',
   })
   @ApiResponse({
-    status: 201,
+    status: 200,
     description: 'Get filtered and sorted accommodations',
   })
   @ApiResponse({
-    status: 409,
-    description: 'Accommodations with provided filters are not found',
+    status: 400,
+    description: 'Inccorrect URL parameters',
   })
   async listAccommodations(@Query() searchParams: ListAccommodationsParamsDto) {
     const accommodations =

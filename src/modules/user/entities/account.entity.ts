@@ -7,7 +7,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Roles } from '#/shared/constants/user-roles.constants';
+import { Roles } from '#/shared/constants/user-roles.constant';
 import { AccountType } from '#/shared/constants/user-account.constant';
 import { Accommodation } from '#/modules/accommodations/entities/accommodations.entity';
 import { Profile } from './profile.entity';

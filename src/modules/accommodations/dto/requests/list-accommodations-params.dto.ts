@@ -6,8 +6,8 @@ import {
   IsString,
   Max,
 } from 'class-validator';
-import { SortOrder } from '#/shared/constants/sort-order.constants';
-import { ParseInt } from '#/shared/transformers/parse-int.transformers';
+import { SortOrder } from '#/shared/constants/sort-order.constant';
+import { ParseInt } from '#/shared/transformers/parse-int.transformer';
 
 export class ListAccommodationsParamsDto {
   @ParseInt()
