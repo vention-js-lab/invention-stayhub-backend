@@ -1,7 +1,9 @@
+import { ListAccommodationsParamsDto } from './../dto/requests/list-accommodations-params.dto';
 import { AccommodationsService } from '../services/accommodations.service';
-import { Controller, Get, Post, Put, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Query } from '@nestjs/common';
+import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 
-@Controller('accommodation')
+@Controller('accommodations')
 export class AccommodationsController {
   constructor(private readonly AccommodationService: AccommodationsService) {}
 
@@ -11,8 +13,23 @@ export class AccommodationsController {
   }
 
   @Get()
-  findAll() {
-    return this.AccommodationService.findAll();
+  @ApiOperation({
+    summary: 'Get list of accommodations that match filtering and sorting',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Get filtered and sorted accommodations',
+  })
+  @ApiResponse({
+    status: 409,
+    description: 'Accommodations with provided filters are not found',
+  })
+  async listAccommodations(@Query() searchParams: ListAccommodationsParamsDto) {
+    const accommodations =
+      await this.AccommodationService.listAccommodations(searchParams);
+    return {
+      data: accommodations,
+    };
   }
 
   @Get()
