@@ -7,6 +7,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from './modules/user/user.module';
 import { validateEnv } from './shared/configs/env.config';
 import { AccommodationModule } from './modules/accommodations/accommodations.module';
+import { WishlistsModule } from './modules/wishlists/wishlists.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { AccommodationModule } from './modules/accommodations/accommodations.mod
       inject: [ConfigService],
       useFactory: databaseConfig,
     }),
+    WishlistsModule,
     UserModule,
     AuthModule,
     DatabaseModule,
