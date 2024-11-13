@@ -2,63 +2,52 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Accommodation } from '#/modules/accommodations/entities/accommodations.entity';
-import { AccommodationAddress } from '#/modules/accommodations/entities/accommodation-address.entity';
-import { AccommodationImage } from '#/modules/accommodations/entities/accommodation-image.entity';
-import { AccommodationAmenity } from '#/modules/accommodations/entities/accommodation-amenity.entity';
 import { AccommodationDto } from '#/modules/accommodations/dto/requests/create-accommodation.req';
+import { AccommodationAddressService } from './accommodation-address.service';
+import { AccommodationAmenityService } from './accommodation-amenity.service';
+import { AccommodationImageService } from './accommodation-image.service';
+
+interface CreateAccommodationParams {
+  createAccommodationDto: AccommodationDto;
+  ownerId: string;
+}
 
 @Injectable()
 export class AccommodationService {
   constructor(
     @InjectRepository(Accommodation)
     private accommodationRepository: Repository<Accommodation>,
-
-    @InjectRepository(AccommodationAddress)
-    private accommodationAddressRepository: Repository<AccommodationAddress>,
-
-    @InjectRepository(AccommodationImage)
-    private accommodationImageRepository: Repository<AccommodationImage>,
-
-    @InjectRepository(AccommodationAmenity)
-    private accommodationAmenityRepository: Repository<AccommodationAmenity>,
+    private accommodationAddressService: AccommodationAddressService,
+    private accommodationAmenityService: AccommodationAmenityService,
+    private accommodationImageService: AccommodationImageService,
   ) {}
 
-  async create(
-    createAccommodationDto: AccommodationDto,
-    owner_id: string,
-  ): Promise<Accommodation> {
+  async create({
+    createAccommodationDto,
+    ownerId,
+  }: CreateAccommodationParams): Promise<Accommodation> {
     const accommodation = this.accommodationRepository.create({
       ...createAccommodationDto,
-      ownerId: owner_id,
+      ownerId,
     });
-    const savedAccommodation =
+    const createdAccommodation =
       await this.accommodationRepository.save(accommodation);
 
-    const amenity = this.accommodationAmenityRepository.create({
-      ...createAccommodationDto.amenity,
-      accommodation: savedAccommodation,
-    });
-    await this.accommodationAmenityRepository.save(amenity);
+    await this.accommodationAddressService.create(
+      createdAccommodation.id,
+      createAccommodationDto.address,
+    );
 
-    const address = this.accommodationAddressRepository.create({
-      ...createAccommodationDto.address,
-      accommodation: savedAccommodation,
-    });
-    await this.accommodationAddressRepository.save(address);
+    await this.accommodationAmenityService.create(
+      createdAccommodation.id,
+      createAccommodationDto.amenity,
+    );
 
-    if (
-      createAccommodationDto.images &&
-      createAccommodationDto.images.length > 0
-    ) {
-      const images = createAccommodationDto.images.map((imageDto) =>
-        this.accommodationImageRepository.create({
-          ...imageDto,
-          accommodation: savedAccommodation,
-        }),
-      );
-      await this.accommodationImageRepository.save(images);
-    }
+    await this.accommodationImageService.create(
+      createdAccommodation.id,
+      createAccommodationDto.images,
+    );
 
-    return savedAccommodation;
+    return createdAccommodation;
   }
 }

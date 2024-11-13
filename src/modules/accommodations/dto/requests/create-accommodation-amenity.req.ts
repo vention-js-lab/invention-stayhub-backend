@@ -7,97 +7,97 @@ export class AccommodationAmenityDto {
   @ApiProperty({ description: 'Indicates if the accommodation has Wi-Fi' })
   @IsBoolean()
   @IsOptional()
-  hasWifi: boolean;
+  hasWifi: boolean | undefined;
 
   @ApiProperty({ description: 'Indicates if the accommodation has parking' })
   @IsBoolean()
   @IsOptional()
-  hasParking: boolean;
+  hasParking: boolean | undefined;
 
   @ApiProperty({
     description: 'Indicates if the accommodation has a swimming pool',
   })
   @IsBoolean()
   @IsOptional()
-  hasSwimmingPool: boolean;
+  hasSwimmingPool: boolean | undefined;
 
   @ApiProperty({
     description: 'Indicates if the accommodation has a pet allowance',
   })
-  @IsOptional()
   @IsBoolean()
-  hasPetAllowance: boolean;
+  @IsOptional()
+  hasPetAllowance: boolean | undefined;
 
   @ApiProperty({ description: 'Indicates if the accommodation has a backyard' })
   @IsBoolean()
   @IsOptional()
-  hasBackyard: boolean;
+  hasBackyard: boolean | undefined;
 
   @ApiProperty({
     description: 'Indicates if the accommodation has smoking allowance',
   })
   @IsBoolean()
   @IsOptional()
-  hasSmokingAllowance: boolean;
+  hasSmokingAllowance: boolean | undefined;
 
   @ApiProperty({
     description: 'Indicates if the accommodation is close to a hospital',
   })
   @IsBoolean()
   @IsOptional()
-  hasHospitalNearby: boolean;
+  hasHospitalNearby: boolean | undefined;
 
   @ApiProperty({
     description: 'Indicates if the accommodation offers laundry service',
   })
   @IsBoolean()
   @IsOptional()
-  hasLaundryService: boolean;
+  hasLaundryService: boolean | undefined;
 
   @ApiProperty({ description: 'Indicates if the accommodation has a kitchen' })
   @IsBoolean()
   @IsOptional()
-  hasKitchen: boolean;
+  hasKitchen: boolean | undefined;
 
   @ApiProperty({
     description: 'Indicates if the accommodation has air conditioning',
   })
-  @IsBoolean()
   @IsOptional()
-  hasAirConditioning: boolean;
+  @IsBoolean()
+  hasAirConditioning: boolean | undefined;
 
   @ApiProperty({ description: 'Indicates if the accommodation has a TV' })
   @IsBoolean()
   @IsOptional()
-  hasTv: boolean;
+  hasTv: boolean | undefined;
 
   @ApiProperty({
     description: 'Indicates if the accommodation offers airport transfer',
   })
   @IsBoolean()
   @IsOptional()
-  hasAirportTransfer: boolean;
+  hasAirportTransfer: boolean | undefined;
 
   @ApiProperty({
     description: 'Indicates if the accommodation is close to the center',
   })
   @IsBoolean()
   @IsOptional()
-  isCloseToCenter: boolean;
+  isCloseToCenter: boolean | undefined;
 
   @ApiProperty({
     description: 'Indicates if the accommodation is child-friendly',
   })
   @IsBoolean()
   @IsOptional()
-  isChildFriendly: boolean;
+  isChildFriendly: boolean | undefined;
 
   @ApiProperty({
     description: 'Indicates if the accommodation is in a quiet area',
   })
   @IsBoolean()
   @IsOptional()
-  isQuietArea: boolean;
+  isQuietArea: boolean | undefined;
 
   @OneToOne(() => Accommodation, (accommodation) => accommodation.amenity, {
     onDelete: 'CASCADE',

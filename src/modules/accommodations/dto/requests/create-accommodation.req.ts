@@ -6,7 +6,6 @@ import {
   IsNumber,
   Min,
   ValidateNested,
-  IsOptional,
 } from 'class-validator';
 import { AccommodationImageDto } from './create-accommodation-image.req';
 import { AccommodationAmenityDto } from './create-accommodation-amenity.req';
@@ -23,9 +22,8 @@ export class AccommodationDto {
   description: string;
 
   @ApiProperty({ description: 'Cover image URL of the accommodation' })
-  @IsOptional()
   @IsString()
-  coverImage?: string;
+  coverImage: string | undefined;
 
   @ApiProperty({ description: 'Price per night of the accommodation' })
   @IsNumber()

@@ -13,13 +13,18 @@ export class AccommodationImageService {
 
   async create(
     accommodationId: string,
-    createAccommodationImageDto: AccommodationImageDto,
-  ): Promise<AccommodationImage> {
-    const accommodationImage = this.accommodationImageRepository.create({
-      accommodationId,
-      ...createAccommodationImageDto,
-    });
+    createAccommodationImagesDto: AccommodationImageDto[],
+  ): Promise<AccommodationImage[]> {
+    const newAccommodationImages = createAccommodationImagesDto.map(
+      (imageDto) =>
+        this.accommodationImageRepository.create({
+          ...imageDto,
+          accommodationId,
+        }),
+    );
+    const createdAccommodationImages =
+      await this.accommodationImageRepository.save(newAccommodationImages);
 
-    return this.accommodationImageRepository.save(accommodationImage);
+    return createdAccommodationImages;
   }
 }

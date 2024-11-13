@@ -15,11 +15,14 @@ export class AccommodationAddressService {
     accommodationId: string,
     createAccommodationAddressDto: AccommodationAddressDto,
   ): Promise<AccommodationAddress> {
-    const accommodationAddress = this.accommodationAddressRepository.create({
+    const newAccommodationAddress = this.accommodationAddressRepository.create({
       accommodationId,
       ...createAccommodationAddressDto,
     });
 
-    return this.accommodationAddressRepository.save(accommodationAddress);
+    const createdAccommodationAddress =
+      await this.accommodationAddressRepository.save(newAccommodationAddress);
+
+    return createdAccommodationAddress;
   }
 }

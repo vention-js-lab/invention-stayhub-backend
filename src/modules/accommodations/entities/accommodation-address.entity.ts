@@ -23,7 +23,7 @@ export class AccommodationAddress {
   @Column({ type: 'varchar' })
   country: string;
 
-  @Column({ nullable: true, name: 'zip_code' })
+  @Column({ name: 'zip_code' })
   zipCode: string;
 
   @Column({ type: 'decimal', precision: 10, scale: 6 })
@@ -43,6 +43,7 @@ export class AccommodationAddress {
   })
   @JoinColumn({ name: 'accommodation_id' })
   accommodation: Accommodation;
+
   @Column({ name: 'accommodation_id' })
   accommodationId: string;
 }
