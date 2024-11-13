@@ -25,20 +25,26 @@ export class AccommodationService {
 
   async create(
     createAccommodationDto: AccommodationDto,
+    owner_id: string,
   ): Promise<Accommodation> {
-    const accommodation = this.accommodationRepository.create(
-      createAccommodationDto,
-    );
+    const accommodation = this.accommodationRepository.create({
+      ...createAccommodationDto,
+      ownerId: owner_id,
+    });
     const savedAccommodation =
       await this.accommodationRepository.save(accommodation);
 
-    if (createAccommodationDto.address) {
-      const address = this.accommodationAddressRepository.create({
-        ...createAccommodationDto.address,
-        accommodation: savedAccommodation,
-      });
-      await this.accommodationAddressRepository.save(address);
-    }
+    const amenity = this.accommodationAmenityRepository.create({
+      ...createAccommodationDto.amenity,
+      accommodation: savedAccommodation,
+    });
+    await this.accommodationAmenityRepository.save(amenity);
+
+    const address = this.accommodationAddressRepository.create({
+      ...createAccommodationDto.address,
+      accommodation: savedAccommodation,
+    });
+    await this.accommodationAddressRepository.save(address);
 
     if (
       createAccommodationDto.images &&
@@ -51,14 +57,6 @@ export class AccommodationService {
         }),
       );
       await this.accommodationImageRepository.save(images);
-    }
-
-    if (createAccommodationDto.amenity) {
-      const amenity = this.accommodationAmenityRepository.create({
-        ...createAccommodationDto.amenity,
-        accommodation: savedAccommodation,
-      });
-      await this.accommodationAmenityRepository.save(amenity);
     }
 
     return savedAccommodation;

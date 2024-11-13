@@ -1,15 +1,17 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsBoolean, IsDate, IsOptional } from 'class-validator';
+import { IsBoolean, IsOptional } from 'class-validator';
 import { Column, JoinColumn, OneToOne } from 'typeorm';
 import { Accommodation } from '#/modules/accommodations/entities/accommodations.entity';
 
 export class AccommodationAmenityDto {
   @ApiProperty({ description: 'Indicates if the accommodation has Wi-Fi' })
   @IsBoolean()
+  @IsOptional()
   hasWifi: boolean;
 
   @ApiProperty({ description: 'Indicates if the accommodation has parking' })
   @IsBoolean()
+  @IsOptional()
   hasParking: boolean;
 
   @ApiProperty({
@@ -97,23 +99,13 @@ export class AccommodationAmenityDto {
   @IsOptional()
   isQuietArea: boolean;
 
-  @ApiProperty({ description: 'Date when the amenity was created' })
-  @IsDate()
-  @IsOptional()
-  createdAt: Date;
-
-  @ApiProperty({ description: 'Date when the amenity was last updated' })
-  @IsDate()
-  @IsOptional()
-  updatedAt: Date;
-
   @OneToOne(() => Accommodation, (accommodation) => accommodation.amenity, {
     onDelete: 'CASCADE',
   })
-  @JoinColumn({ name: 'accommodation_id' }) // Explicitly define the column name here
+  @JoinColumn({ name: 'accommodation_id' })
   accommodation: Accommodation;
 
-  @Column({ name: 'accommodation_id' }) // Explicitly define the accommodation_id column
+  @Column({ name: 'accommodation_id' })
   accommodationId: string;
 }
 

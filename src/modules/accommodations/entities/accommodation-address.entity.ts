@@ -23,8 +23,8 @@ export class AccommodationAddress {
   @Column({ type: 'varchar' })
   country: string;
 
-  @Column({ type: 'varchar' })
-  zip_code: string;
+  @Column({ nullable: true, name: 'zip_code' })
+  zipCode: string;
 
   @Column({ type: 'decimal', precision: 10, scale: 6 })
   latitude: number;

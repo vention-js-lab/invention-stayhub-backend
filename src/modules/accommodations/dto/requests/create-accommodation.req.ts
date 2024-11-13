@@ -3,7 +3,6 @@ import {
   IsString,
   IsBoolean,
   IsDateString,
-  IsUUID,
   IsNumber,
   Min,
   ValidateNested,
@@ -24,7 +23,7 @@ export class AccommodationDto {
   description: string;
 
   @ApiProperty({ description: 'Cover image URL of the accommodation' })
-  @IsOptional() // Make this optional if it might not always be provided
+  @IsOptional()
   @IsString()
   coverImage?: string;
 
@@ -59,10 +58,6 @@ export class AccommodationDto {
   @ApiProperty({ description: 'Allowed number of people in the accommodation' })
   @IsNumber()
   allowedNumberOfPeople: number;
-
-  @ApiProperty({ description: "Accommodation owner's user ID" })
-  @IsUUID()
-  ownerId: string;
 
   @ApiProperty({ description: 'Images related to the accommodation' })
   @ValidateNested({ each: true })

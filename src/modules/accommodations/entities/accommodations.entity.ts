@@ -60,7 +60,6 @@ export class Accommodation {
   })
   @JoinColumn({ name: 'owner_id' })
   owner: Account;
-
   @Column({ name: 'owner_id' })
   ownerId: string;
 
