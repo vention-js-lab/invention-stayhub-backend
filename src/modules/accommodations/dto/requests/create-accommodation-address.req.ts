@@ -17,7 +17,7 @@ export class AccommodationAddressDto {
   @ApiProperty({ description: 'Zip code of the accommodation' })
   @IsOptional()
   @IsString()
-  zip_code: string;
+  zipCode: string;
 
   @ApiProperty({ description: 'Latitude of the accommodation' })
   @IsOptional()
