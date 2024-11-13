@@ -1,30 +1,66 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Accommodation } from '../entities/accommodations.entity';
+import { Repository } from 'typeorm';
+import { Accommodation } from '#/modules/accommodations/entities/accommodations.entity';
+import { AccommodationAddress } from '#/modules/accommodations/entities/accommodation-address.entity';
+import { AccommodationImage } from '#/modules/accommodations/entities/accommodation-image.entity';
+import { AccommodationAmenity } from '#/modules/accommodations/entities/accommodation-amenity.entity';
+import { AccommodationDto } from '#/modules/accommodations/dto/requests/create-accommodation.req';
 
 @Injectable()
-export class AccommodationsService {
+export class AccommodationService {
   constructor(
-    @InjectRepository(Accommodation) private accommodationRepo: Accommodation,
+    @InjectRepository(Accommodation)
+    private accommodationRepository: Repository<Accommodation>,
+
+    @InjectRepository(AccommodationAddress)
+    private accommodationAddressRepository: Repository<AccommodationAddress>,
+
+    @InjectRepository(AccommodationImage)
+    private accommodationImageRepository: Repository<AccommodationImage>,
+
+    @InjectRepository(AccommodationAmenity)
+    private accommodationAmenityRepository: Repository<AccommodationAmenity>,
   ) {}
 
-  create() {
-    return 'This action adds a new Accommodation';
-  }
+  async create(
+    createAccommodationDto: AccommodationDto,
+  ): Promise<Accommodation> {
+    const accommodation = this.accommodationRepository.create(
+      createAccommodationDto,
+    );
+    const savedAccommodation =
+      await this.accommodationRepository.save(accommodation);
 
-  findAll() {
-    return `This action returns all Accommodation`;
-  }
+    if (createAccommodationDto.address) {
+      const address = this.accommodationAddressRepository.create({
+        ...createAccommodationDto.address,
+        accommodation: savedAccommodation,
+      });
+      await this.accommodationAddressRepository.save(address);
+    }
 
-  findOne() {
-    return `This action returns Accommodation`;
-  }
+    if (
+      createAccommodationDto.images &&
+      createAccommodationDto.images.length > 0
+    ) {
+      const images = createAccommodationDto.images.map((imageDto) =>
+        this.accommodationImageRepository.create({
+          ...imageDto,
+          accommodation: savedAccommodation,
+        }),
+      );
+      await this.accommodationImageRepository.save(images);
+    }
 
-  update() {
-    return `This action updates Accommodation`;
-  }
+    if (createAccommodationDto.amenity) {
+      const amenity = this.accommodationAmenityRepository.create({
+        ...createAccommodationDto.amenity,
+        accommodation: savedAccommodation,
+      });
+      await this.accommodationAmenityRepository.save(amenity);
+    }
 
-  remove() {
-    return `This action removes Accommodation`;
+    return savedAccommodation;
   }
 }
