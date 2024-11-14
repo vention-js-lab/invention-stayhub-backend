@@ -1,15 +1,41 @@
-import { AccommodationsService } from '../services/accommodations.service';
-import { Controller, Get, Post, Put, Delete, Query } from '@nestjs/common';
-import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { Controller, Get, Post, Query, Body, UseGuards } from '@nestjs/common';
 import { AccommodationFiltersQueryDto } from '../dto/accommodation-filters.dto';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiBearerAuth,
+  ApiResponse,
+} from '@nestjs/swagger';
+import { AccommodationService } from '#/modules/accommodations/services/accommodations.service';
+import { Accommodation } from '#/modules/accommodations/entities/accommodations.entity';
+import { AccommodationDto } from '#/modules/accommodations/dto/requests/create-accommodation.req';
+import { AccessTokenGuard } from '#/shared/guards/access-token.guard';
+import { GetAccount } from '#/modules/auth/decorators/get-account.decorator';
 
+@ApiTags('Accommodations')
+@ApiBearerAuth()
 @Controller('accommodations')
-export class AccommodationsController {
-  constructor(private readonly AccommodationService: AccommodationsService) {}
+export class AccommodationController {
+  constructor(private readonly accommodationService: AccommodationService) {}
 
   @Post()
-  create() {
-    return this.AccommodationService.create();
+  @UseGuards(AccessTokenGuard)
+  @ApiOperation({ summary: 'Create a new accommodation' })
+  @ApiResponse({
+    status: 201,
+    description: 'Accommodation created successfully.',
+    type: Accommodation,
+  })
+  @ApiResponse({ status: 400, description: 'Invalid data provided.' })
+  @ApiResponse({ status: 401, description: 'Unauthorized request.' })
+  async create(
+    @Body() accommodationDto: AccommodationDto,
+    @GetAccount('accountId') ownerId: string,
+  ): Promise<Accommodation> {
+    return this.accommodationService.create({
+      createAccommodationDto: accommodationDto,
+      ownerId,
+    });
   }
 
   @Get()
@@ -26,24 +52,9 @@ export class AccommodationsController {
   })
   async listAccommodations(@Query() filters: AccommodationFiltersQueryDto) {
     const accommodations =
-      await this.AccommodationService.listAccommodations(filters);
+      await this.accommodationService.listAccommodations(filters);
     return {
       data: accommodations,
     };
-  }
-
-  @Get()
-  findOne() {
-    return this.AccommodationService.findOne();
-  }
-
-  @Put()
-  update() {
-    return this.AccommodationService.update();
-  }
-
-  @Delete()
-  remove() {
-    return this.AccommodationService.remove();
   }
 }
