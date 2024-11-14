@@ -67,7 +67,7 @@ export class Accommodation {
   @OneToMany(() => AccommodationImage, (image) => image.accommodation)
   images: AccommodationImage[];
 
-  @OneToOne(() => AccommodationAmenity)
+  @OneToOne(() => AccommodationAmenity, (amenity) => amenity.accommodation)
   amenity: AccommodationAmenity;
 
   @OneToOne(() => AccommodationAddress, (address) => address.accommodation)

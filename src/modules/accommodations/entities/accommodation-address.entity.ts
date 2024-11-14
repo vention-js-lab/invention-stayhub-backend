@@ -14,22 +14,22 @@ export class AccommodationAddress {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   street: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   city: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   country: string;
 
-  @Column({ nullable: true, name: 'zip_code' })
+  @Column({ name: 'zip_code' })
   zipCode: string;
 
-  @Column('decimal', { precision: 10, scale: 6, nullable: true })
+  @Column({ type: 'decimal', precision: 10, scale: 6 })
   latitude: number;
 
-  @Column('decimal', { precision: 10, scale: 6, nullable: true })
+  @Column({ type: 'decimal', precision: 10, scale: 6 })
   longitude: number;
 
   @CreateDateColumn({ name: 'created_at' })
@@ -43,6 +43,7 @@ export class AccommodationAddress {
   })
   @JoinColumn({ name: 'accommodation_id' })
   accommodation: Accommodation;
+
   @Column({ name: 'accommodation_id' })
   accommodationId: string;
 }

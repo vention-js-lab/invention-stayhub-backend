@@ -1,30 +1,56 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Accommodation } from '../entities/accommodations.entity';
+import { Repository } from 'typeorm';
+import { Accommodation } from '#/modules/accommodations/entities/accommodations.entity';
+import { AccommodationDto } from '#/modules/accommodations/dto/requests/create-accommodation.req';
+import { AccommodationAddressService } from './accommodation-address.service';
+import { AccommodationAmenityService } from './accommodation-amenity.service';
+import { AccommodationImageService } from './accommodation-image.service';
+
+interface CreateAccommodationParams {
+  createAccommodationDto: AccommodationDto;
+  ownerId: string;
+}
 
 @Injectable()
-export class AccommodationsService {
+export class AccommodationService {
   constructor(
-    @InjectRepository(Accommodation) private accommodationRepo: Accommodation,
+    @InjectRepository(Accommodation)
+    private accommodationRepository: Repository<Accommodation>,
+    private accommodationAddressService: AccommodationAddressService,
+    private accommodationAmenityService: AccommodationAmenityService,
+    private accommodationImageService: AccommodationImageService,
   ) {}
 
-  create() {
-    return 'This action adds a new Accommodation';
-  }
+  async create({
+    createAccommodationDto,
+    ownerId,
+  }: CreateAccommodationParams): Promise<Accommodation> {
+    const accommodation = this.accommodationRepository.create({
+      ...createAccommodationDto,
+      ownerId,
+    });
+    const createdAccommodation =
+      await this.accommodationRepository.save(accommodation);
 
-  findAll() {
-    return `This action returns all Accommodation`;
-  }
+    await this.accommodationAddressService.create(
+      createdAccommodation.id,
+      createAccommodationDto.address,
+    );
 
-  findOne() {
-    return `This action returns Accommodation`;
-  }
+    await this.accommodationAmenityService.create(
+      createdAccommodation.id,
+      createAccommodationDto.amenity,
+    );
 
-  update() {
-    return `This action updates Accommodation`;
-  }
+    await this.accommodationImageService.create(
+      createdAccommodation.id,
+      createAccommodationDto.images,
+    );
 
-  remove() {
-    return `This action removes Accommodation`;
+    return this.accommodationRepository.findOne({
+      where: { id: createdAccommodation.id },
+      relations: ['address', 'amenity', 'images'],
+    });
   }
 }
