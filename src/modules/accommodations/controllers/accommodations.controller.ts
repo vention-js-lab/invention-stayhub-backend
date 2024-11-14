@@ -9,7 +9,7 @@ import { AccommodationService } from '#/modules/accommodations/services/accommod
 import { Accommodation } from '#/modules/accommodations/entities/accommodations.entity';
 import { AccommodationDto } from '#/modules/accommodations/dto/requests/create-accommodation.req';
 import { AccessTokenGuard } from '#/shared/guards/access-token.guard';
-import { GetAccount } from '../../auth/decorators/get-account.decorator';
+import { GetAccount } from '#/modules/auth/decorators/get-account.decorator';
 
 @ApiTags('Accommodations')
 @ApiBearerAuth()

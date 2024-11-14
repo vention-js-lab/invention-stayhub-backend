@@ -108,5 +108,3 @@ export class AccommodationAmenityDto {
   @Column({ name: 'accommodation_id' })
   accommodationId: string;
 }
-
-AccommodationAmenityDto;
