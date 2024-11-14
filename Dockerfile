@@ -3,6 +3,8 @@ FROM node:22 AS dependencies
 
 WORKDIR /app
 
+ENV APP_ENV=production
+
 COPY package*.json ./
 
 RUN npm ci
@@ -30,6 +32,8 @@ FROM node:22 AS production
 ENV APP_ENV=production
 
 WORKDIR /app
+
+ENV APP_ENV=production
 
 COPY --from=build /app/package*.json ./
 COPY --from=build /app/node_modules ./node_modules
