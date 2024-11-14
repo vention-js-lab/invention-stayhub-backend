@@ -31,9 +31,6 @@ export class AccommodationController {
     @Body() accommodationDto: AccommodationDto,
     @GetAccount('accountId') ownerId: string,
   ): Promise<Accommodation> {
-    if (!ownerId) {
-      throw new Error('Account ID is missing in the request');
-    }
     return this.accommodationService.create({
       createAccommodationDto: accommodationDto,
       ownerId,
