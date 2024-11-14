@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Accommodation } from '../entities/accommodations.entity';
-import { ListAccommodationsParamsDto } from '../dto/requests/list-accommodations-params.dto';
 import { Repository } from 'typeorm';
-import { SortOrder } from '#/shared/constants/sort-order.constant';
+import { getPaginationOffset } from '#/shared/utils/pagination-offset.util';
+import { sortByParams } from '../utils/sort-by-params.util';
+import { AccommodationFiltersQueryDto } from '../dto/accommodation-filters.dto';
 
 @Injectable()
 export class AccommodationsService {
@@ -16,27 +17,14 @@ export class AccommodationsService {
     return 'This action adds a new Accommodation';
   }
 
-  async listAccommodations(searchParams: ListAccommodationsParamsDto) {
-    const page = searchParams.page ?? 1;
-    const limit = searchParams.limit ?? 20;
-
-    const sortByPrice = searchParams.sortByPrice ?? undefined;
-    const sortByNumberOfRooms = searchParams.sortByNumberOfRooms ?? undefined;
-    const sortByNumberOfPeople = searchParams.sortByNumberOfPeople ?? undefined;
-    const sortByCreatedAt = searchParams.sortByCreatedAt ?? SortOrder.Desc;
-
-    const sortBy = {
-      price: sortByPrice,
-      numberOfRooms: sortByNumberOfRooms,
-      allowedNumberOfPeople: sortByNumberOfPeople,
-      createdAt: sortByCreatedAt,
-    };
-
+  async listAccommodations(filters: AccommodationFiltersQueryDto) {
+    const { skip, take } = getPaginationOffset(filters.page, filters.limit);
     const accommodations = await this.accommodationRepository.find({
-      skip: (page - 1) * limit,
-      take: limit,
-      order: sortBy,
+      skip,
+      take,
+      order: sortByParams(filters),
     });
+
     return accommodations;
   }
 

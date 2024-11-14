@@ -1,7 +1,7 @@
-import { ListAccommodationsParamsDto } from './../dto/requests/list-accommodations-params.dto';
 import { AccommodationsService } from '../services/accommodations.service';
 import { Controller, Get, Post, Put, Delete, Query } from '@nestjs/common';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { AccommodationFiltersQueryDto } from '../dto/accommodation-filters.dto';
 
 @Controller('accommodations')
 export class AccommodationsController {
@@ -24,9 +24,9 @@ export class AccommodationsController {
     status: 400,
     description: 'Inccorrect URL parameters',
   })
-  async listAccommodations(@Query() searchParams: ListAccommodationsParamsDto) {
+  async listAccommodations(@Query() filters: AccommodationFiltersQueryDto) {
     const accommodations =
-      await this.AccommodationService.listAccommodations(searchParams);
+      await this.AccommodationService.listAccommodations(filters);
     return {
       data: accommodations,
     };
