@@ -28,8 +28,6 @@ services:
       - db
     networks:
       - app-network
-    volumes:
-      - ./typeorm.config.ts:/app/typeorm.config.ts
     command: >
       sh -c "npm run migration:run && npm run node dist/src/main"
 
