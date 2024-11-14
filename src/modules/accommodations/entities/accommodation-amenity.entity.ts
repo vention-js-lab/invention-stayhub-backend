@@ -70,6 +70,7 @@ export class AccommodationAmenity {
   })
   @JoinColumn({ name: 'accommodation_id' })
   accommodation: Accommodation;
+
   @Column({ name: 'accommodation_id' })
   accommodationId: string;
 }

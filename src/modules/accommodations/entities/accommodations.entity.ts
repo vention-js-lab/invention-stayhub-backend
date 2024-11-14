@@ -13,8 +13,9 @@ import { AccommodationImage } from './accommodation-image.entity';
 import { AccommodationAmenity } from './accommodation-amenity.entity';
 import { AccommodationAddress } from './accommodation-address.entity';
 import { Account } from '#/modules/user/entities/account.entity';
+import { AccommodationStatus } from '../../../shared/constants/accommodation-status.constants';
 
-@Entity('accommodations')
+@Entity('accommodation')
 export class Accommodation {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -24,6 +25,9 @@ export class Accommodation {
 
   @Column()
   description: string;
+
+  @Column()
+  status: AccommodationStatus;
 
   @Column({ name: 'cover_image' })
   coverImage: string;
@@ -68,10 +72,8 @@ export class Accommodation {
   images: AccommodationImage[];
 
   @OneToOne(() => AccommodationAmenity, (amenity) => amenity.accommodation)
-  @JoinColumn()
   amenity: AccommodationAmenity;
 
   @OneToOne(() => AccommodationAddress, (address) => address.accommodation)
-  @JoinColumn()
   address: AccommodationAddress;
 }

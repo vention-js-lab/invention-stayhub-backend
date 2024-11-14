@@ -8,6 +8,8 @@ import { Account } from '../user/entities/account.entity';
 import { Profile } from '../user/entities/profile.entity';
 import { JwtModule } from '@nestjs/jwt';
 import { AccountRefreshToken } from './entities/account-refresh-token.entity';
+import { AccessTokenStrategy } from './strategies/access-token.strategy';
+import { RefreshTokenStrategy } from './strategies/refresh-token.strategy';
 
 @Module({
   imports: [
@@ -16,6 +18,11 @@ import { AccountRefreshToken } from './entities/account-refresh-token.entity';
     PassportModule.register({ defaultStrategy: 'google' }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, GoogleStrategy],
+  providers: [
+    AuthService,
+    GoogleStrategy,
+    AccessTokenStrategy,
+    RefreshTokenStrategy,
+  ],
 })
 export class AuthModule {}
