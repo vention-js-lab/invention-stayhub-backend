@@ -13,6 +13,7 @@ import { AccommodationImage } from './accommodation-image.entity';
 import { AccommodationAmenity } from './accommodation-amenity.entity';
 import { AccommodationAddress } from './accommodation-address.entity';
 import { Account } from '#/modules/user/entities/account.entity';
+import { AccommodationStatus } from '../../../shared/constants/accommodation-status.constants';
 
 @Entity('accommodation')
 export class Accommodation {
@@ -24,6 +25,9 @@ export class Accommodation {
 
   @Column()
   description: string;
+
+  @Column()
+  status: AccommodationStatus;
 
   @Column({ name: 'cover_image' })
   coverImage: string;

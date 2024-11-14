@@ -6,6 +6,14 @@ import { AccommodationDto } from '#/modules/accommodations/dto/requests/create-a
 import { AccommodationAddressService } from './accommodation-address.service';
 import { AccommodationAmenityService } from './accommodation-amenity.service';
 import { AccommodationImageService } from './accommodation-image.service';
+import { AccommodationFiltersQueryDto } from '../dto/requests/accommodation-filters.dto';
+import {
+  addPriceFilters,
+  addAvailabilityFilters,
+  addAmenityFilters,
+  addSearchFilters,
+  addApartmentFilters,
+} from '../helpers/accommodation-filters.util';
 
 interface CreateAccommodationParams {
   createAccommodationDto: AccommodationDto;
@@ -52,5 +60,22 @@ export class AccommodationService {
       where: { id: createdAccommodation.id },
       relations: ['address', 'amenity', 'images'],
     });
+  }
+
+  async listAccommodations(filters: AccommodationFiltersQueryDto) {
+    const queryBuilder = this.accommodationRepository
+      .createQueryBuilder('accommodation')
+      .leftJoinAndSelect('accommodation.address', 'address')
+      .leftJoinAndSelect('accommodation.amenity', 'amenity')
+      .leftJoinAndSelect('accommodation.images', 'image');
+
+    addPriceFilters(queryBuilder, filters);
+    addAvailabilityFilters(queryBuilder, filters);
+    addSearchFilters(queryBuilder, filters);
+    addApartmentFilters(queryBuilder, filters);
+    addAmenityFilters(queryBuilder, filters);
+
+    const accomodations = await queryBuilder.getMany();
+    return accomodations;
   }
 }
