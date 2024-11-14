@@ -13,12 +13,12 @@ import { GetAccount } from '#/modules/auth/decorators/get-account.decorator';
 
 @ApiTags('Accommodations')
 @ApiBearerAuth()
-@UseGuards(AccessTokenGuard)
 @Controller('accommodations')
 export class AccommodationController {
   constructor(private readonly accommodationService: AccommodationService) {}
 
   @Post()
+  @UseGuards(AccessTokenGuard)
   @ApiOperation({ summary: 'Create a new accommodation' })
   @ApiResponse({
     status: 201,

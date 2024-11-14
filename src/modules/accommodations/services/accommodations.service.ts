@@ -48,6 +48,9 @@ export class AccommodationService {
       createAccommodationDto.images,
     );
 
-    return createdAccommodation;
+    return this.accommodationRepository.findOne({
+      where: { id: createdAccommodation.id },
+      relations: ['address', 'amenity', 'images'],
+    });
   }
 }
