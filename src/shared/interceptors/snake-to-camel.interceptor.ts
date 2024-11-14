@@ -13,9 +13,8 @@ export class SnakeToCamelInterceptor implements NestInterceptor {
     const request = ctx.switchToHttp().getRequest();
 
     if (request.query) {
-      request.query = mapKeys(request.query, (value, key) => {
-        if (/[-_]{2,}|[^a-z0-9_-]/.test(key)) {
-          //Ignoring query if it's not in required format
+      request.query = mapKeys(request.query, (value: any, key: string) => {
+        if (hasMultipleSeparators(key) || hasInvalidCharacters(key)) {
           return false;
         }
         return camelCase(key);
@@ -24,4 +23,12 @@ export class SnakeToCamelInterceptor implements NestInterceptor {
       return next.handle();
     }
   }
+}
+
+function hasMultipleSeparators(key: string): boolean {
+  return /[-_]{2,}/.test(key);
+}
+
+function hasInvalidCharacters(key: string): boolean {
+  return /[^a-z0-9_-]/i.test(key);
 }

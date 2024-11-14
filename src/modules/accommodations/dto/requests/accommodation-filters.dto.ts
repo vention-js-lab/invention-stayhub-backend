@@ -12,37 +12,33 @@ import {
   TransformToBoolean,
   TransformToDate,
   TransformToNumber,
-} from '#/shared/utils/transform-type.util';
+} from '#/shared/transformers/transform-type.transformer';
 
 export class AccommodationFiltersQueryDto {
-  // PRICE
   @ApiProperty({
     name: 'min-price',
     description: 'Minimum price for accommodation',
     required: false,
     type: Number,
-    example: 100,
   })
   @IsOptional()
   @IsNumber({}, { message: 'Minimum price must be a number' })
   @Min(0, { message: 'Price must be greater than or equal to 0' })
   @TransformToNumber()
-  minPrice?: number;
+  minPrice: number | undefined;
 
   @ApiProperty({
     name: 'max-price',
     description: 'Maximum price for accommodation',
     required: false,
     type: Number,
-    example: 500,
   })
   @IsOptional()
   @IsNumber({}, { message: 'Maximum price must be a number' })
   @Min(1, { message: 'Price maximum must be greater than or equal to 1' })
   @TransformToNumber()
-  maxPrice?: number;
+  maxPrice: number | undefined;
 
-  // SEARCH
   @ApiProperty({
     description: 'Search by name and description of accommodation',
     required: false,
@@ -51,18 +47,16 @@ export class AccommodationFiltersQueryDto {
   })
   @IsOptional()
   @IsString()
-  search?: string;
+  search: string | undefined;
 
-  // LOCATION
   @ApiProperty({
     description: 'Street address of the accommodation',
     required: false,
     type: String,
-    example: 'Main St',
   })
   @IsOptional()
   @IsString()
-  street?: string;
+  street: string | undefined;
 
   @ApiProperty({
     description: 'City of the accommodation',
@@ -72,19 +66,17 @@ export class AccommodationFiltersQueryDto {
   })
   @IsOptional()
   @IsString()
-  city?: string;
+  city: string | undefined;
 
   @ApiProperty({
     description: 'Country of the accommodation',
     required: false,
     type: String,
-    example: 'USA',
   })
   @IsOptional()
   @IsString()
-  country?: string;
+  country: string | undefined;
 
-  // AVAILABLE
   @ApiProperty({
     description: 'Availability status of the accommodation',
     required: false,
@@ -94,7 +86,7 @@ export class AccommodationFiltersQueryDto {
   @IsOptional()
   @TransformToBoolean()
   @IsBoolean()
-  available?: boolean;
+  available: boolean | undefined;
 
   @ApiProperty({
     name: 'available-from',
@@ -106,7 +98,7 @@ export class AccommodationFiltersQueryDto {
   @IsOptional()
   @IsDate()
   @TransformToDate()
-  availableFrom?: Date;
+  availableFrom: Date | undefined;
 
   @ApiProperty({
     name: 'available-to',
@@ -118,9 +110,8 @@ export class AccommodationFiltersQueryDto {
   @IsOptional()
   @IsDate()
   @TransformToDate()
-  availableTo?: Date;
+  availableTo: Date | undefined;
 
-  // ROOMS
   @ApiProperty({
     description: 'Number of rooms in the accommodation',
     required: false,
@@ -131,186 +122,170 @@ export class AccommodationFiltersQueryDto {
   @IsInt({ message: 'Rooms must be an integer' })
   @Min(1, { message: 'Rooms must be greater than or equal to 1' })
   @TransformToNumber()
-  rooms?: number;
+  rooms: number | undefined;
 
-  // AMENITIES
   @ApiProperty({
     name: 'has-wifi',
     description: 'Accommodation has Wifi',
     required: false,
     type: Boolean,
-    example: true,
   })
   @IsOptional()
   @IsBoolean()
   @TransformToBoolean()
-  hasWifi?: boolean;
+  hasWifi: boolean | undefined;
 
   @ApiProperty({
     name: 'has-parking',
     description: 'Accommodation has parking',
     required: false,
     type: Boolean,
-    example: false,
   })
   @IsOptional()
   @TransformToBoolean()
   @IsBoolean()
-  hasParking?: boolean;
+  hasParking: boolean | undefined;
 
   @ApiProperty({
     name: 'has-swimming-pool',
     description: 'Accommodation has a swimming pool',
     required: false,
     type: Boolean,
-    example: true,
   })
   @IsOptional()
   @TransformToBoolean()
   @IsBoolean()
-  hasSwimmingPool?: boolean;
+  hasSwimmingPool: boolean | undefined;
 
   @ApiProperty({
     name: 'has-pet-allowance',
     description: 'Accommodation allows pets',
     required: false,
     type: Boolean,
-    example: true,
   })
   @IsOptional()
   @TransformToBoolean()
   @IsBoolean()
-  hasPetAllowance?: boolean;
+  hasPetAllowance: boolean | undefined;
 
   @ApiProperty({
     name: 'has-backyard',
     description: 'Accommodation has a backyard',
     required: false,
     type: Boolean,
-    example: false,
   })
   @IsOptional()
   @TransformToBoolean()
   @IsBoolean()
-  hasBackyard?: boolean;
+  hasBackyard: boolean | undefined;
 
   @ApiProperty({
     name: 'has-smoking-allowance',
     description: 'Accommodation allows smoking',
     required: false,
     type: Boolean,
-    example: true,
   })
   @IsOptional()
   @TransformToBoolean()
   @IsBoolean()
-  hasSmokingAllowance?: boolean;
+  hasSmokingAllowance: boolean | undefined;
 
   @ApiProperty({
     name: 'has-hospital-nearby',
     description: 'Accommodation is close to a hospital',
     required: false,
     type: Boolean,
-    example: false,
   })
   @IsOptional()
   @TransformToBoolean()
   @IsBoolean()
-  hasHospitalNearby?: boolean;
+  hasHospitalNearby: boolean | undefined;
 
   @ApiProperty({
     name: 'has-laundary-service',
     description: 'Accommodation provides laundry service',
     required: false,
     type: Boolean,
-    example: true,
   })
   @IsOptional()
   @TransformToBoolean()
   @IsBoolean()
-  hasLaundryService?: boolean;
+  hasLaundryService: boolean | undefined;
 
   @ApiProperty({
     name: 'has-kitchen',
     description: 'Accommodation has a kitchen',
     required: false,
     type: Boolean,
-    example: true,
   })
   @IsOptional()
   @TransformToBoolean()
   @IsBoolean()
-  hasKitchen?: boolean;
+  hasKitchen: boolean | undefined;
 
   @ApiProperty({
     name: 'has-air-conditioning',
     description: 'Accommodation has air conditioning',
     required: false,
     type: Boolean,
-    example: true,
   })
   @IsOptional()
   @TransformToBoolean()
   @IsBoolean()
-  hasAirConditioning?: boolean;
+  hasAirConditioning: boolean | undefined;
 
   @ApiProperty({
     name: 'has-tv',
     description: 'Accommodation has a TV',
     required: false,
     type: Boolean,
-    example: false,
   })
   @IsOptional()
   @TransformToBoolean()
   @IsBoolean()
-  hasTv?: boolean;
+  hasTv: boolean | undefined;
 
   @ApiProperty({
     name: 'has-airport-transfer',
     description: 'Accommodation provides airport transfer',
     required: false,
     type: Boolean,
-    example: true,
   })
   @IsOptional()
   @TransformToBoolean()
   @IsBoolean()
-  hasAirportTransfer?: boolean;
+  hasAirportTransfer: boolean | undefined;
 
   @ApiProperty({
     name: 'is-close-to-center',
     description: 'Accommodation is close to the center',
     required: false,
     type: Boolean,
-    example: true,
   })
   @IsOptional()
   @TransformToBoolean()
   @IsBoolean()
-  isCloseToCenter?: boolean;
+  isCloseToCenter: boolean | undefined;
 
   @ApiProperty({
     name: 'is-child-friendly',
     description: 'Accommodation is in child-friendly area',
     required: false,
     type: Boolean,
-    example: false,
   })
   @IsOptional()
   @TransformToBoolean()
   @IsBoolean()
-  isChildFriendly?: boolean;
+  isChildFriendly: boolean | undefined;
 
   @ApiProperty({
     name: 'is-quiet-area',
     description: 'Accommodation is in a quiet area',
     required: false,
     type: Boolean,
-    example: true,
   })
   @IsOptional()
   @TransformToBoolean()
   @IsBoolean()
-  isQuietArea?: boolean;
+  isQuietArea: boolean | undefined;
 }

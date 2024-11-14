@@ -1,5 +1,5 @@
 import { SelectQueryBuilder } from 'typeorm';
-import { AccommodationFiltersQueryDto } from '../dto/accomodation-filters.dto';
+import { AccommodationFiltersQueryDto } from '../dto/requests/accommodation-filters.dto';
 import { Accommodation } from '../entities/accommodations.entity';
 import { BadRequestException } from '@nestjs/common';
 
