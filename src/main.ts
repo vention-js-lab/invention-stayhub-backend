@@ -15,6 +15,17 @@ async function bootstrap() {
     infer: true,
   });
 
+  const isCorsEnabled = configService.get<boolean>('CORS_ENABLED');
+  const corsOrigins = configService.get<string>('CORS_ORIGINS')?.split(',');
+
+  if (isCorsEnabled) {
+    app.enableCors({
+      origin: corsOrigins,
+      methods: 'GET, PUT, PATCH, POST, DELETE',
+      allowedHeaders: 'Content-Type, Authorization',
+    });
+  }
+
   app.useGlobalPipes(ValidationConfig);
   app.use(cookieParser());
 

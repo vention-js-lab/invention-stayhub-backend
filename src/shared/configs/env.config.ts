@@ -20,6 +20,9 @@ const envConfigSchema = z.object({
   GOOGLE_CALLBACK_URL: z.string(),
 
   COOKIES_REFRESH_MS: z.coerce.number().int().positive(),
+
+  CORS_ENABLED: z.string(),
+  CORS_ORIGINS: z.string(),
 });
 
 export type EnvConfig = z.infer<typeof envConfigSchema>;
