@@ -6,7 +6,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Wishlist } from '#/modules/wishlists/entities/wishlist.entity';
-import { Account } from '../user/entities/account.entity';
+import { Account } from '../users/entities/account.entity';
 
 @Injectable()
 export class WishlistService {
