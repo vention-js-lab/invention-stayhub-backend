@@ -10,7 +10,6 @@ const envConfigSchema = z.object({
   DB_PASSWORD: z.string(),
   DB_NAME: z.string(),
 
-  JWT_SECRET_TOKEN: z.string(),
   JWT_ACCESS_TOKEN_SECRET: z.string(),
   JWT_ACCESS_TOKEN_EXPIRY: z.string(),
   JWT_REFRESH_TOKEN_SECRET: z.string(),
