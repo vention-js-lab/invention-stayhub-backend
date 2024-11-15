@@ -1,30 +1,81 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Accommodation } from '../entities/accommodations.entity';
+import { Repository } from 'typeorm';
+import { Accommodation } from '#/modules/accommodations/entities/accommodations.entity';
+import { AccommodationDto } from '#/modules/accommodations/dto/requests/create-accommodation.req';
+import { AccommodationAddressService } from './accommodation-address.service';
+import { AccommodationAmenityService } from './accommodation-amenity.service';
+import { AccommodationImageService } from './accommodation-image.service';
+import { AccommodationFiltersQueryDto } from '../dto/requests/accommodation-filters.dto';
+import {
+  addPriceFilters,
+  addAvailabilityFilters,
+  addAmenityFilters,
+  addSearchFilters,
+  addApartmentFilters,
+} from '../helpers/accommodation-filters.util';
+
+interface CreateAccommodationParams {
+  createAccommodationDto: AccommodationDto;
+  ownerId: string;
+}
 
 @Injectable()
-export class AccommodationsService {
+export class AccommodationService {
   constructor(
-    @InjectRepository(Accommodation) private accommodationRepo: Accommodation,
+    @InjectRepository(Accommodation)
+    private accommodationRepository: Repository<Accommodation>,
+    private accommodationAddressService: AccommodationAddressService,
+    private accommodationAmenityService: AccommodationAmenityService,
+    private accommodationImageService: AccommodationImageService,
   ) {}
 
-  create() {
-    return 'This action adds a new Accommodation';
+  async create({
+    createAccommodationDto,
+    ownerId,
+  }: CreateAccommodationParams): Promise<Accommodation> {
+    const accommodation = this.accommodationRepository.create({
+      ...createAccommodationDto,
+      ownerId,
+    });
+    const createdAccommodation =
+      await this.accommodationRepository.save(accommodation);
+
+    await this.accommodationAddressService.create(
+      createdAccommodation.id,
+      createAccommodationDto.address,
+    );
+
+    await this.accommodationAmenityService.create(
+      createdAccommodation.id,
+      createAccommodationDto.amenity,
+    );
+
+    await this.accommodationImageService.create(
+      createdAccommodation.id,
+      createAccommodationDto.images,
+    );
+
+    return this.accommodationRepository.findOne({
+      where: { id: createdAccommodation.id },
+      relations: ['address', 'amenity', 'images'],
+    });
   }
 
-  findAll() {
-    return `This action returns all Accommodation`;
-  }
+  async listAccommodations(filters: AccommodationFiltersQueryDto) {
+    const queryBuilder = this.accommodationRepository
+      .createQueryBuilder('accommodation')
+      .leftJoinAndSelect('accommodation.address', 'address')
+      .leftJoinAndSelect('accommodation.amenity', 'amenity')
+      .leftJoinAndSelect('accommodation.images', 'image');
 
-  findOne() {
-    return `This action returns Accommodation`;
-  }
+    addPriceFilters(queryBuilder, filters);
+    addAvailabilityFilters(queryBuilder, filters);
+    addSearchFilters(queryBuilder, filters);
+    addApartmentFilters(queryBuilder, filters);
+    addAmenityFilters(queryBuilder, filters);
 
-  update() {
-    return `This action updates Accommodation`;
-  }
-
-  remove() {
-    return `This action removes Accommodation`;
+    const accomodations = await queryBuilder.getMany();
+    return accomodations;
   }
 }
