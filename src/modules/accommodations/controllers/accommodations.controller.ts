@@ -21,15 +21,15 @@ import { AccommodationDto } from '#/modules/accommodations/dto/requests/create-a
 import { AccessTokenGuard } from '#/shared/guards/access-token.guard';
 import { GetAccount } from '#/modules/auth/decorators/get-account.decorator';
 import { SnakeToCamelInterceptor } from '#/shared/interceptors/snake-to-camel.interceptor';
-import { AccommodationFiltersQueryDto } from '#/modules/accommodations/dto/requests/accommodation-filters.dto';
+import { AccommodationFiltersQueryDto } from '../dto/requests/accommodation-filters.dto';
 
 @ApiTags('Accommodations')
-@ApiBearerAuth()
 @Controller('accommodations')
 export class AccommodationController {
   constructor(private readonly accommodationService: AccommodationService) {}
 
   @Post()
+  @ApiBearerAuth()
   @UseGuards(AccessTokenGuard)
   @ApiOperation({ summary: 'Create a new accommodation' })
   @ApiResponse({
@@ -69,7 +69,6 @@ export class AccommodationController {
   }
 
   @Get(':id')
-  @UseInterceptors(SnakeToCamelInterceptor)
   @ApiOperation({ summary: 'Get accommodation by ID' })
   @ApiResponse({
     status: 200,

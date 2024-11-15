@@ -6,7 +6,7 @@ import { AccommodationDto } from '#/modules/accommodations/dto/requests/create-a
 import { AccommodationAddressService } from './accommodation-address.service';
 import { AccommodationAmenityService } from './accommodation-amenity.service';
 import { AccommodationImageService } from './accommodation-image.service';
-import { AccommodationFiltersQueryDto } from '#/modules/accommodations/dto/requests/accommodation-filters.dto';
+import { AccommodationFiltersQueryDto } from '../dto/requests/accommodation-filters.dto';
 
 import {
   addPriceFilters,
