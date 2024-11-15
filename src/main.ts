@@ -16,13 +16,17 @@ async function bootstrap() {
   });
 
   const isCorsEnabled = configService.get<boolean>('CORS_ENABLED');
-  const corsOrigins = configService.get<string>('CORS_ORIGINS')?.split(',');
+  const corsOrigins = configService
+    .get<string>('CORS_ALLOWED_ORIGINS')
+    ?.split(',');
+  const corsMethods = configService
+    .get<string>('CORS_ALLOWED_METHODS')
+    ?.split(',');
 
   if (isCorsEnabled) {
     app.enableCors({
       origin: corsOrigins,
-      methods: 'GET, PUT, PATCH, POST, DELETE',
-      allowedHeaders: 'Content-Type, Authorization',
+      methods: corsMethods,
     });
   }
 

@@ -22,7 +22,8 @@ const envConfigSchema = z.object({
   COOKIES_REFRESH_MS: z.coerce.number().int().positive(),
 
   CORS_ENABLED: z.string().transform((val) => val === 'true'),
-  CORS_ORIGINS: z.string(),
+  CORS_ALLOWED_ORIGINS: z.string(),
+  CORS_ALLOWED_METHODS: z.string(),
 });
 
 export type EnvConfig = z.infer<typeof envConfigSchema>;
