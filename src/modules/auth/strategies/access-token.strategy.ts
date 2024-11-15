@@ -5,7 +5,7 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { EnvConfig } from '#/shared/configs/env.config';
 import { AuthTokenPayload } from '../types/auth-payload.type';
 import { JwtAuthConfig } from '#/shared/configs/jwt-auth.config';
-import { Account } from '#/modules/user/entities/account.entity';
+import { Account } from '#/modules/users/entities/account.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { RequestAccount } from '../types/request-account.type';

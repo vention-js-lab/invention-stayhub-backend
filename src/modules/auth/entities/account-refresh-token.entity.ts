@@ -1,4 +1,4 @@
-import { Account } from '#/modules/user/entities/account.entity';
+import { Account } from '#/modules/users/entities/account.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,
