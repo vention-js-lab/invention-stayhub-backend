@@ -4,7 +4,7 @@ import { Module } from '@nestjs/common';
 import { AuthModule } from './modules/auth/auth.module';
 import { DatabaseModule } from './modules/database/database.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { UserModule } from './modules/user/user.module';
+import { UserModule } from './modules/users/users.module';
 import { validateEnv } from './shared/configs/env.config';
 import { AccommodationModule } from './modules/accommodations/accommodations.module';
 import { WishlistsModule } from './modules/wishlists/wishlists.module';

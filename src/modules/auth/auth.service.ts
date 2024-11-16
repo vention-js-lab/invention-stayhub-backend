@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { RegisterDto } from './dto/register.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Account } from '../user/entities/account.entity';
+import { Account } from '../users/entities/account.entity';
 import { Repository } from 'typeorm';
 import { Hasher } from '#/shared/libs/hasher.lib';
 import { AuthTokenPayload } from './types/auth-payload.type';
@@ -14,7 +14,7 @@ import { EnvConfig } from '#/shared/configs/env.config';
 import { JwtService } from '@nestjs/jwt';
 import { LoginDto } from './dto/login.dto';
 import { GoogleUser } from './types/google-user.type';
-import { Profile } from '../user/entities/profile.entity';
+import { Profile } from '../users/entities/profile.entity';
 import { AccountType } from '../../shared/constants/user-account.constant';
 import { AccountRefreshToken } from './entities/account-refresh-token.entity';
 

@@ -6,6 +6,7 @@ import {
   UseInterceptors,
   Get,
   Query,
+  Param,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -23,12 +24,12 @@ import { SnakeToCamelInterceptor } from '#/shared/interceptors/snake-to-camel.in
 import { AccommodationFiltersQueryDto } from '../dto/requests/accommodation-filters.dto';
 
 @ApiTags('Accommodations')
-@ApiBearerAuth()
 @Controller('accommodations')
 export class AccommodationController {
   constructor(private readonly accommodationService: AccommodationService) {}
 
   @Post()
+  @ApiBearerAuth()
   @UseGuards(AccessTokenGuard)
   @ApiOperation({ summary: 'Create a new accommodation' })
   @ApiResponse({
@@ -65,5 +66,19 @@ export class AccommodationController {
     const result = await this.accommodationService.listAccommodations(filters);
 
     return result;
+  }
+
+  @Get(':id')
+  @ApiOperation({ summary: 'Get accommodation by ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'Accommodation fetched successfully',
+    type: Accommodation,
+  })
+  async getAccommodationById(@Param('id') id: string) {
+    const accommodation =
+      await this.accommodationService.getAccommodationById(id);
+
+    return accommodation;
   }
 }

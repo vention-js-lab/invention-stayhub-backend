@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Accommodation } from '../entities/accommodations.entity';
 import { Repository } from 'typeorm';
@@ -9,6 +9,7 @@ import { AccommodationAddressService } from './accommodation-address.service';
 import { AccommodationAmenityService } from './accommodation-amenity.service';
 import { AccommodationImageService } from './accommodation-image.service';
 import { AccommodationFiltersQueryDto } from '../dto/requests/accommodation-filters.dto';
+
 import {
   addPriceFilters,
   addAvailabilityFilters,
@@ -88,5 +89,16 @@ export class AccommodationService {
 
     const accommodations = await queryBuilder.getMany();
     return accommodations;
+  }
+
+  async getAccommodationById(id: string): Promise<Accommodation> {
+    const accommodation = await this.accommodationRepository.findOne({
+      where: { id },
+      relations: ['address', 'amenity', 'images'],
+    });
+    if (!accommodation) {
+      throw new NotFoundException(`Accommodation with ID ${id} not found`);
+    }
+    return accommodation;
   }
 }

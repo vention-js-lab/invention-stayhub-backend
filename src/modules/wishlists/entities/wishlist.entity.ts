@@ -5,7 +5,7 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { Account } from '#/modules/user/entities/account.entity';
+import { Account } from '#/modules/users/entities/account.entity';
 import { Accommodation } from '#/modules/accommodations/entities/accommodations.entity';
 
 @Entity('wishlist')
