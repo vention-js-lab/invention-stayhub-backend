@@ -45,21 +45,23 @@ export class AccommodationFiltersQueryDto {
   @ApiProperty({
     description: 'Sort options to get sorted accommodations',
     required: false,
+    example: 'numberOfRooms',
   })
   @IsString()
   @IsEnum(SortBy)
   @IsOptional()
-  sort_by?: SortBy;
+  sortBy?: SortBy;
 
   @ApiProperty({
     description:
       'Order options to clarify in which order will the accommodations be sorted',
     required: false,
+    example: 'ASC',
   })
   @IsString()
   @IsEnum(SortOrder)
   @IsOptional()
-  sort_order?: SortOrder;
+  sortOrder?: SortOrder;
 
   @ApiProperty({
     name: 'min-price',

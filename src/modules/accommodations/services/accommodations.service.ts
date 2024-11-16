@@ -2,13 +2,13 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Accommodation } from '../entities/accommodations.entity';
 import { Repository } from 'typeorm';
-// import { getPaginationOffset } from '#/shared/utils/pagination-offset.util';
-// import { sortByParams } from '../utils/sort-by-params.util';
 import { AccommodationDto } from '#/modules/accommodations/dto/requests/create-accommodation.req';
 import { AccommodationAddressService } from './accommodation-address.service';
 import { AccommodationAmenityService } from './accommodation-amenity.service';
 import { AccommodationImageService } from './accommodation-image.service';
 import { AccommodationFiltersQueryDto } from '../dto/requests/accommodation-filters.dto';
+import { getPaginationOffset } from '#/shared/utils/pagination-offset.util';
+import { sortByParams } from '../utils/sort-by-params.util';
 
 import {
   addPriceFilters,
@@ -17,7 +17,6 @@ import {
   addSearchFilters,
   addApartmentFilters,
 } from '../helpers/accommodation-filters.util';
-// import { SortOrder } from '#/shared/constants/sort-order.constant';
 
 interface CreateAccommodationParams {
   createAccommodationDto: AccommodationDto;
@@ -79,13 +78,13 @@ export class AccommodationService {
     addApartmentFilters(queryBuilder, filters);
     addAmenityFilters(queryBuilder, filters);
 
-    // const { skip, take } = getPaginationOffset(filters.page, filters.limit);
-    // queryBuilder.skip(skip).take(take);
+    const { skip, take } = getPaginationOffset(filters.page, filters.limit);
+    queryBuilder.skip(skip).take(take);
 
-    // const sortParams = sortByParams(filters);
-    // Object.entries(sortParams).forEach(([key, order]) => {
-    //   queryBuilder.addOrderBy(`accommodation.${key}`, order);
-    // });
+    const orderBy = sortByParams(filters);
+    for (const [key, value] of Object.entries(orderBy)) {
+      queryBuilder.addOrderBy(`accommodation.${key}`, value);
+    }
 
     const accommodations = await queryBuilder.getMany();
     return accommodations;
