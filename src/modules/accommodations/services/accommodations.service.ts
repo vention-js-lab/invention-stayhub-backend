@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Accommodation } from '#/modules/accommodations/entities/accommodations.entity';
@@ -7,6 +11,7 @@ import { AccommodationAddressService } from './accommodation-address.service';
 import { AccommodationAmenityService } from './accommodation-amenity.service';
 import { AccommodationImageService } from './accommodation-image.service';
 import { AccommodationFiltersQueryDto } from '../dto/requests/accommodation-filters.dto';
+import { UpdateAccommodationDto } from '../dto/requests/update-accommodation.req';
 
 import {
   addPriceFilters,
@@ -19,6 +24,12 @@ import {
 interface CreateAccommodationParams {
   createAccommodationDto: AccommodationDto;
   ownerId: string;
+}
+
+interface UpdateAccommodationParams {
+  accommodationId: string;
+  ownerId: string;
+  updateAccommodationDto: UpdateAccommodationDto;
 }
 
 @Injectable()
@@ -89,5 +100,41 @@ export class AccommodationService {
       throw new NotFoundException(`Accommodation with ID ${id} not found`);
     }
     return accommodation;
+  }
+
+  async update({
+    accommodationId,
+    ownerId,
+    updateAccommodationDto,
+  }: UpdateAccommodationParams): Promise<Accommodation> {
+    const accommodation = await this.getAccommodationById(accommodationId);
+
+    if (accommodation.ownerId !== ownerId) {
+      throw new ForbiddenException(
+        'You are not the owner of this accommodation',
+      );
+    }
+
+    const { address, amenity, ...accommodationDetails } =
+      updateAccommodationDto;
+    await this.accommodationRepository.update(
+      accommodationId,
+      accommodationDetails,
+    );
+
+    if (address) {
+      await this.accommodationAddressService.update(
+        accommodation.address.id,
+        updateAccommodationDto.address,
+      );
+    }
+
+    if (amenity) {
+      await this.accommodationAmenityService.update(
+        accommodation.amenity.id,
+        updateAccommodationDto.amenity,
+      );
+    }
+    return await this.getAccommodationById(accommodationId);
   }
 }

@@ -25,4 +25,18 @@ export class AccommodationAmenityService {
 
     return createdAccommodationAmenity;
   }
+
+  async update(
+    accommodationAmenityId: string,
+    updateAccommodationAmenityDto: AccommodationAmenityDto,
+  ) {
+    await this.accommodationAmenityRepository.update(
+      accommodationAmenityId,
+      updateAccommodationAmenityDto,
+    );
+
+    return await this.accommodationAmenityRepository.findOne({
+      where: { id: accommodationAmenityId },
+    });
+  }
 }
