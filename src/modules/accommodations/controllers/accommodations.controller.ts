@@ -1,16 +1,26 @@
-import { Controller, Get, Post, Query, Body, UseGuards } from '@nestjs/common';
-import { AccommodationFiltersQueryDto } from '../dto/accommodation-filters.dto';
+import {
+  Controller,
+  Post,
+  Body,
+  UseGuards,
+  UseInterceptors,
+  Get,
+  Query,
+} from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
   ApiBearerAuth,
   ApiResponse,
+  ApiQuery,
 } from '@nestjs/swagger';
 import { AccommodationService } from '#/modules/accommodations/services/accommodations.service';
 import { Accommodation } from '#/modules/accommodations/entities/accommodations.entity';
 import { AccommodationDto } from '#/modules/accommodations/dto/requests/create-accommodation.req';
 import { AccessTokenGuard } from '#/shared/guards/access-token.guard';
 import { GetAccount } from '#/modules/auth/decorators/get-account.decorator';
+import { SnakeToCamelInterceptor } from '#/shared/interceptors/snake-to-camel.interceptor';
+import { AccommodationFiltersQueryDto } from '../dto/requests/accommodation-filters.dto';
 
 @ApiTags('Accommodations')
 @ApiBearerAuth()
@@ -39,22 +49,21 @@ export class AccommodationController {
   }
 
   @Get()
-  @ApiOperation({
-    summary: 'Get list of accommodations that match filtering and sorting',
+  @UseInterceptors(SnakeToCamelInterceptor)
+  @ApiOperation({ summary: 'Get all accommodations with filters' })
+  @ApiQuery({
+    name: 'filters',
+    type: AccommodationFiltersQueryDto,
+    required: false,
+    description: 'Query parameters for filtering accommodations',
   })
   @ApiResponse({
     status: 200,
-    description: 'Get filtered and sorted accommodations',
-  })
-  @ApiResponse({
-    status: 400,
-    description: 'Inccorrect URL parameters',
+    description: 'List of accommodations fetched successfully',
   })
   async listAccommodations(@Query() filters: AccommodationFiltersQueryDto) {
-    const accommodations =
-      await this.accommodationService.listAccommodations(filters);
-    return {
-      data: accommodations,
-    };
+    const result = await this.accommodationService.listAccommodations(filters);
+
+    return result;
   }
 }

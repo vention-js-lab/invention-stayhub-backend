@@ -2,13 +2,21 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Accommodation } from '../entities/accommodations.entity';
 import { Repository } from 'typeorm';
-import { getPaginationOffset } from '#/shared/utils/pagination-offset.util';
-import { sortByParams } from '../utils/sort-by-params.util';
-import { AccommodationFiltersQueryDto } from '../dto/accommodation-filters.dto';
+// import { getPaginationOffset } from '#/shared/utils/pagination-offset.util';
+// import { sortByParams } from '../utils/sort-by-params.util';
 import { AccommodationDto } from '#/modules/accommodations/dto/requests/create-accommodation.req';
 import { AccommodationAddressService } from './accommodation-address.service';
 import { AccommodationAmenityService } from './accommodation-amenity.service';
 import { AccommodationImageService } from './accommodation-image.service';
+import { AccommodationFiltersQueryDto } from '../dto/requests/accommodation-filters.dto';
+import {
+  addPriceFilters,
+  addAvailabilityFilters,
+  addAmenityFilters,
+  addSearchFilters,
+  addApartmentFilters,
+} from '../helpers/accommodation-filters.util';
+// import { SortOrder } from '#/shared/constants/sort-order.constant';
 
 interface CreateAccommodationParams {
   createAccommodationDto: AccommodationDto;
@@ -56,14 +64,29 @@ export class AccommodationService {
       relations: ['address', 'amenity', 'images'],
     });
   }
-  async listAccommodations(filters: AccommodationFiltersQueryDto) {
-    const { skip, take } = getPaginationOffset(filters.page, filters.limit);
-    const accommodations = await this.accommodationRepository.find({
-      skip,
-      take,
-      order: sortByParams(filters),
-    });
 
+  async listAccommodations(filters: AccommodationFiltersQueryDto) {
+    const queryBuilder = this.accommodationRepository
+      .createQueryBuilder('accommodation')
+      .leftJoinAndSelect('accommodation.address', 'address')
+      .leftJoinAndSelect('accommodation.amenity', 'amenity')
+      .leftJoinAndSelect('accommodation.images', 'image');
+
+    addPriceFilters(queryBuilder, filters);
+    addAvailabilityFilters(queryBuilder, filters);
+    addSearchFilters(queryBuilder, filters);
+    addApartmentFilters(queryBuilder, filters);
+    addAmenityFilters(queryBuilder, filters);
+
+    // const { skip, take } = getPaginationOffset(filters.page, filters.limit);
+    // queryBuilder.skip(skip).take(take);
+
+    // const sortParams = sortByParams(filters);
+    // Object.entries(sortParams).forEach(([key, order]) => {
+    //   queryBuilder.addOrderBy(`accommodation.${key}`, order);
+    // });
+
+    const accommodations = await queryBuilder.getMany();
     return accommodations;
   }
 }
