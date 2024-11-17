@@ -7,7 +7,7 @@ import {
   Get,
   Query,
   Param,
-  Put,
+  Patch,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -24,6 +24,7 @@ import { GetAccount } from '#/modules/auth/decorators/get-account.decorator';
 import { SnakeToCamelInterceptor } from '#/shared/interceptors/snake-to-camel.interceptor';
 import { AccommodationFiltersQueryDto } from '../dto/requests/accommodation-filters.dto';
 import { UpdateAccommodationDto } from './../dto/requests/update-accommodation.req';
+import { UUIDValidationPipe } from '#/shared/pipes/uuid-validation.pipe';
 
 @ApiTags('Accommodations')
 @Controller('accommodations')
@@ -84,7 +85,7 @@ export class AccommodationController {
     return accommodation;
   }
 
-  @Put(':id')
+  @Patch(':id')
   @ApiBearerAuth()
   @UseGuards(AccessTokenGuard)
   @ApiOperation({ summary: 'Update accommodation details' })
@@ -93,7 +94,7 @@ export class AccommodationController {
     description: 'Accommodation updated successfully',
   })
   async update(
-    @Param('id') accommodationId: string,
+    @Param('id', new UUIDValidationPipe()) accommodationId: string,
     @GetAccount('accountId') ownerId: string,
     @Body() updateAccommodationDto: UpdateAccommodationDto,
   ) {
