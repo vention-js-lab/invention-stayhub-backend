@@ -26,6 +26,7 @@ COPY . .
 
 RUN npm run build
 RUN npx tsc typeorm.config.ts --outDir dist
+RUN npx tsc database/migrations/*.ts --outDir dist/database/migrations
 
 # Stage 3: Creating image to run the application
 FROM node:22 AS production
@@ -39,6 +40,5 @@ ENV APP_ENV=production
 COPY --from=build /app/package*.json ./
 COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/dist ./dist
-COPY --from=build /app/database/migrations ./database/migrations
 
 EXPOSE 3000
