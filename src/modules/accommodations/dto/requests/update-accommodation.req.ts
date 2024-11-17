@@ -17,7 +17,7 @@ export class UpdateAccommodationDto {
   @ApiProperty({ description: 'Name of the accommodation', required: false })
   @IsOptional()
   @IsString()
-  name?: string;
+  name: string | undefined;
 
   @ApiProperty({
     description: 'Description of the accommodation',
@@ -25,7 +25,7 @@ export class UpdateAccommodationDto {
   })
   @IsOptional()
   @IsString()
-  description?: string;
+  description: string | undefined;
 
   @ApiProperty({
     description: 'Cover image URL of the accommodation',
@@ -33,7 +33,7 @@ export class UpdateAccommodationDto {
   })
   @IsOptional()
   @IsString()
-  coverImage?: string | undefined;
+  coverImage: string | undefined;
 
   @ApiProperty({
     description: 'Price per night of the accommodation',
@@ -41,7 +41,7 @@ export class UpdateAccommodationDto {
   })
   @IsOptional()
   @IsNumber()
-  price?: number;
+  price: number | undefined;
 
   @ApiProperty({
     description: 'Availability status of the accommodation',
@@ -49,7 +49,7 @@ export class UpdateAccommodationDto {
   })
   @IsOptional()
   @IsBoolean()
-  available?: boolean;
+  available: boolean | undefined;
 
   @ApiProperty({
     description: 'Date when accommodation becomes available',
@@ -57,7 +57,7 @@ export class UpdateAccommodationDto {
   })
   @IsOptional()
   @IsDateString()
-  availableFrom?: string;
+  availableFrom: string | undefined;
 
   @ApiProperty({
     description: 'Date when accommodation is no longer available',
@@ -65,7 +65,7 @@ export class UpdateAccommodationDto {
   })
   @IsOptional()
   @IsDateString()
-  availableTo?: string;
+  availableTo: string | undefined;
 
   @ApiProperty({
     description: 'Total square meters of the accommodation',
@@ -74,7 +74,7 @@ export class UpdateAccommodationDto {
   @IsOptional()
   @IsNumber()
   @Min(1)
-  squareMeters?: number;
+  squareMeters: number | undefined;
 
   @ApiProperty({
     description: 'Number of rooms in the accommodation',
@@ -83,7 +83,7 @@ export class UpdateAccommodationDto {
   @IsOptional()
   @IsNumber()
   @Min(1)
-  numberOfRooms?: number;
+  numberOfRooms: number | undefined;
 
   @ApiProperty({
     description: 'Allowed number of people in the accommodation',
@@ -91,7 +91,7 @@ export class UpdateAccommodationDto {
   })
   @IsOptional()
   @IsNumber()
-  allowedNumberOfPeople?: number;
+  allowedNumberOfPeople: number | undefined;
 
   @ApiProperty({
     description: 'Images related to the accommodation',
@@ -100,7 +100,7 @@ export class UpdateAccommodationDto {
   @IsOptional()
   @ValidateNested({ each: true })
   @Type(() => AccommodationImageDto)
-  images?: AccommodationImageDto[];
+  images: AccommodationImageDto[] | undefined;
 
   @ApiProperty({
     description: 'Amenities related to the accommodation',
@@ -109,7 +109,7 @@ export class UpdateAccommodationDto {
   @IsOptional()
   @ValidateNested()
   @Type(() => AccommodationAmenityDto)
-  amenity?: AccommodationAmenityDto;
+  amenity: AccommodationAmenityDto | undefined;
 
   @ApiProperty({
     description: 'Address related to the accommodation',
@@ -118,5 +118,5 @@ export class UpdateAccommodationDto {
   @IsOptional()
   @ValidateNested()
   @Type(() => UpdateAccommodationAddressDto)
-  address?: UpdateAccommodationAddressDto;
+  address: UpdateAccommodationAddressDto | undefined;
 }
