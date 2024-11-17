@@ -25,6 +25,7 @@ COPY --from=dependencies /app/node_modules ./node_modules
 COPY . .
 
 RUN npm run build
+RUN npx tsc typeorm.config.ts --outDir dist
 
 # Stage 3: Creating image to run the application
 FROM node:22 AS production
@@ -39,6 +40,5 @@ COPY --from=build /app/package*.json ./
 COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/dist ./dist
 COPY --from=build /app/database/migrations ./database/migrations
-COPY --from=build /app/typeorm.config.ts ./typeorm.config.ts
 
 EXPOSE 3000
