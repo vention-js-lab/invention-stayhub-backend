@@ -23,6 +23,8 @@ const envConfigSchema = z.object({
   CORS_ENABLED: z.string().transform((val) => val === 'true'),
   CORS_ALLOWED_ORIGINS: z.string(),
   CORS_ALLOWED_METHODS: z.string(),
+  SUPABASE_KEY: z.string(),
+  SUPABASE_URL: z.string(),
 });
 
 export type EnvConfig = z.infer<typeof envConfigSchema>;
