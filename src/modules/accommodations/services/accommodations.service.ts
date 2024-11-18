@@ -100,4 +100,39 @@ export class AccommodationService {
     }
     return accommodation;
   }
+
+  // async softDeleteAccommodationByOwner(
+  //   accommodationId: string,
+  //   ownerId: string,
+  // ): Promise<void> {
+  //   const accommodation = await this.accommodationRepository.findOne({
+  //     where: { id: accommodationId, owner: { id: ownerId }, deletedAt: null },
+  //   });
+
+  //   if (!accommodation) {
+  //     throw new NotFoundException(
+  //       'Accommodation not found or already deleted.',
+  //     );
+  //   }
+
+  //   accommodation.deletedAt = new Date();
+  //   await this.accommodationRepository.save(accommodation);
+  // }
+
+  async softDeleteAccommodationByOwner(
+    accommodationId: string,
+    ownerId: string,
+  ): Promise<void> {
+    const accommodation = await this.accommodationRepository.findOne({
+      where: { id: accommodationId, owner: { id: ownerId }, deletedAt: null },
+    });
+
+    if (!accommodation) {
+      throw new NotFoundException(
+        'Accommodation not found or already deleted.',
+      );
+    }
+
+    await this.accommodationRepository.softRemove(accommodation);
+  }
 }

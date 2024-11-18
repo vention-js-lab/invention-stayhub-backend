@@ -8,6 +8,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   ManyToOne,
+  DeleteDateColumn,
 } from 'typeorm';
 import { AccommodationImage } from './accommodation-image.entity';
 import { AccommodationAmenity } from './accommodation-amenity.entity';
@@ -54,6 +55,12 @@ export class Accommodation {
 
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
+
+  // @Column({ type: 'timestamp', name: 'deleted_at', nullable: true })
+  // deletedAt: Date | null;
+
+  @DeleteDateColumn({ name: 'deleted_at' })
+  deletedAt: Date | null;
 
   @ManyToOne(() => Account, (account) => account.accommodations, {
     onDelete: 'CASCADE',
