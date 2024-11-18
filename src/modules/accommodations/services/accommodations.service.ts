@@ -70,7 +70,8 @@ export class AccommodationService {
       .createQueryBuilder('accommodation')
       .leftJoinAndSelect('accommodation.address', 'address')
       .leftJoinAndSelect('accommodation.amenity', 'amenity')
-      .leftJoinAndSelect('accommodation.images', 'image');
+      .leftJoinAndSelect('accommodation.images', 'image')
+      .where('accommodation.deletedAt is NULL');
 
     addPriceFilters(queryBuilder, filters);
     addAvailabilityFilters(queryBuilder, filters);
