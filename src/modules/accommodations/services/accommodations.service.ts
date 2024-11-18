@@ -129,22 +129,21 @@ export class AccommodationService {
     const { address, amenity, ...accommodationDetails } =
       updateAccommodationDto;
 
-    const filteredDetaills = Object.entries(accommodationDetails).filter(
+    const filteredDetaills = Object.entries(updateAccommodationDto).filter(
       ([, value]) => value !== undefined,
     );
     const definedDetails = Object.fromEntries(filteredDetaills);
-    console.log(definedDetails);
 
-    if (Object.keys(definedDetails).length > 0) {
-      await this.accommodationRepository.update(
-        accommodationId,
-        accommodationDetails,
-      );
-    } else {
+    if (Object.keys(definedDetails).length === 0) {
       throw new BadRequestException(
         'Please provide at least one field to update.',
       );
     }
+
+    await this.accommodationRepository.update(
+      accommodationId,
+      accommodationDetails,
+    );
 
     if (address) {
       await this.accommodationAddressService.update(
