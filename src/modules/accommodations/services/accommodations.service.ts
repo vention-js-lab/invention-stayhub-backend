@@ -1,12 +1,15 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Accommodation } from '../entities/accommodations.entity';
 import { Repository } from 'typeorm';
-import { Accommodation } from '#/modules/accommodations/entities/accommodations.entity';
 import { AccommodationDto } from '#/modules/accommodations/dto/requests/create-accommodation.req';
 import { AccommodationAddressService } from './accommodation-address.service';
 import { AccommodationAmenityService } from './accommodation-amenity.service';
 import { AccommodationImageService } from './accommodation-image.service';
 import { AccommodationFiltersQueryDto } from '../dto/requests/accommodation-filters.dto';
+import { getPaginationOffset } from '#/shared/utils/pagination-offset.util';
+import { sortByParams } from '../utils/sort-by-params.util';
+
 import {
   addPriceFilters,
   addAvailabilityFilters,
@@ -75,7 +78,26 @@ export class AccommodationService {
     addApartmentFilters(queryBuilder, filters);
     addAmenityFilters(queryBuilder, filters);
 
-    const accomodations = await queryBuilder.getMany();
-    return accomodations;
+    const { skip, take } = getPaginationOffset(filters.page, filters.limit);
+    queryBuilder.skip(skip).take(take);
+
+    const orderBy = sortByParams(filters);
+    for (const [key, value] of Object.entries(orderBy)) {
+      queryBuilder.addOrderBy(`accommodation.${key}`, value);
+    }
+
+    const accommodations = await queryBuilder.getMany();
+    return accommodations;
+  }
+
+  async getAccommodationById(id: string): Promise<Accommodation> {
+    const accommodation = await this.accommodationRepository.findOne({
+      where: { id },
+      relations: ['address', 'amenity', 'images'],
+    });
+    if (!accommodation) {
+      throw new NotFoundException(`Accommodation with ID ${id} not found`);
+    }
+    return accommodation;
   }
 }

@@ -6,7 +6,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { Roles } from '../constants/user-roles.constants';
+import { Roles } from '../constants/user-roles.constant';
 import { extractRequestAccount } from '../extractors/request-account.extractor';
 
 const ROLES_DECORATOR_KEY = 'roles';

@@ -2,10 +2,13 @@ import { ApiProperty } from '@nestjs/swagger';
 import {
   IsBoolean,
   IsDate,
+  IsEnum,
   IsInt,
   IsNumber,
   IsOptional,
+  IsPositive,
   IsString,
+  Max,
   Min,
 } from 'class-validator';
 import {
@@ -13,8 +16,53 @@ import {
   TransformToDate,
   TransformToNumber,
 } from '#/shared/transformers/transform-type.transformer';
+import { SortOrder } from '#/shared/constants/sort-order.constant';
+import { ParseInt } from '#/shared/transformers/parse-int.transformer';
+import { SortBy } from '#/modules/accommodations/constants/sort-by.constant';
 
 export class AccommodationFiltersQueryDto {
+  @ApiProperty({
+    description: 'Page is provided to calculate pagination',
+    required: false,
+  })
+  @ParseInt()
+  @IsOptional()
+  @IsInt()
+  @IsPositive()
+  page?: number;
+
+  @ApiProperty({
+    description: 'Limit is provided to calculate pagination',
+    required: false,
+  })
+  @ParseInt()
+  @IsOptional()
+  @IsInt()
+  @IsPositive()
+  @Max(1000)
+  limit?: number;
+
+  @ApiProperty({
+    description: 'Sort options to get sorted accommodations',
+    required: false,
+    example: 'numberOfRooms',
+  })
+  @IsString()
+  @IsEnum(SortBy)
+  @IsOptional()
+  sortBy?: SortBy;
+
+  @ApiProperty({
+    description:
+      'Order options to clarify in which order will the accommodations be sorted',
+    required: false,
+    example: 'ASC',
+  })
+  @IsString()
+  @IsEnum(SortOrder)
+  @IsOptional()
+  sortOrder?: SortOrder;
+
   @ApiProperty({
     name: 'min-price',
     description: 'Minimum price for accommodation',
