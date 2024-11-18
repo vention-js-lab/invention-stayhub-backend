@@ -32,7 +32,7 @@ services:
     networks:
       - app-network
     command: >
-      sh -c "npx typeorm-ts-node-commonjs migration:run -d /app/dist/typeorm.config.js && npm run start:prod"
+      sh -c "npx typeorm-ts-node-commonjs migration:run -d /app/dist/typeorm.config.ts && npm run start:prod"
   db:
     container_name: db
     image: postgres:17
