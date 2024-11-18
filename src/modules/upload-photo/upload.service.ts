@@ -15,7 +15,19 @@ export class FileUploadService {
 
   async uploadFile(file: Express.Multer.File): Promise<string> {
     if (!file || !file.buffer) {
-      throw new Error('No file provided or file buffer is empty');
+      throw new BadRequestException('No file provided or file buffer is empty');
+    }
+
+    const allowedMimeTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+    if (!allowedMimeTypes.includes(file.mimetype)) {
+      throw new BadRequestException(
+        'Invalid file type. Only JPEG, JPG, and PNG are allowed',
+      );
+    }
+
+    const maxSizeInBytes = 1 * 1024 * 1024;
+    if (file.size > maxSizeInBytes) {
+      throw new BadRequestException('File size exceeds the 1 MB limit');
     }
 
     const fileName = `${Date.now()}-${file.originalname}`;
