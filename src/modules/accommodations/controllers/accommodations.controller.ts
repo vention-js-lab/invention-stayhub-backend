@@ -7,6 +7,7 @@ import {
   Get,
   Query,
   Param,
+  Patch,
   Delete,
 } from '@nestjs/common';
 import {
@@ -23,6 +24,8 @@ import { AccessTokenGuard } from '#/shared/guards/access-token.guard';
 import { GetAccount } from '#/modules/auth/decorators/get-account.decorator';
 import { SnakeToCamelInterceptor } from '#/shared/interceptors/snake-to-camel.interceptor';
 import { AccommodationFiltersQueryDto } from '../dto/requests/accommodation-filters.dto';
+import { UpdateAccommodationDto } from './../dto/requests/update-accommodation.req';
+import { UUIDValidationPipe } from '#/shared/pipes/uuid-validation.pipe';
 
 @ApiTags('Accommodations')
 @Controller('accommodations')
@@ -81,6 +84,26 @@ export class AccommodationController {
       await this.accommodationService.getAccommodationById(id);
 
     return accommodation;
+  }
+
+  @Patch(':id')
+  @ApiBearerAuth()
+  @UseGuards(AccessTokenGuard)
+  @ApiOperation({ summary: 'Update accommodation details' })
+  @ApiResponse({
+    status: 200,
+    description: 'Accommodation updated successfully',
+  })
+  async update(
+    @Param('id', new UUIDValidationPipe()) accommodationId: string,
+    @GetAccount('accountId') ownerId: string,
+    @Body() updateAccommodationDto: UpdateAccommodationDto,
+  ) {
+    return this.accommodationService.update({
+      accommodationId,
+      ownerId,
+      updateAccommodationDto,
+    });
   }
 
   @Delete(':id')

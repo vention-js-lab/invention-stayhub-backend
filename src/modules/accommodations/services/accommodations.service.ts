@@ -1,8 +1,12 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Accommodation } from '../entities/accommodations.entity';
 import { Repository } from 'typeorm';
-import { AccommodationDto } from '#/modules/accommodations/dto/requests/create-accommodation.req';
 import { AccommodationAddressService } from './accommodation-address.service';
 import { AccommodationAmenityService } from './accommodation-amenity.service';
 import { AccommodationImageService } from './accommodation-image.service';
@@ -17,11 +21,10 @@ import {
   addSearchFilters,
   addApartmentFilters,
 } from '../helpers/accommodation-filters.util';
-
-interface CreateAccommodationParams {
-  createAccommodationDto: AccommodationDto;
-  ownerId: string;
-}
+import {
+  CreateAccommodationParams,
+  UpdateAccommodationParams,
+} from '../types/accommodations-service.type';
 
 @Injectable()
 export class AccommodationService {
@@ -100,6 +103,54 @@ export class AccommodationService {
       throw new NotFoundException(`Accommodation with ID ${id} not found`);
     }
     return accommodation;
+  }
+
+  async update({
+    accommodationId,
+    ownerId,
+    updateAccommodationDto,
+  }: UpdateAccommodationParams): Promise<Accommodation> {
+    const accommodation = await this.getAccommodationById(accommodationId);
+
+    if (accommodation.ownerId !== ownerId) {
+      throw new ForbiddenException(
+        'You are not the owner of this accommodation',
+      );
+    }
+
+    const { address, amenity, ...accommodationDetails } =
+      updateAccommodationDto;
+
+    const filteredDetaills = Object.entries(updateAccommodationDto).filter(
+      ([, value]) => value !== undefined,
+    );
+    const definedDetails = Object.fromEntries(filteredDetaills);
+
+    if (Object.keys(definedDetails).length === 0) {
+      throw new BadRequestException(
+        'Please provide at least one field to update.',
+      );
+    }
+
+    await this.accommodationRepository.update(
+      accommodationId,
+      accommodationDetails,
+    );
+
+    if (address) {
+      await this.accommodationAddressService.update(
+        accommodation.address.id,
+        updateAccommodationDto.address,
+      );
+    }
+
+    if (amenity) {
+      await this.accommodationAmenityService.update(
+        accommodation.amenity.id,
+        updateAccommodationDto.amenity,
+      );
+    }
+    return await this.getAccommodationById(accommodationId);
   }
 
   async softDeleteAccommodationByOwner(
