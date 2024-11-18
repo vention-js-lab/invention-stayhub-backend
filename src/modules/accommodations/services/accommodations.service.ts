@@ -82,7 +82,8 @@ export class AccommodationService {
       .createQueryBuilder('accommodation')
       .leftJoinAndSelect('accommodation.address', 'address')
       .leftJoinAndSelect('accommodation.amenity', 'amenity')
-      .leftJoinAndSelect('accommodation.images', 'image');
+      .leftJoinAndSelect('accommodation.images', 'image')
+      .where('accommodation.deletedAt is NULL');
 
     addPriceFilters(queryBuilder, filters);
     addAvailabilityFilters(queryBuilder, filters);
@@ -159,5 +160,22 @@ export class AccommodationService {
       );
     }
     return await this.getAccommodationById(accommodationId);
+  }
+
+  async softDeleteAccommodationByOwner(
+    accommodationId: string,
+    ownerId: string,
+  ): Promise<void> {
+    const accommodation = await this.accommodationRepository.findOne({
+      where: { id: accommodationId, owner: { id: ownerId }, deletedAt: null },
+    });
+
+    if (!accommodation) {
+      throw new NotFoundException(
+        'Accommodation not found or already deleted.',
+      );
+    }
+
+    await this.accommodationRepository.softRemove(accommodation);
   }
 }

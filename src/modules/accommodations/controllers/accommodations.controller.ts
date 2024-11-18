@@ -8,6 +8,7 @@ import {
   Query,
   Param,
   Patch,
+  Delete,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -103,5 +104,32 @@ export class AccommodationController {
       ownerId,
       updateAccommodationDto,
     });
+  }
+
+  @Delete(':id')
+  @ApiBearerAuth()
+  @UseGuards(AccessTokenGuard)
+  @ApiOperation({ summary: 'Soft delete an accommodation by owner' })
+  @ApiResponse({
+    status: 200,
+    description: 'Accommodation soft deleted successfully.',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Accommodation not found or already deleted.',
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized request.' })
+  async softDeleteAccommodation(
+    @Param('id') accommodationId: string,
+    @GetAccount('accountId') ownerId: string,
+  ): Promise<{ message: string }> {
+    await this.accommodationService.softDeleteAccommodationByOwner(
+      accommodationId,
+      ownerId,
+    );
+
+    return {
+      message: `Accommodation with ID ${accommodationId} has been successfully deleted.`,
+    };
   }
 }
