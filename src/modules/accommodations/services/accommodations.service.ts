@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -127,10 +128,23 @@ export class AccommodationService {
 
     const { address, amenity, ...accommodationDetails } =
       updateAccommodationDto;
-    await this.accommodationRepository.update(
-      accommodationId,
-      accommodationDetails,
+
+    const filteredDetaills = Object.entries(accommodationDetails).filter(
+      ([, value]) => value !== undefined,
     );
+    const definedDetails = Object.fromEntries(filteredDetaills);
+    console.log(definedDetails);
+
+    if (Object.keys(definedDetails).length > 0) {
+      await this.accommodationRepository.update(
+        accommodationId,
+        accommodationDetails,
+      );
+    } else {
+      throw new BadRequestException(
+        'Please provide at least one field to update.',
+      );
+    }
 
     if (address) {
       await this.accommodationAddressService.update(

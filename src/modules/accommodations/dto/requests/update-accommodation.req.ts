@@ -1,6 +1,7 @@
 import {
   IsBoolean,
   IsDateString,
+  IsNotEmpty,
   IsNumber,
   IsOptional,
   IsString,
@@ -17,6 +18,7 @@ export class UpdateAccommodationDto {
   @ApiProperty({ description: 'Name of the accommodation', required: false })
   @IsOptional()
   @IsString()
+  @IsNotEmpty()
   name: string | undefined;
 
   @ApiProperty({
@@ -25,6 +27,7 @@ export class UpdateAccommodationDto {
   })
   @IsOptional()
   @IsString()
+  @IsNotEmpty()
   description: string | undefined;
 
   @ApiProperty({
@@ -41,6 +44,7 @@ export class UpdateAccommodationDto {
   })
   @IsOptional()
   @IsNumber()
+  @IsNotEmpty()
   price: number | undefined;
 
   @ApiProperty({
@@ -57,6 +61,7 @@ export class UpdateAccommodationDto {
   })
   @IsOptional()
   @IsDateString()
+  @IsNotEmpty()
   availableFrom: string | undefined;
 
   @ApiProperty({
@@ -65,6 +70,7 @@ export class UpdateAccommodationDto {
   })
   @IsOptional()
   @IsDateString()
+  @IsNotEmpty()
   availableTo: string | undefined;
 
   @ApiProperty({
@@ -91,6 +97,7 @@ export class UpdateAccommodationDto {
   })
   @IsOptional()
   @IsNumber()
+  @IsNotEmpty()
   allowedNumberOfPeople: number | undefined;
 
   @ApiProperty({
