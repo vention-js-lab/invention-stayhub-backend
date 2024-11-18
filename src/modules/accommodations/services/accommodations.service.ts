@@ -7,14 +7,12 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Accommodation } from '../entities/accommodations.entity';
 import { Repository } from 'typeorm';
-import { AccommodationDto } from '#/modules/accommodations/dto/requests/create-accommodation.req';
 import { AccommodationAddressService } from './accommodation-address.service';
 import { AccommodationAmenityService } from './accommodation-amenity.service';
 import { AccommodationImageService } from './accommodation-image.service';
 import { AccommodationFiltersQueryDto } from '../dto/requests/accommodation-filters.dto';
 import { getPaginationOffset } from '#/shared/utils/pagination-offset.util';
 import { sortByParams } from '../utils/sort-by-params.util';
-import { UpdateAccommodationDto } from '../dto/requests/update-accommodation.req';
 
 import {
   addPriceFilters,
@@ -23,17 +21,10 @@ import {
   addSearchFilters,
   addApartmentFilters,
 } from '../helpers/accommodation-filters.util';
-
-interface CreateAccommodationParams {
-  createAccommodationDto: AccommodationDto;
-  ownerId: string;
-}
-
-interface UpdateAccommodationParams {
-  accommodationId: string;
-  ownerId: string;
-  updateAccommodationDto: UpdateAccommodationDto;
-}
+import {
+  CreateAccommodationParams,
+  UpdateAccommodationParams,
+} from '../types/accommodations-service.type';
 
 @Injectable()
 export class AccommodationService {
