@@ -15,6 +15,6 @@ export class AddDeletedAtToAccommodation1731928957503
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropColumn('accommodation', 'deletedAt');
+    await queryRunner.dropColumn('accommodation', 'deleted_at');
   }
 }
