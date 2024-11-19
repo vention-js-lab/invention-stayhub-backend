@@ -1,21 +1,26 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsUUID, IsDateString } from 'class-validator';
-import { Type } from 'class-transformer';
+import { IsUUID, IsDateString, Validate } from 'class-validator';
+import {
+  IsFutureDate,
+  IsStartDateBeforeEndDate,
+} from '../validators/date-validators';
 
 export class CreateBookingDto {
   @ApiProperty({ description: 'ID of the accommodation being booked' })
   @IsUUID()
-  @IsNotEmpty()
-  @Type(() => String)
   accommodationId: string;
 
   @ApiProperty({ description: 'Start date of the booking in ISO format' })
   @IsDateString()
-  @IsNotEmpty()
+  @Validate(IsFutureDate, { message: 'Start date must not be in the past' })
   startDate: string;
 
   @ApiProperty({ description: 'End date of the booking in ISO format' })
   @IsDateString()
-  @IsNotEmpty()
   endDate: string;
+
+  @Validate(IsStartDateBeforeEndDate)
+  validateDates() {
+    return { startDate: this.startDate, endDate: this.endDate };
+  }
 }
