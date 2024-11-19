@@ -23,6 +23,12 @@ const envConfigSchema = z.object({
   CORS_ENABLED: z.string().transform((val) => val === 'true'),
   CORS_ALLOWED_ORIGINS: z.string(),
   CORS_ALLOWED_METHODS: z.string(),
+
+  MINIO_ROOT_USER: z.string(),
+  MINIO_ROOT_PASSWORD: z.string(),
+  MINIO_ENDPOINT: z.string(),
+  MINIO_ACCESS_KEY: z.string(),
+  MINIO_SECRET_KEY: z.string(),
 });
 
 export type EnvConfig = z.infer<typeof envConfigSchema>;
