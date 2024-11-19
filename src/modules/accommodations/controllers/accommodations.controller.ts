@@ -69,7 +69,10 @@ export class AccommodationController {
   async listAccommodations(@Query() filters: AccommodationFiltersQueryDto) {
     const result = await this.accommodationService.listAccommodations(filters);
 
-    return result;
+    return {
+      data: result[0],
+      total: result[1],
+    };
   }
 
   @Get(':id')

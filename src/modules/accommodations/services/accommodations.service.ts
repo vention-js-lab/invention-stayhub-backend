@@ -90,7 +90,7 @@ export class AccommodationService {
       queryBuilder.addOrderBy(`accommodation.${key}`, value);
     }
 
-    const accommodations = await queryBuilder.getMany();
+    const accommodations = await queryBuilder.getManyAndCount();
     return accommodations;
   }
 
