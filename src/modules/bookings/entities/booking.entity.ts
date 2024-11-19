@@ -22,7 +22,7 @@ export class Booking {
   @Column({ name: 'end_date' })
   endDate: Date;
 
-  @Column({ enum: BookingStatus })
+  @Column({ enum: BookingStatus, default: BookingStatus.Pending })
   status: BookingStatus;
 
   @CreateDateColumn({ name: 'created_at' })

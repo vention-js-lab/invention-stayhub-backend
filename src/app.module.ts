@@ -8,6 +8,7 @@ import { UserModule } from './modules/users/users.module';
 import { validateEnv } from './shared/configs/env.config';
 import { AccommodationModule } from './modules/accommodations/accommodations.module';
 import { WishlistsModule } from './modules/wishlists/wishlists.module';
+import { BookingsModule } from './modules/bookings/bookings.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { WishlistsModule } from './modules/wishlists/wishlists.module';
     AuthModule,
     DatabaseModule,
     AccommodationModule,
+    BookingsModule,
   ],
   providers: [],
 })
