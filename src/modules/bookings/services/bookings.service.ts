@@ -27,6 +27,7 @@ export class BookingsService {
     const accommodation = await this.accommodationRepository.findOne({
       where: { id: accommodationId },
     });
+
     if (!accommodation) {
       throw new NotFoundException('Accommodation not found');
     }
@@ -37,7 +38,6 @@ export class BookingsService {
 
     accommodation.available = false;
     await this.accommodationRepository.save(accommodation);
-
     const booking = this.bookingRepository.create({
       startDate,
       endDate,
