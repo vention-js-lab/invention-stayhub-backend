@@ -10,6 +10,7 @@ import { AccommodationModule } from './modules/accommodations/accommodations.mod
 import { WishlistsModule } from './modules/wishlists/wishlists.module';
 import { PaymentModule } from './modules/payment/payment.module';
 import { UploadModule } from './modules/uploads/upload.module';
+import { BookingsModule } from './modules/bookings/bookings.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { UploadModule } from './modules/uploads/upload.module';
     DatabaseModule,
     AccommodationModule,
     PaymentModule,
+    BookingsModule,
   ],
   providers: [],
 })
