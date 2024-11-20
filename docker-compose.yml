@@ -24,20 +24,20 @@ services:
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
       GOOGLE_CALLBACK_URL: ${GOOGLE_CALLBACK_URL}
       COOKIES_REFRESH_MS: ${COOKIES_REFRESH_MS}
-      CORS_ENABLED: ${COOKIES_REFRESH_MS}
+      CORS_ENABLED: ${CORS_ENABLED}
       CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS}
-      CORS_ALLOWED_METHODS: ${COOKIES_REFRESH_MS}
+      CORS_ALLOWED_METHODS: ${CORS_ALLOWED_METHODS}
     depends_on:
       - db
+      - minio
     networks:
-      - app-network
+      app-network:
     command: >
       sh -c "npx typeorm migration:run -d dist/typeorm.config.js && npm run start:prod"
+
   db:
     container_name: db
     image: postgres:17
-    ports:
-      - '5432:5432'
     environment:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
@@ -45,9 +45,30 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
     networks:
-      - app-network
+      app-network:
+
+  minio:
+    image: quay.io/minio/minio
+    container_name: minio
+    command: server /data --console-address ":9001"
+    ports:
+      - '9000:9000'
+      - '9001:9001'
+    volumes:
+      - minio-data:/data
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      MINIO_ENDPOINT: ${MINIO_ENDPOINT}
+      MINIO_PORT: ${MINIO_PORT}
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
+    networks:
+      app-network:
+
 volumes:
   pgdata: {}
+  minio-data: {}
 
 networks:
   app-network:
