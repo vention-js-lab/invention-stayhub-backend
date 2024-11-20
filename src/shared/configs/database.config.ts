@@ -9,6 +9,7 @@ import { AccommodationAddress } from '#/modules/accommodations/entities/accommod
 import { Profile } from '#/modules/users/entities/profile.entity';
 import { AccountRefreshToken } from '#/modules/auth/entities/account-refresh-token.entity';
 import { Wishlist } from '#/modules/wishlists/entities/wishlist.entity';
+import { Payment } from '#/modules/payment/entities/payment.entity';
 import { Booking } from '#/modules/bookings/entities/booking.entity';
 
 export const databaseConfig = (
@@ -29,6 +30,7 @@ export const databaseConfig = (
     AccommodationAddress,
     AccountRefreshToken,
     Wishlist,
+    Payment,
     Booking,
   ],
   synchronize: false,
