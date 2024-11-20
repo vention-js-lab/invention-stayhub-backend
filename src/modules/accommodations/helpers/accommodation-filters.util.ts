@@ -1,11 +1,11 @@
 import { SelectQueryBuilder } from 'typeorm';
-import { AccommodationFiltersQueryDto } from '../dto/requests/accommodation-filters.dto';
+import { AccommodationFiltersReqQueryDto } from '../dto/requests/accommodation-filters.req';
 import { Accommodation } from '../entities/accommodations.entity';
 import { BadRequestException } from '@nestjs/common';
 
 export function addPriceFilters(
   queryBuilder: SelectQueryBuilder<Accommodation>,
-  filters: AccommodationFiltersQueryDto,
+  filters: AccommodationFiltersReqQueryDto,
 ) {
   if (filters.minPrice) {
     queryBuilder.andWhere('accommodation.price >= :minPrice', {
@@ -21,7 +21,7 @@ export function addPriceFilters(
 
 export function addAvailabilityFilters(
   queryBuilder: SelectQueryBuilder<Accommodation>,
-  filters: AccommodationFiltersQueryDto,
+  filters: AccommodationFiltersReqQueryDto,
 ) {
   if (filters.available !== undefined) {
     queryBuilder.andWhere('accommodation.available = :available', {
@@ -60,7 +60,7 @@ export function addAvailabilityFilters(
 
 export function addApartmentFilters(
   queryBuilder: SelectQueryBuilder<Accommodation>,
-  filters: AccommodationFiltersQueryDto,
+  filters: AccommodationFiltersReqQueryDto,
 ) {
   if (filters.rooms) {
     queryBuilder.andWhere('accommodation.numberOfRooms = :numberOfRooms', {
@@ -71,7 +71,7 @@ export function addApartmentFilters(
 
 export function addSearchFilters(
   queryBuilder: SelectQueryBuilder<Accommodation>,
-  filters: AccommodationFiltersQueryDto,
+  filters: AccommodationFiltersReqQueryDto,
 ) {
   if (filters.search) {
     queryBuilder.andWhere(
@@ -98,7 +98,7 @@ export function addSearchFilters(
 
 export function addAmenityFilters(
   queryBuilder: SelectQueryBuilder<Accommodation>,
-  filters: AccommodationFiltersQueryDto,
+  filters: AccommodationFiltersReqQueryDto,
 ) {
   const amenityFilters = {
     hasWifi: 'amenity.hasWifi = :hasWifi',
