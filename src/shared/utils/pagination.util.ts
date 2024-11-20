@@ -8,7 +8,7 @@ export function getPaginationOffset(page: number | null, limit: number | null) {
 export function getPaginationMetadata(
   page: number | null,
   limit: number | null,
-  total?: number | null,
+  total: number | null,
 ) {
   return {
     page,
