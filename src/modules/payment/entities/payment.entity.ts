@@ -1,8 +1,10 @@
+import { Booking } from '#/modules/bookings/entities/booking.entity';
 import { PaymentStatus } from '#/shared/constants/payment-status.constant';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
   OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -36,6 +38,10 @@ export class Payment {
   })
   updatedAt: Date;
 
-  @OneToOne(() => Booking, (booking) => booking.bookingId)
-  bookingId: Booking;
+  @OneToOne(() => Booking, (booking) => booking.id, { onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'booking_id' })
+  booking: Booking;
+
+  @Column({ name: 'booking_id' })
+  bookingId: string;
 }
