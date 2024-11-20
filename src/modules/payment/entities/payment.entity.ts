@@ -38,7 +38,7 @@ export class Payment {
   })
   updatedAt: Date;
 
-  @OneToOne(() => Booking, (booking) => booking.id, { onDelete: 'SET NULL' })
+  @OneToOne(() => Booking, { onDelete: 'SET NULL' })
   @JoinColumn({ name: 'booking_id' })
   booking: Booking;
 
