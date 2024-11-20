@@ -14,7 +14,9 @@ export class CreatePaymentTable1732043802492 implements MigrationInterface {
           },
           {
             name: 'amount',
-            type: 'number',
+            type: 'decimal',
+            precision: 10,
+            scale: 2,
             isNullable: false,
           },
           {
