@@ -8,6 +8,7 @@ import { UserModule } from './modules/users/users.module';
 import { validateEnv } from './shared/configs/env.config';
 import { AccommodationModule } from './modules/accommodations/accommodations.module';
 import { WishlistsModule } from './modules/wishlists/wishlists.module';
+import { PaymentModule } from './modules/payment/payment.module';
 import { UploadModule } from './modules/uploads/upload.module';
 
 @Module({
@@ -28,6 +29,7 @@ import { UploadModule } from './modules/uploads/upload.module';
     AuthModule,
     DatabaseModule,
     AccommodationModule,
+    PaymentModule,
   ],
   providers: [],
 })
