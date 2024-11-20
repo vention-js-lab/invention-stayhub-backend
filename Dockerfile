@@ -9,6 +9,7 @@ COPY package*.json ./
 
 RUN npm config set registry https://registry.npmjs.org/
 RUN npm install
+RUN npm ci
 
 COPY . .
 
