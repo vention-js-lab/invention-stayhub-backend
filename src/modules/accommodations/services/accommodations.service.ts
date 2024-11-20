@@ -28,6 +28,7 @@ import {
   CreateAccommodationParams,
   UpdateAccommodationParams,
 } from '../types/accommodations-service.type';
+import { PaginationMetadata } from '#/shared/constants/pagination.constant';
 
 @Injectable()
 export class AccommodationService {
@@ -84,7 +85,8 @@ export class AccommodationService {
     addSearchFilters(queryBuilder, filters);
     addApartmentFilters(queryBuilder, filters);
     addAmenityFilters(queryBuilder, filters);
-    const { page, limit } = filters;
+    const { page = PaginationMetadata.Page, limit = PaginationMetadata.Limit } =
+      filters;
 
     const { skip, take } = getPaginationOffset(page, limit);
     queryBuilder.skip(skip).take(take);
@@ -94,11 +96,10 @@ export class AccommodationService {
       queryBuilder.addOrderBy(`accommodation.${key}`, value);
     }
 
-    const accommodations = await queryBuilder.getManyAndCount();
-    const total = accommodations[1];
-    const metadata = getPaginationMetadata(page, limit, total);
+    const [result, total] = await queryBuilder.getManyAndCount();
+    const metadata = getPaginationMetadata({ page, limit, total });
     return {
-      result: accommodations[0],
+      result,
       metadata,
     };
   }

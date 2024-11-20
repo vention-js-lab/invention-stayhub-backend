@@ -4,11 +4,7 @@ export function withBaseResponse<T>({
   status,
   message,
   data,
-}: {
-  status: number;
-  message: string;
-  data: T;
-}): BaseResponse<T> {
+}: BaseResponse<T>): BaseResponse<T> {
   return {
     status,
     message,
