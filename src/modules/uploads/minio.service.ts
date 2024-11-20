@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Client } from 'minio';
-import { EnvConfig } from '../../shared/configs/env.config';
+import { EnvConfig } from '#/shared/configs/env.config';
 
 @Injectable()
 export class MinioService {
