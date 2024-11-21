@@ -28,7 +28,7 @@ import {
   CreateAccommodationParams,
   UpdateAccommodationParams,
 } from '../types/accommodations-service.type';
-import { PaginationMetadata } from '#/shared/constants/pagination.constant';
+import { paginationParams } from '../utils/pagination-params.util';
 
 @Injectable()
 export class AccommodationService {
@@ -85,8 +85,7 @@ export class AccommodationService {
     addSearchFilters(queryBuilder, filters);
     addApartmentFilters(queryBuilder, filters);
     addAmenityFilters(queryBuilder, filters);
-    const { page = PaginationMetadata.Page, limit = PaginationMetadata.Limit } =
-      filters;
+    const { page, limit } = paginationParams(filters);
 
     const { skip, take } = getPaginationOffset(page, limit);
     queryBuilder.skip(skip).take(take);
