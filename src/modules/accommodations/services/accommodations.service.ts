@@ -10,8 +10,11 @@ import { Repository } from 'typeorm';
 import { AccommodationAddressService } from './accommodation-address.service';
 import { AccommodationAmenityService } from './accommodation-amenity.service';
 import { AccommodationImageService } from './accommodation-image.service';
-import { AccommodationFiltersQueryDto } from '../dto/requests/accommodation-filters.dto';
-import { getPaginationOffset } from '#/shared/utils/pagination-offset.util';
+import { AccommodationFiltersReqQueryDto } from '../dto/requests/accommodation-filters.req';
+import {
+  getPaginationMetadata,
+  getPaginationOffset,
+} from '#/shared/utils/pagination.util';
 import { sortByParams } from '../utils/sort-by-params.util';
 
 import {
@@ -25,6 +28,7 @@ import {
   CreateAccommodationParams,
   UpdateAccommodationParams,
 } from '../types/accommodations-service.type';
+import { paginationParams } from '../utils/pagination-params.util';
 
 @Injectable()
 export class AccommodationService {
@@ -68,7 +72,7 @@ export class AccommodationService {
     });
   }
 
-  async listAccommodations(filters: AccommodationFiltersQueryDto) {
+  async listAccommodations(filters: AccommodationFiltersReqQueryDto) {
     const queryBuilder = this.accommodationRepository
       .createQueryBuilder('accommodation')
       .leftJoinAndSelect('accommodation.address', 'address')
@@ -81,8 +85,9 @@ export class AccommodationService {
     addSearchFilters(queryBuilder, filters);
     addApartmentFilters(queryBuilder, filters);
     addAmenityFilters(queryBuilder, filters);
+    const { page, limit } = paginationParams(filters);
 
-    const { skip, take } = getPaginationOffset(filters.page, filters.limit);
+    const { skip, take } = getPaginationOffset(page, limit);
     queryBuilder.skip(skip).take(take);
 
     const orderBy = sortByParams(filters);
@@ -90,8 +95,12 @@ export class AccommodationService {
       queryBuilder.addOrderBy(`accommodation.${key}`, value);
     }
 
-    const accommodations = await queryBuilder.getManyAndCount();
-    return accommodations;
+    const [result, total] = await queryBuilder.getManyAndCount();
+    const metadata = getPaginationMetadata({ page, limit, total });
+    return {
+      result,
+      metadata,
+    };
   }
 
   async getAccommodationById(id: string): Promise<Accommodation> {
