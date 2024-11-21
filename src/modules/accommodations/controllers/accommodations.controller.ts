@@ -23,9 +23,10 @@ import { AccommodationDto } from '#/modules/accommodations/dto/requests/create-a
 import { AccessTokenGuard } from '#/shared/guards/access-token.guard';
 import { GetAccount } from '#/modules/auth/decorators/get-account.decorator';
 import { SnakeToCamelInterceptor } from '#/shared/interceptors/snake-to-camel.interceptor';
-import { AccommodationFiltersQueryDto } from '../dto/requests/accommodation-filters.dto';
+import { AccommodationFiltersReqQueryDto } from '../dto/requests/accommodation-filters.req';
 import { UpdateAccommodationDto } from './../dto/requests/update-accommodation.req';
 import { UUIDValidationPipe } from '#/shared/pipes/uuid-validation.pipe';
+import { withBaseResponse } from '#/shared/utils/with-base-response.util';
 
 @ApiTags('Accommodations')
 @Controller('accommodations')
@@ -58,7 +59,7 @@ export class AccommodationController {
   @ApiOperation({ summary: 'Get all accommodations with filters' })
   @ApiQuery({
     name: 'filters',
-    type: AccommodationFiltersQueryDto,
+    type: AccommodationFiltersReqQueryDto,
     required: false,
     description: 'Query parameters for filtering accommodations',
   })
@@ -66,13 +67,14 @@ export class AccommodationController {
     status: 200,
     description: 'List of accommodations fetched successfully',
   })
-  async listAccommodations(@Query() filters: AccommodationFiltersQueryDto) {
+  async listAccommodations(@Query() filters: AccommodationFiltersReqQueryDto) {
     const result = await this.accommodationService.listAccommodations(filters);
 
-    return {
-      data: result[0],
-      total: result[1],
-    };
+    return withBaseResponse({
+      status: 200,
+      message: 'Accommodations are retrieved successfully',
+      data: result,
+    });
   }
 
   @Get(':id')

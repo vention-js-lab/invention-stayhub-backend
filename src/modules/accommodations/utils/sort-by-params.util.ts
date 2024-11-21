@@ -1,8 +1,8 @@
 import { SortOrder } from '#/shared/constants/sort-order.constant';
 import { SortBy } from '../constants/sort-by.constant';
-import { AccommodationFiltersQueryDto } from '../dto/requests/accommodation-filters.dto';
+import { AccommodationFiltersReqQueryDto } from '../dto/requests/accommodation-filters.req';
 
-export function sortByParams(searchParams: AccommodationFiltersQueryDto) {
+export function sortByParams(searchParams: AccommodationFiltersReqQueryDto) {
   const sortBy = searchParams.sortBy ?? SortBy.CreatedAt;
   const sortOrder = searchParams.sortOrder ?? SortOrder.Desc;
   const orderBy = {

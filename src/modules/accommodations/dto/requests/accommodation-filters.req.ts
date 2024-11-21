@@ -20,7 +20,7 @@ import { SortOrder } from '#/shared/constants/sort-order.constant';
 import { ParseInt } from '#/shared/transformers/parse-int.transformer';
 import { SortBy } from '#/modules/accommodations/constants/sort-by.constant';
 
-export class AccommodationFiltersQueryDto {
+export class AccommodationFiltersReqQueryDto {
   @ApiProperty({
     description: 'Page is provided to calculate pagination',
     required: false,
