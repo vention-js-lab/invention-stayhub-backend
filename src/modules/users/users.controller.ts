@@ -11,9 +11,9 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get()
-  @UseGuards(AccessTokenGuard)
   @UseGuards(RolesGuard)
   @UserRoles(Roles.Admin)
+  @UseGuards(AccessTokenGuard)
   async getAllUsers() {
     const result = await this.userService.listUsers();
 
