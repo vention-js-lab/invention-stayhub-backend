@@ -1,15 +1,18 @@
+import { Wishlist } from '#/modules/wishlists/entities/wishlist.entity';
 import { UpdateProfileDto } from './dto/requests/update-profile.dto';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Account } from './entities/account.entity';
 import { Profile } from './entities/profile.entity';
 import { Repository } from 'typeorm';
+import { Roles } from '#/shared/constants/user-roles.constant';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(Account) private userAccountRepo: Repository<Account>,
     @InjectRepository(Profile) private userProfileRepo: Repository<Profile>,
+    @InjectRepository(Wishlist) private wishlistRepo: Repository<Wishlist>,
   ) {}
 
   async listUsers() {
@@ -24,9 +27,8 @@ export class UserService {
     const account = await this.userAccountRepo.findOne({
       where: { id: userId, isDeleted: false },
     });
-
     if (!account) {
-      throw new NotFoundException('Account not found or deleted');
+      throw new NotFoundException('Account not found');
     }
 
     const profile = await this.userProfileRepo.findOne({
@@ -41,12 +43,33 @@ export class UserService {
     return profile;
   }
 
-  async updateProfile(userId: string, updateProfileDto: UpdateProfileDto) {
+  async getUserWishlist(userId: string) {
+    const account = await this.userAccountRepo.findOne({
+      where: { id: userId, isDeleted: false },
+    });
+    if (!account) {
+      throw new NotFoundException('Account not found');
+    }
+
+    const userWishlist = await this.wishlistRepo.find({
+      where: {
+        accountId: userId,
+      },
+    });
+
+    return userWishlist;
+  }
+
+  async updateProfile(
+    userId: string,
+    updateProfileDto: UpdateProfileDto,
+    imageUrl: string | undefined,
+  ) {
     const userAccount = await this.userAccountRepo.findOne({
       where: { id: userId, isDeleted: false },
     });
     if (!userAccount) {
-      throw new NotFoundException('Account not found or deleted');
+      throw new NotFoundException('Account not found');
     }
 
     const profile = await this.userProfileRepo.findOne({
@@ -57,22 +80,42 @@ export class UserService {
     }
 
     Object.assign(profile, updateProfileDto);
+    if (imageUrl) {
+      profile.image = imageUrl;
+    }
 
     const savedProfile = await this.userProfileRepo.save(profile);
     return savedProfile;
   }
 
-  async deleteAccountByOwner(userId: string) {
+  async toggleUserRole(userId: string) {
+    const account = await this.userAccountRepo.findOne({
+      where: { id: userId, isDeleted: false },
+    });
+    if (!account) {
+      throw new NotFoundException('Account not found');
+    }
+
+    account.role = account.role === Roles.Admin ? Roles.User : Roles.Admin;
+
+    const updatedUser = await this.userAccountRepo.save(account);
+    return updatedUser;
+  }
+
+  async deleteAccount(userId: string) {
     const userAccount = await this.userAccountRepo.findOne({
       where: { id: userId, isDeleted: false },
     });
     if (!userAccount) {
-      throw new NotFoundException('Account not found or already deleted.');
+      throw new NotFoundException('Account not found or already deleted');
     }
 
     userAccount.isDeleted = true;
     const deletedUser = await this.userAccountRepo.save(userAccount);
 
-    return deletedUser;
+    const { ...result } = deletedUser;
+    delete result.password;
+
+    return result;
   }
 }

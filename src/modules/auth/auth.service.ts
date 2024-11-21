@@ -80,7 +80,7 @@ export class AuthService {
 
   async login({ email, password }: LoginDto) {
     const user = await this.accountRepository.findOne({
-      where: { email },
+      where: { email, isDeleted: false },
     });
 
     if (!user) {
