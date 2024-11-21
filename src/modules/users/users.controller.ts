@@ -6,7 +6,7 @@ import { UpdateProfileDto } from './dto/requests/update-profile.dto';
 import { RolesGuard, UserRoles } from '#/shared/guards/roles.guard';
 import { Roles } from '#/shared/constants/user-roles.constant';
 
-@Controller('user')
+@Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
