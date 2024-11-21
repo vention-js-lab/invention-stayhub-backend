@@ -54,10 +54,11 @@ jobs:
 
       steps:
       - name: SSH into EC2 and deploy
-        uses: appleboy/ssh-action@v0.1.0
+        uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
+          fingerprint: ${{ secrets.FINGERPRINT }}
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           script: |
             cd /home/ubuntu/invention-stayhub-backend
