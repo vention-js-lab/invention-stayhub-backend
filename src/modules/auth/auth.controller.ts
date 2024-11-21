@@ -23,7 +23,7 @@ export class AuthController {
 
   @Post('register')
   @ApiOperation({ summary: 'Register a new user' })
-  @ApiResponse({ status: 201, description: 'User registeresd successfully' })
+  @ApiResponse({ status: 201, description: 'User registered successfully' })
   @ApiResponse({
     status: 409,
     description: 'User with this email already exists',
