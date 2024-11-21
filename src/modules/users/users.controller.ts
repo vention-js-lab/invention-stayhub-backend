@@ -12,10 +12,13 @@ import {
   Body,
   UseInterceptors,
   UploadedFile,
+  Param,
+  NotFoundException,
 } from '@nestjs/common';
 import { UpdateProfileDto } from './dto/requests/update-profile.dto';
 import { RolesGuard, UserRoles } from '#/shared/guards/roles.guard';
 import { Roles } from '#/shared/constants/user-roles.constant';
+import { withBaseResponse } from '#/shared/utils/with-base-response.util';
 
 @Controller('users')
 export class UserController {
@@ -28,25 +31,14 @@ export class UserController {
   @UseGuards(RolesGuard)
   @UserRoles(Roles.Admin)
   @UseGuards(AccessTokenGuard)
-  async getAllUsers() {
+  async listUsers() {
     const result = await this.userService.listUsers();
 
-    return {
-      statusCode: 200,
+    return withBaseResponse({
+      status: 200,
       message: 'Users successfully received',
       data: result,
-    };
-  }
-
-  @Get('wishlist')
-  @UseGuards(AccessTokenGuard)
-  async getUserWishlist(@GetAccount('accountId') userId: string) {
-    const result = await this.userService.getUserWishlist(userId);
-
-    return {
-      message: 'User wishlist successfully received',
-      data: result,
-    };
+    });
   }
 
   @Get('profile')
@@ -54,58 +46,93 @@ export class UserController {
   async getProfile(@GetAccount('accountId') userId: string) {
     const result = await this.userService.getProfile(userId);
 
-    return {
+    return withBaseResponse({
+      status: 200,
       message: 'Profile successfully received',
       data: result,
-    };
+    });
+  }
+
+  @Get('wishlist')
+  @UseGuards(AccessTokenGuard)
+  async getUserWishlist(@GetAccount('accountId') userId: string) {
+    const result = await this.userService.getUserWishlist(userId);
+
+    return withBaseResponse({
+      status: 200,
+      message: 'User wishlist successfully received',
+      data: result,
+    });
   }
 
   @Put('profile')
   @UseGuards(AccessTokenGuard)
-  @UseInterceptors(FileInterceptor('image'))
   async updateProfile(
-    @UploadedFile() image: Express.Multer.File,
     @GetAccount('accountId') userId: string,
     @Body() updateProfileDto: UpdateProfileDto,
   ) {
-    let imageUrl: string | undefined;
-    if (image) {
-      imageUrl = await this.uploadService.uploadImage(image);
-    }
-
     const result = await this.userService.updateProfile(
       userId,
       updateProfileDto,
-      imageUrl,
     );
 
-    return {
+    return withBaseResponse({
+      status: 200,
       message: 'Profile successfully updated',
       data: result,
-    };
+    });
   }
 
-  @Put('role')
+  @Put('profile/avatar')
+  @UseGuards(AccessTokenGuard)
+  @UseInterceptors(FileInterceptor('image'))
+  async updateProfileAvatar(
+    @UploadedFile() image: Express.Multer.File,
+    @GetAccount('accountId') userId: string,
+  ) {
+    if (!image) {
+      throw new NotFoundException('Uploading file not found');
+    }
+
+    const imgUrl = await this.uploadService.uploadImage(image);
+    const result = await this.userService.updateProfileAvatar(userId, imgUrl);
+
+    return withBaseResponse({
+      status: 200,
+      message: 'Profile avatar successfully updated',
+      data: result,
+    });
+  }
+
+  @Put(':userId/role')
   @UseGuards(RolesGuard)
   @UserRoles(Roles.Admin)
   @UseGuards(AccessTokenGuard)
-  async toggleUserRole(@GetAccount('accountId') userId: string) {
+  async toggleUserRole(@Param('userId') userId: string) {
     const result = await this.userService.toggleUserRole(userId);
 
-    return {
+    return withBaseResponse({
+      status: 200,
       message: 'User role successfully updated',
       data: result,
-    };
+    });
   }
 
-  @Delete('profile')
+  @Delete(':userId')
   @UseGuards(AccessTokenGuard)
-  async deleteAccount(@GetAccount('accountId') userId: string) {
-    const result = await this.userService.deleteAccount(userId);
+  async deleteAccount(
+    @GetAccount('accountId') deleterId: string,
+    @Param('userId') deletingUserId: string,
+  ) {
+    const result = await this.userService.deleteAccount(
+      deleterId,
+      deletingUserId,
+    );
 
-    return {
-      message: 'Profile successfully deleted',
+    return withBaseResponse({
+      status: 200,
+      message: 'Account successfully deleted',
       data: result,
-    };
+    });
   }
 }

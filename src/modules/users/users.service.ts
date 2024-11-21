@@ -1,6 +1,10 @@
 import { Wishlist } from '#/modules/wishlists/entities/wishlist.entity';
 import { UpdateProfileDto } from './dto/requests/update-profile.dto';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Account } from './entities/account.entity';
 import { Profile } from './entities/profile.entity';
@@ -26,21 +30,13 @@ export class UserService {
   async getProfile(userId: string) {
     const account = await this.userAccountRepo.findOne({
       where: { id: userId, isDeleted: false },
+      relations: ['profile'],
     });
-    if (!account) {
+    if (!account || !account.profile) {
       throw new NotFoundException('Account not found');
     }
 
-    const profile = await this.userProfileRepo.findOne({
-      where: {
-        accountId: { id: userId },
-      },
-    });
-    if (!profile) {
-      throw new NotFoundException('User profile not found');
-    }
-
-    return profile;
+    return account.profile;
   }
 
   async getUserWishlist(userId: string) {
@@ -60,31 +56,33 @@ export class UserService {
     return userWishlist;
   }
 
-  async updateProfile(
-    userId: string,
-    updateProfileDto: UpdateProfileDto,
-    imageUrl: string | undefined,
-  ) {
-    const userAccount = await this.userAccountRepo.findOne({
+  async updateProfile(userId: string, updateProfileDto: UpdateProfileDto) {
+    const account = await this.userAccountRepo.findOne({
       where: { id: userId, isDeleted: false },
+      relations: ['profile'],
     });
-    if (!userAccount) {
+    if (!account || !account.profile) {
       throw new NotFoundException('Account not found');
     }
 
-    const profile = await this.userProfileRepo.findOne({
-      where: { accountId: { id: userId } },
+    Object.assign(account.profile, updateProfileDto);
+
+    const savedProfile = await this.userProfileRepo.save(account.profile);
+    return savedProfile;
+  }
+
+  async updateProfileAvatar(userId: string, imgUrl: string) {
+    const account = await this.userAccountRepo.findOne({
+      where: { id: userId, isDeleted: false },
+      relations: ['profile'],
     });
-    if (!profile) {
-      throw new NotFoundException('User profile not found');
+    if (!account || !account.profile) {
+      throw new NotFoundException('Account not found');
     }
 
-    Object.assign(profile, updateProfileDto);
-    if (imageUrl) {
-      profile.image = imageUrl;
-    }
+    account.profile.image = imgUrl;
 
-    const savedProfile = await this.userProfileRepo.save(profile);
+    const savedProfile = await this.userProfileRepo.save(account.profile);
     return savedProfile;
   }
 
@@ -102,16 +100,23 @@ export class UserService {
     return updatedUser;
   }
 
-  async deleteAccount(userId: string) {
-    const userAccount = await this.userAccountRepo.findOne({
-      where: { id: userId, isDeleted: false },
+  async deleteAccount(deleterId: string, deletingUserId: string) {
+    const deleter = await this.userAccountRepo.findOne({
+      where: { id: deleterId, isDeleted: false },
     });
-    if (!userAccount) {
-      throw new NotFoundException('Account not found or already deleted');
+    if (deleter.role != Roles.Admin && deleterId != deletingUserId) {
+      throw new ForbiddenException('Only owner or admin can delete account');
     }
 
-    userAccount.isDeleted = true;
-    const deletedUser = await this.userAccountRepo.save(userAccount);
+    const deletingUser = await this.userAccountRepo.findOne({
+      where: { id: deletingUserId, isDeleted: false },
+    });
+    if (!deletingUser) {
+      throw new NotFoundException('User not found or already deleted');
+    }
+
+    deletingUser.isDeleted = true;
+    const deletedUser = await this.userAccountRepo.save(deletingUser);
 
     const { ...result } = deletedUser;
     delete result.password;
