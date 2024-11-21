@@ -52,7 +52,7 @@ export class UserController {
     };
   }
 
-  @Delete('account')
+  @Delete('profile')
   @UseGuards(AccessTokenGuard)
   async deleteAccount(@GetAccount('accountId') userId: string) {
     const result = await this.userService.deleteAccountByOwner(userId);
