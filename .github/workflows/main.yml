@@ -42,10 +42,10 @@ jobs:
             run: |
               docker build \
                 --file Dockerfile \
-                --tag ${{ secrets.DOCKER_USERNAME}}/invention/airbnb:1.0.0 .
+                --tag ${{ secrets.DOCKER_USERNAME}}/invention-airbnb:1.0.0 .
 
           - name: Push Docker image
-            run: docker push ${{ secrets.DOCKER_USERNAME }}/invention/airbnb:1.0.0
+            run: docker push ${{ secrets.DOCKER_USERNAME }}/invention-airbnb:1.0.0
 
                 
     deploy:
