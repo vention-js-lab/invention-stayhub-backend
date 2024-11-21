@@ -50,7 +50,7 @@ jobs:
                 
     deploy:
       needs: build-and-test
-      runs-on: [aws-ec2-stayhub]
+      runs-on: [self-hosted, Linux, X64, aws-ec2]
 
       steps:
       - name: SSH into EC2 and deploy
