@@ -31,13 +31,14 @@ export class Profile {
   @Column({ nullable: true, type: 'enum', enum: Gender })
   gender: Gender;
 
-  @Column()
+  @Column({ nullable: true })
   country: string;
 
-  @Column()
+  @Column({ nullable: true })
   description: string;
 
   @Column({
+    nullable: true,
     name: 'phone_number',
   })
   phoneNumber: string;

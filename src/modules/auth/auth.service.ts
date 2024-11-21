@@ -44,9 +44,15 @@ export class AuthService {
     const user = this.accountRepository.create({
       email,
       password: hashedPassword,
-      ...rest,
     });
     await this.accountRepository.save(user);
+
+    const userProfile = this.profileRepository.create({
+      accountId: { id: user.id },
+      ...rest,
+    });
+
+    await this.profileRepository.save(userProfile);
 
     const { ...result } = user;
     delete result.password;
