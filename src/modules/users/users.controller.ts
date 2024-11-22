@@ -13,7 +13,7 @@ import {
   UseInterceptors,
   UploadedFile,
   Param,
-  NotFoundException,
+  BadRequestException,
 } from '@nestjs/common';
 import { UpdateProfileDto } from './dto/requests/update-profile.dto';
 import { RolesGuard, UserRoles } from '#/shared/guards/roles.guard';
@@ -90,7 +90,7 @@ export class UserController {
     @GetAccount('accountId') accountId: string,
   ) {
     if (!avatarImg) {
-      throw new NotFoundException('Uploading file not found');
+      throw new BadRequestException('Error during uploading avatar');
     }
 
     const avatarUrl = await this.uploadService.uploadImage(avatarImg);
