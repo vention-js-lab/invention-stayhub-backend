@@ -14,22 +14,25 @@ import { Roles } from '#/shared/constants/user-roles.constant';
 @Injectable()
 export class UserService {
   constructor(
-    @InjectRepository(Account) private userAccountRepo: Repository<Account>,
-    @InjectRepository(Profile) private userProfileRepo: Repository<Profile>,
-    @InjectRepository(Wishlist) private wishlistRepo: Repository<Wishlist>,
+    @InjectRepository(Account)
+    private userAccountRepository: Repository<Account>,
+    @InjectRepository(Profile)
+    private userProfileRepository: Repository<Profile>,
+    @InjectRepository(Wishlist)
+    private wishlistRepository: Repository<Wishlist>,
   ) {}
 
   async listUsers() {
-    const users = await this.userAccountRepo.find({
+    const users = await this.userAccountRepository.find({
       select: ['id', 'email', 'isDeleted', 'role', 'createdAt', 'updatedAt'],
     });
 
     return users;
   }
 
-  async getProfile(userId: string) {
-    const account = await this.userAccountRepo.findOne({
-      where: { id: userId, isDeleted: false },
+  async getProfile(accountId: string) {
+    const account = await this.userAccountRepository.findOne({
+      where: { id: accountId, isDeleted: false },
       relations: ['profile'],
     });
     if (!account || !account.profile) {
@@ -39,26 +42,26 @@ export class UserService {
     return account.profile;
   }
 
-  async getUserWishlist(userId: string) {
-    const account = await this.userAccountRepo.findOne({
-      where: { id: userId, isDeleted: false },
+  async getUserWishlist(accountId: string) {
+    const account = await this.userAccountRepository.findOne({
+      where: { id: accountId, isDeleted: false },
     });
     if (!account) {
       throw new NotFoundException('Account not found');
     }
 
-    const userWishlist = await this.wishlistRepo.find({
+    const userWishlist = await this.wishlistRepository.find({
       where: {
-        accountId: userId,
+        accountId,
       },
     });
 
     return userWishlist;
   }
 
-  async updateProfile(userId: string, updateProfileDto: UpdateProfileDto) {
-    const account = await this.userAccountRepo.findOne({
-      where: { id: userId, isDeleted: false },
+  async updateProfile(accountId: string, updateProfileDto: UpdateProfileDto) {
+    const account = await this.userAccountRepository.findOne({
+      where: { id: accountId, isDeleted: false },
       relations: ['profile'],
     });
     if (!account || !account.profile) {
@@ -67,28 +70,28 @@ export class UserService {
 
     Object.assign(account.profile, updateProfileDto);
 
-    const savedProfile = await this.userProfileRepo.save(account.profile);
+    const savedProfile = await this.userProfileRepository.save(account.profile);
     return savedProfile;
   }
 
-  async updateProfileAvatar(userId: string, imgUrl: string) {
-    const account = await this.userAccountRepo.findOne({
-      where: { id: userId, isDeleted: false },
+  async updateProfileAvatar(accountId: string, avatarUrl: string) {
+    const account = await this.userAccountRepository.findOne({
+      where: { id: accountId, isDeleted: false },
       relations: ['profile'],
     });
     if (!account || !account.profile) {
       throw new NotFoundException('Account not found');
     }
 
-    account.profile.image = imgUrl;
+    account.profile.image = avatarUrl;
 
-    const savedProfile = await this.userProfileRepo.save(account.profile);
+    const savedProfile = await this.userProfileRepository.save(account.profile);
     return savedProfile;
   }
 
-  async toggleUserRole(userId: string) {
-    const account = await this.userAccountRepo.findOne({
-      where: { id: userId, isDeleted: false },
+  async toggleUserRole(accountId: string) {
+    const account = await this.userAccountRepository.findOne({
+      where: { id: accountId, isDeleted: false },
     });
     if (!account) {
       throw new NotFoundException('Account not found');
@@ -96,27 +99,27 @@ export class UserService {
 
     account.role = account.role === Roles.Admin ? Roles.User : Roles.Admin;
 
-    const updatedUser = await this.userAccountRepo.save(account);
+    const updatedUser = await this.userAccountRepository.save(account);
     return updatedUser;
   }
 
-  async deleteAccount(deleterId: string, deletingUserId: string) {
-    const deleter = await this.userAccountRepo.findOne({
+  async deleteAccount(deleterId: string, deletingAccountId: string) {
+    const deleter = await this.userAccountRepository.findOne({
       where: { id: deleterId, isDeleted: false },
     });
-    if (deleter.role != Roles.Admin && deleterId != deletingUserId) {
+    if (deleter.role != Roles.Admin && deleterId != deletingAccountId) {
       throw new ForbiddenException('Only owner or admin can delete account');
     }
 
-    const deletingUser = await this.userAccountRepo.findOne({
-      where: { id: deletingUserId, isDeleted: false },
+    const deletingUser = await this.userAccountRepository.findOne({
+      where: { id: deletingAccountId, isDeleted: false },
     });
     if (!deletingUser) {
       throw new NotFoundException('User not found or already deleted');
     }
 
     deletingUser.isDeleted = true;
-    const deletedUser = await this.userAccountRepo.save(deletingUser);
+    const deletedUser = await this.userAccountRepository.save(deletingUser);
 
     const { ...result } = deletedUser;
     delete result.password;

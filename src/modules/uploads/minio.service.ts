@@ -29,11 +29,7 @@ export class MinioService implements OnModuleInit {
         await this.client.makeBucket(this.bucketName, 'us-east-1');
       }
     } catch (error) {
-      console.error(
-        `Failed to create bucket "${this.bucketName}":`,
-        error.message,
-      );
-      throw error;
+      throw new Error(error.message);
     }
   }
 

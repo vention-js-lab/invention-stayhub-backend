@@ -28,9 +28,8 @@ export class UserController {
   ) {}
 
   @Get()
-  @UseGuards(RolesGuard)
   @UserRoles(Roles.Admin)
-  @UseGuards(AccessTokenGuard)
+  @UseGuards(AccessTokenGuard, RolesGuard)
   async listUsers() {
     const result = await this.userService.listUsers();
 
@@ -43,8 +42,8 @@ export class UserController {
 
   @Get('profile')
   @UseGuards(AccessTokenGuard)
-  async getProfile(@GetAccount('accountId') userId: string) {
-    const result = await this.userService.getProfile(userId);
+  async getProfile(@GetAccount('accountId') accountId: string) {
+    const result = await this.userService.getProfile(accountId);
 
     return withBaseResponse({
       status: 200,
@@ -55,8 +54,8 @@ export class UserController {
 
   @Get('wishlist')
   @UseGuards(AccessTokenGuard)
-  async getUserWishlist(@GetAccount('accountId') userId: string) {
-    const result = await this.userService.getUserWishlist(userId);
+  async getUserWishlist(@GetAccount('accountId') accountId: string) {
+    const result = await this.userService.getUserWishlist(accountId);
 
     return withBaseResponse({
       status: 200,
@@ -68,11 +67,11 @@ export class UserController {
   @Put('profile')
   @UseGuards(AccessTokenGuard)
   async updateProfile(
-    @GetAccount('accountId') userId: string,
+    @GetAccount('accountId') accountId: string,
     @Body() updateProfileDto: UpdateProfileDto,
   ) {
     const result = await this.userService.updateProfile(
-      userId,
+      accountId,
       updateProfileDto,
     );
 
@@ -85,17 +84,20 @@ export class UserController {
 
   @Put('profile/avatar')
   @UseGuards(AccessTokenGuard)
-  @UseInterceptors(FileInterceptor('image'))
+  @UseInterceptors(FileInterceptor('avatar'))
   async updateProfileAvatar(
-    @UploadedFile() image: Express.Multer.File,
-    @GetAccount('accountId') userId: string,
+    @UploadedFile() avatarImg: Express.Multer.File,
+    @GetAccount('accountId') accountId: string,
   ) {
-    if (!image) {
+    if (!avatarImg) {
       throw new NotFoundException('Uploading file not found');
     }
 
-    const imgUrl = await this.uploadService.uploadImage(image);
-    const result = await this.userService.updateProfileAvatar(userId, imgUrl);
+    const avatarUrl = await this.uploadService.uploadImage(avatarImg);
+    const result = await this.userService.updateProfileAvatar(
+      accountId,
+      avatarUrl,
+    );
 
     return withBaseResponse({
       status: 200,
@@ -104,12 +106,11 @@ export class UserController {
     });
   }
 
-  @Put(':userId/role')
-  @UseGuards(RolesGuard)
+  @Put(':accountId/role')
   @UserRoles(Roles.Admin)
-  @UseGuards(AccessTokenGuard)
-  async toggleUserRole(@Param('userId') userId: string) {
-    const result = await this.userService.toggleUserRole(userId);
+  @UseGuards(AccessTokenGuard, RolesGuard)
+  async toggleUserRole(@Param('accountId') accountId: string) {
+    const result = await this.userService.toggleUserRole(accountId);
 
     return withBaseResponse({
       status: 200,
@@ -118,15 +119,15 @@ export class UserController {
     });
   }
 
-  @Delete(':userId')
+  @Delete(':accountId')
   @UseGuards(AccessTokenGuard)
   async deleteAccount(
     @GetAccount('accountId') deleterId: string,
-    @Param('userId') deletingUserId: string,
+    @Param('accountId') deletingAccountId: string,
   ) {
     const result = await this.userService.deleteAccount(
       deleterId,
-      deletingUserId,
+      deletingAccountId,
     );
 
     return withBaseResponse({

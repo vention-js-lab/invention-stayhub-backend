@@ -61,6 +61,6 @@ export class Account {
   @OneToMany(() => Accommodation, (accommodation) => accommodation.owner)
   accommodations: Accommodation[];
 
-  @OneToOne(() => Profile, (profile) => profile.accountId)
+  @OneToOne(() => Profile, (profile) => profile.account)
   profile: Profile;
 }

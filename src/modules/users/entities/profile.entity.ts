@@ -31,14 +31,13 @@ export class Profile {
   @Column({ nullable: true, type: 'enum', enum: Gender })
   gender: Gender;
 
-  @Column({ nullable: true })
+  @Column()
   country: string;
 
-  @Column({ nullable: true })
+  @Column()
   description: string;
 
   @Column({
-    nullable: true,
     name: 'phone_number',
   })
   phoneNumber: string;
@@ -57,9 +56,12 @@ export class Profile {
   })
   updatedAt: Date;
 
+  @Column({ name: 'account_id' })
+  accountId: string;
+
   @OneToOne(() => Account, (account) => account.profile, {
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'account_id' })
-  accountId: Account;
+  account: Account;
 }

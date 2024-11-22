@@ -27,7 +27,7 @@ export const mockUsers = [
 
 export const mockUser = mockUsers[0];
 
-export const mockProfile: Profile = {
+export const mockProfile = {
   id: faker.string.uuid(),
   firstName: faker.person.firstName(),
   lastName: faker.person.lastName(),
@@ -38,8 +38,8 @@ export const mockProfile: Profile = {
   phoneNumber: faker.phone.number(),
   createdAt: faker.date.anytime(),
   updatedAt: faker.date.anytime(),
-  accountId: mockUser,
-};
+  accountId: mockUser.id,
+} as Profile;
 
 export const mockUserWishlist = [
   {

@@ -48,7 +48,7 @@ export class AuthService {
     await this.accountRepository.save(user);
 
     const userProfile = this.profileRepository.create({
-      accountId: { id: user.id },
+      accountId: user.id,
       ...rest,
     });
 
@@ -197,7 +197,7 @@ export class AuthService {
       });
       await this.accountRepository.save(newAccount);
 
-      newProfile.accountId = newAccount;
+      newProfile.accountId = newAccount.id;
 
       await this.profileRepository.save(newProfile);
     }
