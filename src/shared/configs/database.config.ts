@@ -11,6 +11,7 @@ import { AccountRefreshToken } from '#/modules/auth/entities/account-refresh-tok
 import { Wishlist } from '#/modules/wishlists/entities/wishlist.entity';
 import { Payment } from '#/modules/payment/entities/payment.entity';
 import { Booking } from '#/modules/bookings/entities/booking.entity';
+import { Review } from '../../modules/review/entities/review.entity';
 
 export const databaseConfig = (
   configService: ConfigService<EnvConfig>,
@@ -22,6 +23,7 @@ export const databaseConfig = (
   password: configService.get('DB_PASSWORD'),
   database: configService.get('DB_NAME'),
   entities: [
+    Review,
     Profile,
     Account,
     Accommodation,

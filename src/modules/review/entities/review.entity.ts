@@ -6,6 +6,7 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -31,24 +32,24 @@ export class Review {
   @Max(5, { message: 'Rating must be at most 5.' })
   rating: number;
 
-  @ManyToOne(() => Account, { onDelete: 'SET NULL' })
+  @ManyToOne(() => Account, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'account_id' })
-  account: Account | null;
+  account: Account;
 
   @Column({ name: 'account_id' })
-  accountId: string | null;
+  accountId: string;
 
-  @ManyToOne(() => Accommodation, { onDelete: 'SET NULL' })
+  @ManyToOne(() => Accommodation, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'accommodation_id' })
-  accommodation: Accommodation | null;
+  accommodation: Accommodation;
 
   @Column({ name: 'accommodation_id' })
-  accommodationId: string | null;
+  accommodationId: string;
 
-  @ManyToOne(() => Booking, { onDelete: 'SET NULL' })
+  @OneToOne(() => Booking, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'booking_id' })
-  booking: Booking | null;
+  booking: Booking;
 
-  @Column({ name: 'accommodation_id' })
-  bookingId: string | null;
+  @Column({ name: 'booking_id' })
+  bookingId: string;
 }

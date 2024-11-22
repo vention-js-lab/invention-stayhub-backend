@@ -14,6 +14,7 @@ import { AccommodationImage } from './accommodation-image.entity';
 import { AccommodationAmenity } from './accommodation-amenity.entity';
 import { AccommodationAddress } from './accommodation-address.entity';
 import { Account } from '#/modules/users/entities/account.entity';
+import { Review } from '../../review/entities/review.entity';
 
 @Entity('accommodation')
 export class Accommodation {
@@ -76,4 +77,7 @@ export class Accommodation {
 
   @OneToOne(() => AccommodationAddress, (address) => address.accommodation)
   address: AccommodationAddress;
+
+  @OneToMany(() => Review, (review) => review.accommodation)
+  reviews: Review[];
 }
