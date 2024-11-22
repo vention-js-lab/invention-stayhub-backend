@@ -58,7 +58,6 @@ jobs:
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
-          fingerprint: ${{ secrets.FINGERPRINT }}
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           script: |
             cd /home/ubuntu/invention-stayhub-backend
