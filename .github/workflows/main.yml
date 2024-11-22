@@ -42,10 +42,10 @@ jobs:
             run: |
               docker build \
                 --file Dockerfile \
-                --tag ${{ secrets.DOCKER_USERNAME}}/invention-airbnb:1.0.0 .
+                --tag ${{ secrets.DOCKER_USERNAME}}/invention-airbnb:${{ github.sha }} .
 
           - name: Push Docker image
-            run: docker push ${{ secrets.DOCKER_USERNAME }}/invention-airbnb:1.0.0
+            run: docker push ${{ secrets.DOCKER_USERNAME }}/invention-airbnb:${{ github.sha }}
 
                 
     deploy:
@@ -53,7 +53,7 @@ jobs:
       runs-on: [self-hosted, Linux, X64, aws-ec2]
 
       steps:
-      - name: SSH into EC2 and deploy
+      - name: SSH into EC2 and pull Docker image
         uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.EC2_HOST }}
@@ -61,6 +61,5 @@ jobs:
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           script: |
             cd /home/ubuntu/invention-stayhub-backend
-            docker-compose down
-            docker-compose pull
-            docker-compose up -d
+            docker pull ${{ secrets.DOCKER_USERNAME }}/invention-airbnb:${{ github.sha }}
+            docker run -d -p 5000:5000 --env-file /home/ubuntu/invention-stayhub-backend/.env ${{ secrets.DOCKER_USERNAME }}/invention-airbnb:${{ github.sha }}
