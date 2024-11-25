@@ -11,7 +11,7 @@ import { Roles } from '#/shared/constants/user-roles.constant';
 import { AccountType } from '#/shared/constants/user-account.constant';
 import { Accommodation } from '#/modules/accommodations/entities/accommodations.entity';
 import { Profile } from './profile.entity';
-import { Review } from '../../review/entities/review.entity';
+import { Review } from '#/modules/review/entities/review.entity';
 
 @Entity('account')
 export class Account {
