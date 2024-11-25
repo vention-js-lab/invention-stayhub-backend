@@ -7,7 +7,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Account } from './entities/account.entity';
 import { Profile } from './entities/profile.entity';
-import { Repository } from 'typeorm';
+import { Not, Repository } from 'typeorm';
 import { Roles } from '#/shared/constants/user-roles.constant';
 import { UserFiltersReqQueryDto } from './dto/requests/users-filters.req';
 import { addUserFilters } from './helpers/users-filters.util';
@@ -117,6 +117,20 @@ export class UserService {
     });
     if (!deletingAccount) {
       throw new NotFoundException('User not found or already deleted');
+    }
+
+    if (deletingAccount.role === Roles.Admin) {
+      const remainingAdmins = await this.accountRepository.count({
+        where: {
+          role: Roles.Admin,
+          isDeleted: false,
+          id: Not(deletingAccountId),
+        },
+      });
+
+      if (remainingAdmins === 0) {
+        throw new ForbiddenException('Cannot delete the last admin');
+      }
     }
 
     deletingAccount.isDeleted = true;

@@ -57,13 +57,25 @@ describe('UserService', () => {
         leftJoinAndSelect: jest.fn().mockReturnThis(),
         select: jest.fn().mockReturnThis(),
         where: jest.fn().mockReturnThis(),
-        getMany: jest.fn().mockResolvedValue(users),
+        skip: jest.fn().mockReturnThis(),
+        take: jest.fn().mockReturnThis(),
+        getManyAndCount: jest
+          .fn()
+          .mockResolvedValue([mockUsers, mockUsers.length]),
       });
 
       const result = await userService.listUsers({} as UserFiltersReqQueryDto);
 
       expect(accountRepo.createQueryBuilder).toHaveBeenCalledWith('account');
-      expect(result).toEqual(users);
+      expect(result).toEqual({
+        result: users,
+        metadata: {
+          page: 1,
+          hasNextPage: false,
+          hasPreviousPage: false,
+          total: users.length,
+        },
+      });
     });
   });
 
@@ -118,7 +130,7 @@ describe('UserService', () => {
   });
 
   describe('updateProfileAvatar', () => {
-    it('returns updated profile', async () => {
+    it('returns updated profile (avatar)', async () => {
       const account = mockUser;
       const profile = mockProfile;
       const userId = mockUser.id;
@@ -242,7 +254,7 @@ describe('UserService', () => {
     it('deletes user account successfully by user themselves', async () => {
       const deleteActorId = mockUser.id;
       const deletingUserId = mockUser.id;
-      const userToDelete = mockUser;
+      const userToDelete = { ...mockUser, role: Roles.User };
 
       accountRepo.findOne = jest
         .fn()
