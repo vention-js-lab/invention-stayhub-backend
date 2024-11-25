@@ -10,10 +10,8 @@ import { CreateReviewDto } from './dto/create.review.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Booking } from '../bookings/entities/booking.entity';
 import { Repository } from 'typeorm';
-import { BookingStatus } from '../../shared/constants/booking-status.constant';
+import { BookingStatus } from '#/shared/constants/booking-status.constant';
 import { Accommodation } from '../accommodations/entities/accommodations.entity';
-import { withBaseResponse } from '../../shared/utils/with-base-response.util';
-import { BaseResponse } from '../../shared/types/base-response.type';
 
 @Injectable()
 export class ReviewService {
@@ -29,24 +27,26 @@ export class ReviewService {
   async createReview(
     accountId: string,
     createReviewDto: CreateReviewDto,
-  ): Promise<BaseResponse<Review>> {
+  ): Promise<Review> {
     const { accommodationId, bookingId, rating, content } = createReviewDto;
 
     const booking = await this.bookingRepository.findOne({
-      where: { id: bookingId },
+      where: {
+        id: bookingId,
+      },
     });
     if (!booking) {
       throw new NotFoundException('Booking not found.');
+    }
+
+    if (accountId !== booking.accountId) {
+      throw new ForbiddenException('You can only review your own booking.');
     }
 
     if (booking.status !== BookingStatus.Completed) {
       throw new BadRequestException(
         'You can only add a review after your booking has been completed.',
       );
-    }
-
-    if (accountId !== booking.accountId) {
-      throw new ForbiddenException('You can only review your own booking.');
     }
 
     const existingReview = await this.reviewRepository.findOne({
@@ -71,10 +71,6 @@ export class ReviewService {
       bookingId,
     });
 
-    return withBaseResponse({
-      status: 201,
-      message: 'Review created successfully.',
-      data: await this.reviewRepository.save(review),
-    });
+    return await this.reviewRepository.save(review);
   }
 }

@@ -8,10 +8,10 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { ReviewService } from '../review.service';
-import { Booking } from '../../bookings/entities/booking.entity';
+import { Booking } from '#/modules/bookings/entities/booking.entity';
 import { Review } from '../entities/review.entity';
-import { Accommodation } from '../../../modules/accommodations/entities/accommodations.entity';
-import { BookingStatus } from '../../../shared/constants/booking-status.constant';
+import { Accommodation } from '#/modules/accommodations/entities/accommodations.entity';
+import { BookingStatus } from '#/shared/constants/booking-status.constant';
 
 const mockBookingRepository = {
   findOne: jest.fn(),
@@ -180,11 +180,7 @@ describe('ReviewService', () => {
         },
       );
 
-      expect(result).toEqual({
-        status: 201,
-        message: 'Review created successfully.',
-        data: mockReviewData,
-      });
+      expect(result).toEqual(mockReviewData);
     });
   });
 });

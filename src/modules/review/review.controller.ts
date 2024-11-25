@@ -3,14 +3,15 @@ import { ReviewService } from './review.service';
 import { GetAccount } from '../auth/decorators/get-account.decorator';
 import { CreateReviewDto } from './dto/create.review.dto';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { AccessTokenGuard } from '../../shared/guards/access-token.guard';
+import { AccessTokenGuard } from '#/shared/guards/access-token.guard';
+import { withBaseResponse } from '#/shared/utils/with-base-response.util';
 
 @ApiTags('Reviews')
-@Controller('review')
+@Controller('reviews')
 export class ReviewController {
   constructor(private readonly reviewService: ReviewService) {}
 
-  @Post('/add')
+  @Post()
   @ApiOperation({ summary: 'Create a new review' })
   @ApiResponse({
     status: 201,
@@ -29,6 +30,12 @@ export class ReviewController {
     @GetAccount('accountId') accountId: string,
     @Body() createReviewDto: CreateReviewDto,
   ) {
-    return this.reviewService.createReview(accountId, createReviewDto);
+    const data = this.reviewService.createReview(accountId, createReviewDto);
+
+    return withBaseResponse({
+      status: 201,
+      message: 'Review created successfully.',
+      data: data,
+    });
   }
 }

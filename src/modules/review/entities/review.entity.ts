@@ -32,14 +32,18 @@ export class Review {
   @Max(5, { message: 'Rating must be at most 5.' })
   rating: number;
 
-  @ManyToOne(() => Account, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Account, (account) => account.reviews, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'account_id' })
   account: Account;
 
   @Column({ name: 'account_id' })
   accountId: string;
 
-  @ManyToOne(() => Accommodation, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Accommodation, (accommodation) => accommodation.reviews, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'accommodation_id' })
   accommodation: Accommodation;
 
