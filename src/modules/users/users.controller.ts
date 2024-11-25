@@ -1,3 +1,5 @@
+import { ListUsersResponseDto } from './dto/responses/list-users.res';
+import { ProfileResDto } from './dto/responses/profile.res';
 import { UploadService } from './../uploads/upload.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AccessTokenGuard } from '#/shared/guards/access-token.guard';
@@ -14,12 +16,22 @@ import {
   UploadedFile,
   Param,
   BadRequestException,
+  Query,
 } from '@nestjs/common';
-import { UpdateProfileDto } from './dto/requests/update-profile.dto';
+import { UpdateProfileDto } from './dto/requests/update-profile.req';
 import { RolesGuard, UserRoles } from '#/shared/guards/roles.guard';
 import { Roles } from '#/shared/constants/user-roles.constant';
 import { withBaseResponse } from '#/shared/utils/with-base-response.util';
+import { UserFiltersReqQueryDto } from './dto/requests/users-filters.req';
+import {
+  ApiOkResponse,
+  ApiOperation,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
+import { SnakeToCamelInterceptor } from '#/shared/interceptors/snake-to-camel.interceptor';
 
+@ApiTags('Users')
 @Controller('users')
 export class UserController {
   constructor(
@@ -28,10 +40,22 @@ export class UserController {
   ) {}
 
   @Get()
+  @ApiOperation({ summary: 'Get all users with filters' })
+  @ApiQuery({
+    name: 'filters',
+    type: UserFiltersReqQueryDto,
+    required: false,
+    description: 'Query parameters for filtering users',
+  })
+  @ApiOkResponse({
+    description: 'List of users fetched successfully',
+    type: ListUsersResponseDto,
+  })
+  @UseInterceptors(SnakeToCamelInterceptor)
   @UserRoles(Roles.Admin)
   @UseGuards(AccessTokenGuard, RolesGuard)
-  async listUsers() {
-    const result = await this.userService.listUsers();
+  async listUsers(@Query() filters: UserFiltersReqQueryDto) {
+    const result = await this.userService.listUsers(filters);
 
     return withBaseResponse({
       status: 200,
@@ -41,6 +65,11 @@ export class UserController {
   }
 
   @Get('profile')
+  @ApiOperation({ summary: 'Get user profile' })
+  @ApiOkResponse({
+    description: 'User profile fetched successfully',
+    type: ProfileResDto,
+  })
   @UseGuards(AccessTokenGuard)
   async getProfile(@GetAccount('accountId') accountId: string) {
     const result = await this.userService.getProfile(accountId);
@@ -52,19 +81,12 @@ export class UserController {
     });
   }
 
-  @Get('wishlist')
-  @UseGuards(AccessTokenGuard)
-  async getUserWishlist(@GetAccount('accountId') accountId: string) {
-    const result = await this.userService.getUserWishlist(accountId);
-
-    return withBaseResponse({
-      status: 200,
-      message: 'User wishlist successfully received',
-      data: result,
-    });
-  }
-
   @Put('profile')
+  @ApiOperation({ summary: 'Update user profile' })
+  @ApiOkResponse({
+    description: 'User profile updated successfully',
+    type: ProfileResDto,
+  })
   @UseGuards(AccessTokenGuard)
   async updateProfile(
     @GetAccount('accountId') accountId: string,
@@ -83,6 +105,11 @@ export class UserController {
   }
 
   @Put('profile/avatar')
+  @ApiOperation({ summary: 'Update the user profile avatar' })
+  @ApiOkResponse({
+    description: 'User profile avatar updated successfully',
+    type: ProfileResDto,
+  })
   @UseGuards(AccessTokenGuard)
   @UseInterceptors(FileInterceptor('avatar'))
   async updateProfileAvatar(
@@ -90,7 +117,7 @@ export class UserController {
     @GetAccount('accountId') accountId: string,
   ) {
     if (!avatarImg) {
-      throw new BadRequestException('Error during uploading avatar');
+      throw new BadRequestException('Image is required');
     }
 
     const avatarUrl = await this.uploadService.uploadImage(avatarImg);
@@ -107,6 +134,11 @@ export class UserController {
   }
 
   @Put(':accountId/role')
+  @ApiOperation({ summary: 'Toggle user role (admin only)' })
+  @ApiOkResponse({
+    description: 'User role updated successfully',
+    type: ProfileResDto,
+  })
   @UserRoles(Roles.Admin)
   @UseGuards(AccessTokenGuard, RolesGuard)
   async toggleUserRole(@Param('accountId') accountId: string) {
@@ -119,14 +151,18 @@ export class UserController {
     });
   }
 
-  @Delete(':accountId')
+  @Delete(':userId')
+  @ApiOperation({ summary: 'Soft delete a user account' })
+  @ApiOkResponse({
+    description: 'User soft deleted successfully',
+  })
   @UseGuards(AccessTokenGuard)
   async deleteAccount(
-    @GetAccount('accountId') deleterId: string,
-    @Param('accountId') deletingAccountId: string,
+    @GetAccount('accountId') deleteActorId: string,
+    @Param('userId') deletingAccountId: string,
   ) {
-    const result = await this.userService.deleteAccount(
-      deleterId,
+    const result = await this.userService.softDeleteAccount(
+      deleteActorId,
       deletingAccountId,
     );
 

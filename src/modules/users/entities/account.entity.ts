@@ -1,6 +1,7 @@
 import {
   Column,
   CreateDateColumn,
+  DeleteDateColumn,
   Entity,
   OneToMany,
   OneToOne,
@@ -41,7 +42,12 @@ export class Account {
   @Column({ type: 'enum', name: 'type', enum: AccountType })
   type: AccountType;
 
-  @Column({ type: 'boolean', name: 'is_deleted', nullable: true })
+  @Column({
+    type: 'boolean',
+    name: 'is_deleted',
+    nullable: false,
+    default: false,
+  })
   isDeleted: boolean;
 
   @CreateDateColumn({
@@ -57,6 +63,13 @@ export class Account {
     default: () => 'CURRENT_TIMESTAMP',
   })
   updatedAt: Date;
+
+  @DeleteDateColumn({
+    name: 'deleted_at',
+    type: 'timestamp',
+    default: () => null,
+  })
+  deletedAt: Date;
 
   @OneToMany(() => Accommodation, (accommodation) => accommodation.owner)
   accommodations: Accommodation[];

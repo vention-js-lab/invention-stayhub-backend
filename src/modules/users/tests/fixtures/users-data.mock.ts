@@ -1,31 +1,50 @@
-import { Wishlist } from '#/modules/wishlists/entities/wishlist.entity';
 import { Account } from '#/modules/users/entities/account.entity';
 import { Profile } from '#/modules/users/entities/profile.entity';
 import { Gender } from '#/shared/constants/gender.constant';
 import { Roles } from '#/shared/constants/user-roles.constant';
-import { UpdateProfileDto } from '#/modules/users/dto/requests/update-profile.dto';
+import { UpdateProfileDto } from '#/modules/users/dto/requests/update-profile.req';
 import { faker } from '@faker-js/faker';
 
 export const mockUsers = [
   {
     id: faker.string.uuid(),
     email: faker.internet.email(),
-    isDeleted: faker.datatype.boolean(),
     role: faker.helpers.arrayElement([Roles.User, Roles.Admin]),
+    isDeleted: faker.datatype.boolean(),
     createdAt: faker.date.anytime(),
-    updatedAt: faker.date.anytime(),
+    profile: {
+      firstName: faker.person.firstName(),
+      lastName: faker.person.lastName(),
+      gender: faker.helpers.arrayElement([Gender.Female, Gender.Male]),
+      country: faker.location.country(),
+      phoneNumber: faker.phone.number(),
+    },
   },
   {
     id: faker.string.uuid(),
     email: faker.internet.email(),
-    isDeleted: faker.datatype.boolean(),
     role: faker.helpers.arrayElement([Roles.User, Roles.Admin]),
+    isDeleted: faker.datatype.boolean(),
     createdAt: faker.date.anytime(),
-    updatedAt: faker.date.anytime(),
+    profile: {
+      firstName: faker.person.firstName(),
+      lastName: faker.person.lastName(),
+      gender: faker.helpers.arrayElement([Gender.Female, Gender.Male]),
+      country: faker.location.country(),
+      phoneNumber: faker.phone.number(),
+    },
   },
 ] as Account[];
 
-export const mockUser = mockUsers[0];
+export const mockUser = {
+  id: faker.string.uuid(),
+  email: faker.internet.email(),
+  role: faker.helpers.arrayElement([Roles.User, Roles.Admin]),
+  isDeleted: false,
+  createdAt: faker.date.anytime(),
+  updatedAt: faker.date.anytime(),
+  deletedAt: null,
+} as Account;
 
 export const mockProfile = {
   id: faker.string.uuid(),
@@ -40,23 +59,6 @@ export const mockProfile = {
   updatedAt: faker.date.anytime(),
   accountId: mockUser.id,
 } as Profile;
-
-export const mockUserWishlist = [
-  {
-    id: faker.string.uuid(),
-    accountId: mockUser.id,
-    accommodationId: faker.string.uuid(),
-    createdAt: faker.date.anytime(),
-    updatedAt: faker.date.anytime(),
-  },
-  {
-    id: faker.string.uuid(),
-    accountId: mockUser.id,
-    accomodationId: faker.string.uuid(),
-    createdAt: faker.date.anytime(),
-    updatedAt: faker.date.anytime(),
-  },
-] as Wishlist[];
 
 export const mockUpdateProfileDto: UpdateProfileDto = {
   firstName: faker.person.firstName(),

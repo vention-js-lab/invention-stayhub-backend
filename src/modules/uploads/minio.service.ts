@@ -1,4 +1,8 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  OnModuleInit,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Client } from 'minio';
 import { EnvConfig } from '#/shared/configs/env.config';
@@ -29,7 +33,7 @@ export class MinioService implements OnModuleInit {
         await this.client.makeBucket(this.bucketName, 'us-east-1');
       }
     } catch (error) {
-      throw new Error(error.message);
+      throw new InternalServerErrorException('Failed to ensure bucket exists');
     }
   }
 

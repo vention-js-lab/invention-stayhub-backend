@@ -1,5 +1,4 @@
-import { Wishlist } from '#/modules/wishlists/entities/wishlist.entity';
-import { UpdateProfileDto } from './dto/requests/update-profile.dto';
+import { UpdateProfileDto } from './dto/requests/update-profile.req';
 import {
   ForbiddenException,
   Injectable,
@@ -10,87 +9,89 @@ import { Account } from './entities/account.entity';
 import { Profile } from './entities/profile.entity';
 import { Repository } from 'typeorm';
 import { Roles } from '#/shared/constants/user-roles.constant';
+import { UserFiltersReqQueryDto } from './dto/requests/users-filters.req';
+import { addUserFilters } from './helpers/users-filters.util';
+import { paginationParams } from '../accommodations/utils/pagination-params.util';
+import {
+  getPaginationMetadata,
+  getPaginationOffset,
+} from '#/shared/utils/pagination.util';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(Account)
-    private userAccountRepository: Repository<Account>,
+    private accountRepository: Repository<Account>,
     @InjectRepository(Profile)
-    private userProfileRepository: Repository<Profile>,
-    @InjectRepository(Wishlist)
-    private wishlistRepository: Repository<Wishlist>,
+    private profileRepository: Repository<Profile>,
   ) {}
 
-  async listUsers() {
-    const users = await this.userAccountRepository.find({
-      select: ['id', 'email', 'isDeleted', 'role', 'createdAt', 'updatedAt'],
-    });
+  async listUsers(filters: UserFiltersReqQueryDto) {
+    const queryBuilder = this.accountRepository
+      .createQueryBuilder('account')
+      .leftJoinAndSelect('account.profile', 'profile')
+      .select([
+        'account.id',
+        'account.email',
+        'profile.firstName',
+        'profile.lastName',
+        'profile.phoneNumber',
+        'profile.gender',
+        'profile.country',
+        'account.role',
+        'account.isDeleted',
+        'account.createdAt',
+      ]);
 
-    return users;
+    addUserFilters(queryBuilder, filters);
+
+    const { page, limit } = paginationParams(filters);
+    const { skip, take } = getPaginationOffset(page, limit);
+    queryBuilder.skip(skip).take(take);
+
+    const [result, total] = await queryBuilder.getManyAndCount();
+    const metadata = getPaginationMetadata({ page, limit, total });
+    return {
+      result,
+      metadata,
+    };
   }
 
   async getProfile(accountId: string) {
-    const account = await this.userAccountRepository.findOne({
+    const account = await this.accountRepository.findOne({
       where: { id: accountId, isDeleted: false },
       relations: ['profile'],
     });
-    if (!account || !account.profile) {
-      throw new NotFoundException('Account not found');
-    }
 
     return account.profile;
   }
 
-  async getUserWishlist(accountId: string) {
-    const account = await this.userAccountRepository.findOne({
-      where: { id: accountId, isDeleted: false },
-    });
-    if (!account) {
-      throw new NotFoundException('Account not found');
-    }
-
-    const userWishlist = await this.wishlistRepository.find({
-      where: {
-        accountId,
-      },
-    });
-
-    return userWishlist;
-  }
-
   async updateProfile(accountId: string, updateProfileDto: UpdateProfileDto) {
-    const account = await this.userAccountRepository.findOne({
+    const account = await this.accountRepository.findOne({
       where: { id: accountId, isDeleted: false },
       relations: ['profile'],
     });
-    if (!account || !account.profile) {
-      throw new NotFoundException('Account not found');
-    }
 
     Object.assign(account.profile, updateProfileDto);
 
-    const savedProfile = await this.userProfileRepository.save(account.profile);
+    const savedProfile = await this.profileRepository.save(account.profile);
     return savedProfile;
   }
 
   async updateProfileAvatar(accountId: string, avatarUrl: string) {
-    const account = await this.userAccountRepository.findOne({
+    const account = await this.accountRepository.findOne({
       where: { id: accountId, isDeleted: false },
       relations: ['profile'],
     });
-    if (!account || !account.profile) {
-      throw new NotFoundException('Account not found');
-    }
 
     account.profile.image = avatarUrl;
 
-    const savedProfile = await this.userProfileRepository.save(account.profile);
+    const savedProfile = await this.profileRepository.save(account.profile);
     return savedProfile;
   }
 
   async toggleUserRole(accountId: string) {
-    const account = await this.userAccountRepository.findOne({
+    const account = await this.accountRepository.findOne({
       where: { id: accountId, isDeleted: false },
     });
     if (!account) {
@@ -99,31 +100,27 @@ export class UserService {
 
     account.role = account.role === Roles.Admin ? Roles.User : Roles.Admin;
 
-    const updatedUser = await this.userAccountRepository.save(account);
+    const updatedUser = await this.accountRepository.save(account);
     return updatedUser;
   }
 
-  async deleteAccount(deleterId: string, deletingAccountId: string) {
-    const deleter = await this.userAccountRepository.findOne({
-      where: { id: deleterId, isDeleted: false },
+  async softDeleteAccount(deleteActorId: string, deletingAccountId: string) {
+    const deleteActor = await this.accountRepository.findOne({
+      where: { id: deleteActorId, isDeleted: false },
     });
-    if (deleter.role != Roles.Admin && deleterId != deletingAccountId) {
+    if (deleteActor.role != Roles.Admin && deleteActorId != deletingAccountId) {
       throw new ForbiddenException('Only owner or admin can delete account');
     }
 
-    const deletingUser = await this.userAccountRepository.findOne({
+    const deletingAccount = await this.accountRepository.findOne({
       where: { id: deletingAccountId, isDeleted: false },
     });
-    if (!deletingUser) {
+    if (!deletingAccount) {
       throw new NotFoundException('User not found or already deleted');
     }
 
-    deletingUser.isDeleted = true;
-    const deletedUser = await this.userAccountRepository.save(deletingUser);
-
-    const { ...result } = deletedUser;
-    delete result.password;
-
-    return result;
+    deletingAccount.isDeleted = true;
+    await this.accountRepository.save(deletingAccount);
+    await this.accountRepository.softRemove(deletingAccount);
   }
 }

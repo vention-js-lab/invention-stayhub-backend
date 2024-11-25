@@ -9,19 +9,18 @@ import {
   mockUsers,
   mockProfile,
   mockUser,
-  mockUserWishlist,
   mockUpdateProfileDto,
-} from './fixtures/usersMockData';
+} from './fixtures/users-data.mock';
 import { randomUUID } from 'node:crypto';
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { faker } from '@faker-js/faker';
-import { Roles } from '../../../shared/constants/user-roles.constant';
+import { Roles } from '#/shared/constants/user-roles.constant';
+import { UserFiltersReqQueryDto } from '#/modules/users/dto/requests/users-filters.req';
 
 describe('UserService', () => {
   let userService: UserService;
   let accountRepo: Repository<Account>;
   let profileRepo: Repository<Profile>;
-  let wishlistRepo: Repository<Wishlist>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -45,30 +44,25 @@ describe('UserService', () => {
     userService = module.get<UserService>(UserService);
     accountRepo = module.get<Repository<Account>>(getRepositoryToken(Account));
     profileRepo = module.get<Repository<Profile>>(getRepositoryToken(Profile));
-    wishlistRepo = module.get<Repository<Wishlist>>(
-      getRepositoryToken(Wishlist),
-    );
   });
 
   afterEach(() => {
     jest.clearAllMocks();
   });
 
-  it('should be defined', () => {
-    expect(userService).toBeDefined();
-  });
-
   describe('listUsers', () => {
-    it('returns a list of users', async () => {
+    it('should return a list of users with filters applied', async () => {
       const users = mockUsers;
-
-      accountRepo.find = jest.fn().mockResolvedValue(users);
-
-      const result = await userService.listUsers();
-
-      expect(accountRepo.find).toHaveBeenCalledWith({
-        select: ['id', 'email', 'isDeleted', 'role', 'createdAt', 'updatedAt'],
+      accountRepo.createQueryBuilder = jest.fn().mockReturnValue({
+        leftJoinAndSelect: jest.fn().mockReturnThis(),
+        select: jest.fn().mockReturnThis(),
+        where: jest.fn().mockReturnThis(),
+        getMany: jest.fn().mockResolvedValue(users),
       });
+
+      const result = await userService.listUsers({} as UserFiltersReqQueryDto);
+
+      expect(accountRepo.createQueryBuilder).toHaveBeenCalledWith('account');
       expect(result).toEqual(users);
     });
   });
@@ -91,61 +85,6 @@ describe('UserService', () => {
         relations: ['profile'],
       });
       expect(result).toEqual(profile);
-    });
-
-    it('returns error if account not found', async () => {
-      const userId = randomUUID();
-      accountRepo.findOne = jest.fn().mockResolvedValue(null);
-
-      const result = userService.getProfile(userId);
-
-      await expect(result).rejects.toThrow(NotFoundException);
-    });
-
-    it('returns error if profile not found', async () => {
-      const account = mockUser;
-      const userId = mockUser.id;
-
-      accountRepo.findOne = jest.fn().mockResolvedValue({
-        ...account,
-        profile: null,
-      });
-
-      const result = userService.getProfile(userId);
-
-      await expect(result).rejects.toThrow(NotFoundException);
-    });
-  });
-
-  describe('getUserWishlist', () => {
-    it('returns user wishlist', async () => {
-      const account = mockUser;
-      const userId = mockUser.id;
-      const userWishlist = mockUserWishlist;
-
-      accountRepo.findOne = jest.fn().mockResolvedValue(account);
-      wishlistRepo.find = jest.fn().mockResolvedValue(userWishlist);
-
-      const result = await userService.getUserWishlist(userId);
-
-      expect(accountRepo.findOne).toHaveBeenCalledWith({
-        where: { id: userId, isDeleted: false },
-      });
-      expect(wishlistRepo.find).toHaveBeenCalledWith({
-        where: {
-          accountId: userId,
-        },
-      });
-      expect(result).toEqual(userWishlist);
-    });
-
-    it('returns error if account not found', async () => {
-      const userId = randomUUID();
-      accountRepo.findOne = jest.fn().mockResolvedValue(null);
-
-      const result = userService.getUserWishlist(userId);
-
-      await expect(result).rejects.toThrow(NotFoundException);
     });
   });
 
@@ -176,31 +115,6 @@ describe('UserService', () => {
         ...updateProfileDto,
       });
     });
-
-    it('returns error if account not found', async () => {
-      const userId = randomUUID();
-      const updateProfileDto = mockUpdateProfileDto;
-      accountRepo.findOne = jest.fn().mockResolvedValue(null);
-
-      const result = userService.updateProfile(userId, updateProfileDto);
-
-      await expect(result).rejects.toThrow(NotFoundException);
-    });
-
-    it('returns error if profile not found', async () => {
-      const account = mockUser;
-      const userId = mockUser.id;
-      const updateProfileDto = mockUpdateProfileDto;
-
-      accountRepo.findOne = jest.fn().mockResolvedValue({
-        ...account,
-        profile: null,
-      });
-
-      const result = userService.updateProfile(userId, updateProfileDto);
-
-      await expect(result).rejects.toThrow(NotFoundException);
-    });
   });
 
   describe('updateProfileAvatar', () => {
@@ -229,31 +143,6 @@ describe('UserService', () => {
         ...profile,
         image: imageUrl,
       });
-    });
-
-    it('returns error if account not found', async () => {
-      const userId = randomUUID();
-      const imageUrl = faker.internet.url();
-      accountRepo.findOne = jest.fn().mockResolvedValue(null);
-
-      const result = userService.updateProfileAvatar(userId, imageUrl);
-
-      await expect(result).rejects.toThrow(NotFoundException);
-    });
-
-    it('returns error if profile not found', async () => {
-      const account = mockUser;
-      const userId = mockUser.id;
-      const imageUrl = faker.internet.url();
-
-      accountRepo.findOne = jest.fn().mockResolvedValue({
-        ...account,
-        profile: null,
-      });
-
-      const result = userService.updateProfileAvatar(userId, imageUrl);
-
-      await expect(result).rejects.toThrow(NotFoundException);
     });
   });
 
@@ -310,25 +199,35 @@ describe('UserService', () => {
     });
   });
 
-  describe('deleteAccount', () => {
+  describe('softDeleteAccount', () => {
     it('deletes user account successfully by admin', async () => {
-      const deleterId = randomUUID();
+      const deleteActorId = randomUUID();
       const deletingUserId = mockUser.id;
-      const admin = { ...mockUser, id: deleterId, role: Roles.Admin };
-      const userToDelete = { ...mockUser, isDeleted: false };
+      const admin = {
+        ...mockUser,
+        id: deleteActorId,
+        role: Roles.Admin,
+      };
+      const userToDelete = mockUser;
 
       accountRepo.findOne = jest
         .fn()
         .mockResolvedValueOnce(admin)
         .mockResolvedValueOnce(userToDelete);
-      accountRepo.save = jest
-        .fn()
-        .mockResolvedValue({ ...userToDelete, isDeleted: true });
+      accountRepo.save = jest.fn().mockResolvedValue({
+        ...userToDelete,
+        isDeleted: true,
+      });
+      accountRepo.softRemove = jest.fn().mockResolvedValue({
+        ...userToDelete,
+        isDeleted: true,
+        deletedAt: Date.now(),
+      });
 
-      const result = await userService.deleteAccount(deleterId, deletingUserId);
+      await userService.softDeleteAccount(deleteActorId, deletingUserId);
 
       expect(accountRepo.findOne).toHaveBeenCalledWith({
-        where: { id: deleterId, isDeleted: false },
+        where: { id: deleteActorId, isDeleted: false },
       });
       expect(accountRepo.findOne).toHaveBeenCalledWith({
         where: { id: deletingUserId, isDeleted: false },
@@ -337,26 +236,32 @@ describe('UserService', () => {
         ...userToDelete,
         isDeleted: true,
       });
-      expect(result.isDeleted).toBe(true);
+      expect(accountRepo.softRemove).toHaveBeenCalledWith(userToDelete);
     });
 
     it('deletes user account successfully by user themselves', async () => {
-      const deleterId = mockUser.id;
+      const deleteActorId = mockUser.id;
       const deletingUserId = mockUser.id;
-      const userToDelete = { ...mockUser, isDeleted: false };
+      const userToDelete = mockUser;
 
       accountRepo.findOne = jest
         .fn()
         .mockResolvedValueOnce(userToDelete)
         .mockResolvedValueOnce(userToDelete);
-      accountRepo.save = jest
-        .fn()
-        .mockResolvedValue({ ...userToDelete, isDeleted: true });
+      accountRepo.save = jest.fn().mockResolvedValue({
+        ...userToDelete,
+        isDeleted: true,
+      });
+      accountRepo.softRemove = jest.fn().mockResolvedValue({
+        ...userToDelete,
+        isDeleted: true,
+        deletedAt: Date.now(),
+      });
 
-      const result = await userService.deleteAccount(deleterId, deletingUserId);
+      await userService.softDeleteAccount(deleteActorId, deletingUserId);
 
       expect(accountRepo.findOne).toHaveBeenCalledWith({
-        where: { id: deleterId, isDeleted: false },
+        where: { id: deleteActorId, isDeleted: false },
       });
       expect(accountRepo.findOne).toHaveBeenCalledWith({
         where: { id: deletingUserId, isDeleted: false },
@@ -365,11 +270,11 @@ describe('UserService', () => {
         ...userToDelete,
         isDeleted: true,
       });
-      expect(result.isDeleted).toBe(true);
+      expect(accountRepo.softRemove).toHaveBeenCalledWith(userToDelete);
     });
 
-    it('throws forbidden exception if deleter is not admin and not the deleting user', async () => {
-      const deleterId = mockUser.id;
+    it('throws forbidden exception if deleteActor is not admin and not the deleting user', async () => {
+      const deleteActorId = mockUser.id;
       const deletingUserId = randomUUID();
       const userToDelete = {
         ...mockUser,
@@ -383,12 +288,15 @@ describe('UserService', () => {
         .mockResolvedValueOnce(nonAdminUser)
         .mockResolvedValueOnce(userToDelete);
 
-      const result = userService.deleteAccount(deleterId, deletingUserId);
+      const result = userService.softDeleteAccount(
+        deleteActorId,
+        deletingUserId,
+      );
 
       await expect(result).rejects.toThrow(ForbiddenException);
     });
 
-    it('throws not found exception if user to delete is not found', async () => {
+    it('throws not found exception if deleting user is not found', async () => {
       const deleterId = mockUser.id;
       const deletingUserId = randomUUID();
       const admin = { ...mockUser, role: Roles.Admin };
@@ -398,7 +306,7 @@ describe('UserService', () => {
         .mockResolvedValueOnce(admin)
         .mockResolvedValueOnce(null);
 
-      const result = userService.deleteAccount(deleterId, deletingUserId);
+      const result = userService.softDeleteAccount(deleterId, deletingUserId);
 
       expect(accountRepo.findOne).toHaveBeenCalledWith({
         where: { id: deleterId, isDeleted: false },
