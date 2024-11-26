@@ -4,7 +4,6 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { Account } from '../entities/account.entity';
 import { Profile } from '../entities/profile.entity';
 import { UserService } from '../users.service';
-import { Wishlist } from '#/modules/wishlists/entities/wishlist.entity';
 import {
   mockUsers,
   mockProfile,
@@ -32,10 +31,6 @@ describe('UserService', () => {
         },
         {
           provide: getRepositoryToken(Profile),
-          useClass: Repository,
-        },
-        {
-          provide: getRepositoryToken(Wishlist),
           useClass: Repository,
         },
       ],
