@@ -43,17 +43,17 @@ export class CreateReviewEntity1732127232754 implements MigrationInterface {
           {
             name: 'account_id',
             type: 'uuid',
-            isNullable: true,
+            isNullable: false,
           },
           {
             name: 'accommodation_id',
             type: 'uuid',
-            isNullable: true,
+            isNullable: false,
           },
           {
             name: 'booking_id',
             type: 'uuid',
-            isNullable: true,
+            isNullable: false,
           },
         ],
       }),
@@ -65,7 +65,7 @@ export class CreateReviewEntity1732127232754 implements MigrationInterface {
         columnNames: ['account_id'],
         referencedColumnNames: ['id'],
         referencedTableName: 'account',
-        onDelete: 'SET NULL',
+        onDelete: 'CASCADE',
       }),
     );
 
@@ -75,7 +75,7 @@ export class CreateReviewEntity1732127232754 implements MigrationInterface {
         columnNames: ['accommodation_id'],
         referencedColumnNames: ['id'],
         referencedTableName: 'accommodation',
-        onDelete: 'SET NULL',
+        onDelete: 'CASCADE',
       }),
     );
 
@@ -85,7 +85,7 @@ export class CreateReviewEntity1732127232754 implements MigrationInterface {
         columnNames: ['booking_id'],
         referencedColumnNames: ['id'],
         referencedTableName: 'booking',
-        onDelete: 'SET NULL',
+        onDelete: 'CASCADE',
       }),
     );
   }
