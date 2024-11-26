@@ -26,11 +26,14 @@ export class ReviewController {
     description: 'Booking or accommodation not found.',
   })
   @UseGuards(AccessTokenGuard)
-  createReview(
+  async createReview(
     @GetAccount('accountId') accountId: string,
     @Body() createReviewDto: CreateReviewDto,
   ) {
-    const data = this.reviewService.createReview(accountId, createReviewDto);
+    const data = await this.reviewService.createReview(
+      accountId,
+      createReviewDto,
+    );
 
     return withBaseResponse({
       status: 201,

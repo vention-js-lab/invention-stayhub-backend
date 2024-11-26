@@ -1,6 +1,5 @@
 import {
   BadRequestException,
-  ConflictException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -28,12 +27,11 @@ export class ReviewService {
     accountId: string,
     createReviewDto: CreateReviewDto,
   ): Promise<Review> {
-    const { accommodationId, bookingId, rating, content } = createReviewDto;
+    const { bookingId, rating, content } = createReviewDto;
 
     const booking = await this.bookingRepository.findOne({
-      where: {
-        id: bookingId,
-      },
+      where: { id: bookingId },
+      relations: ['accommodation'],
     });
     if (!booking) {
       throw new NotFoundException('Booking not found.');
@@ -48,19 +46,23 @@ export class ReviewService {
         'You can only add a review after your booking has been completed.',
       );
     }
-
-    const existingReview = await this.reviewRepository.findOne({
-      where: { accountId, bookingId },
-    });
-    if (existingReview) {
-      throw new ConflictException('Review for this booking already exists.');
-    }
+    const accommodationId = booking.accommodationId;
 
     const accommodation = await this.accommodationRepository.findOne({
       where: { id: accommodationId },
     });
     if (!accommodation) {
       throw new NotFoundException('Accommodation not found.');
+    }
+
+    const existingReview = await this.reviewRepository.findOne({
+      where: { accountId, bookingId },
+    });
+
+    if (existingReview) {
+      existingReview.content = content;
+      existingReview.rating = rating;
+      return await this.reviewRepository.save(existingReview);
     }
 
     const review = this.reviewRepository.create({

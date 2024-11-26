@@ -29,14 +29,6 @@ export class CreateReviewDto {
   rating: number;
 
   @ApiProperty({
-    description: 'ID of the accommodation being reviewed.',
-  })
-  @IsNotEmpty()
-  @IsUUID('4')
-  @IsString()
-  accommodationId: string;
-
-  @ApiProperty({
     description: 'ID of the booking associated with the review.',
   })
   @IsNotEmpty()
