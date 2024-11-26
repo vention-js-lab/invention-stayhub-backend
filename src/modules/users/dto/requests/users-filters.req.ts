@@ -39,14 +39,14 @@ export class UserFiltersReqQueryDto {
     description: 'Search by first name, last name, phone number',
     required: false,
     type: String,
-    example: 'someone@gmail.com',
+    format: 'email',
   })
   @IsOptional()
   @IsString()
   search: string | undefined;
 
   @ApiProperty({
-    description: '',
+    description: 'User country',
     required: false,
     type: String,
     example: 'New York',
@@ -69,7 +69,7 @@ export class UserFiltersReqQueryDto {
     description: 'Filter by user deleted status',
     required: false,
     type: Boolean,
-    example: true,
+    format: 'boolean',
   })
   @IsOptional()
   @TransformToBoolean()

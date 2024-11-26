@@ -51,7 +51,7 @@ export class UpdateProfileDto {
   @ApiPropertyOptional({
     description: 'Changing phone number',
     required: false,
-    example: '+998 90 123 45 67',
+    format: 'phone',
   })
   @IsOptional()
   @IsPhoneNumber()

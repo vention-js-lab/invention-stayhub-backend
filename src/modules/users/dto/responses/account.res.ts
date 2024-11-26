@@ -2,19 +2,25 @@ import { ProfilePartialResDto } from './profile.res';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class UserResDto {
-  @ApiProperty({ example: '1bd59221-5e37-4bc5-9b71-6b0e36561677' })
+  @ApiProperty({
+    description: 'User account id',
+    format: 'uuid',
+  })
   id: string;
 
-  @ApiProperty({ example: 'user7@example.com' })
+  @ApiProperty({
+    description: 'User email',
+    format: 'email',
+  })
   email: string;
 
-  @ApiProperty({ example: 'admin' })
+  @ApiProperty({ description: 'User role', example: 'admin' })
   role: string;
 
-  @ApiProperty({ example: true })
+  @ApiProperty({ description: 'Did account deleted', format: 'boolean' })
   isDeleted: boolean;
 
-  @ApiProperty({ example: '2024-11-19T20:40:30.518Z' })
+  @ApiProperty({ description: 'Account created date', format: 'date-time' })
   createdAt: string;
 
   @ApiProperty({ type: ProfilePartialResDto })
