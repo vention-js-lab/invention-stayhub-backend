@@ -1,6 +1,7 @@
 import { Accommodation } from '#/modules/accommodations/entities/accommodations.entity';
 import {
   ConflictException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -18,17 +19,18 @@ export class WishlistService {
   ) {}
 
   async addToWishlist(accountId: string, accommodationId: string) {
-    const existingWishlistItem = await this.wishlistRepository.findOne({
-      where: { accountId, accommodationId },
-    });
-    if (existingWishlistItem) {
-      throw new ConflictException('Wishlist item already exists');
-    }
     const accommodation = await this.accommodationRepository.findOne({
       where: { id: accommodationId },
     });
     if (!accommodation) {
       throw new NotFoundException('Accomodation not found');
+    }
+
+    const existingWishlistItem = await this.wishlistRepository.findOne({
+      where: { accountId, accommodationId },
+    });
+    if (existingWishlistItem) {
+      throw new ConflictException('Wishlist item already exists');
     }
 
     const wishlistItem = this.wishlistRepository.create({
@@ -48,8 +50,18 @@ export class WishlistService {
     return userWishlist;
   }
 
-  async removeFromWishlist(wishId: string) {
-    const result = await this.wishlistRepository.delete(wishId);
+  async removeFromWishlist(accountId: string, wishlistItemId: string) {
+    const wishlistItem = await this.wishlistRepository.findOne({
+      where: { id: wishlistItemId },
+    });
+
+    if (wishlistItem.accountId !== accountId) {
+      throw new ForbiddenException(
+        'Only author can delete items from wishlist',
+      );
+    }
+
+    const result = await this.wishlistRepository.delete(wishlistItemId);
     if (result.affected === 0) {
       throw new NotFoundException(`Wished item not found`);
     }

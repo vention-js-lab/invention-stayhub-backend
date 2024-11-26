@@ -1,18 +1,33 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class WishlistResDto {
-  @ApiProperty({ example: '1bd59221-5e37-4bc5-9b71-6b0e36561677' })
+  @ApiProperty({
+    format: 'uuid',
+    description: 'Unique identifier for the wishlist',
+  })
   id: string;
 
-  @ApiProperty({ example: '1bd59221-5e37-4bc5-9b71-6b0e36561677' })
+  @ApiProperty({
+    format: 'uuid',
+    description: 'Unique identifier for the associated account',
+  })
   accountId: string;
 
-  @ApiProperty({ example: '1bd59221-5e37-4bc5-9b71-6b0e36561677' })
+  @ApiProperty({
+    format: 'uuid',
+    description: 'Unique identifier for the associated accommodation',
+  })
   accommodationId: string;
 
-  @ApiProperty({ example: '2024-11-19T20:40:30.518Z' })
+  @ApiProperty({
+    format: 'date-time',
+    description: 'Date and time when the wishlist was created',
+  })
   createdAt: string;
 
-  @ApiProperty({ example: '2024-11-19T20:40:30.518Z' })
+  @ApiProperty({
+    format: 'date-time',
+    description: 'Date and time when the wishlist was last updated',
+  })
   updatedAt: string;
 }

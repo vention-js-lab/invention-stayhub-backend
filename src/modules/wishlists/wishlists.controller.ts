@@ -61,14 +61,20 @@ export class WishlistController {
     });
   }
 
-  @Delete(':wishId')
+  @Delete(':wishlistItemId')
   @ApiOperation({ summary: 'Removing wishlist item' })
   @ApiOkResponse({
     description: 'Wishlist item successfully deleted',
   })
   @UseGuards(AccessTokenGuard)
-  async removeFromWishlist(@Param('wishId') wishId: string) {
-    const result = await this.wishlistService.removeFromWishlist(wishId);
+  async removeFromWishlist(
+    @GetAccount('accountId') accountId: string,
+    @Param('wishlistItemId') wishlistItemId: string,
+  ) {
+    const result = await this.wishlistService.removeFromWishlist(
+      accountId,
+      wishlistItemId,
+    );
 
     return withBaseResponse({
       status: 200,
