@@ -11,6 +11,7 @@ import { WishlistsModule } from './modules/wishlists/wishlists.module';
 import { PaymentsModule } from './modules/payments/payments.module';
 import { UploadModule } from './modules/uploads/upload.module';
 import { BookingsModule } from './modules/bookings/bookings.module';
+import { ReviewModule } from './modules/review/review.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { BookingsModule } from './modules/bookings/bookings.module';
       inject: [ConfigService],
       useFactory: databaseConfig,
     }),
+    ReviewModule,
     UploadModule,
     WishlistsModule,
     UserModule,

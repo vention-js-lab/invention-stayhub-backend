@@ -44,9 +44,15 @@ export class AuthService {
     const user = this.accountRepository.create({
       email,
       password: hashedPassword,
-      ...rest,
     });
     await this.accountRepository.save(user);
+
+    const userProfile = this.profileRepository.create({
+      accountId: user.id,
+      ...rest,
+    });
+
+    await this.profileRepository.save(userProfile);
 
     const { ...result } = user;
     delete result.password;
@@ -74,7 +80,7 @@ export class AuthService {
 
   async login({ email, password }: LoginDto) {
     const user = await this.accountRepository.findOne({
-      where: { email },
+      where: { email, deletedAt: null },
     });
 
     if (!user) {
@@ -119,7 +125,7 @@ export class AuthService {
 
     if (
       !existingRefreshTokenEntity ||
-      existingRefreshTokenEntity.account.isDeleted
+      existingRefreshTokenEntity.account.deletedAt
     ) {
       throw new UnauthorizedException();
     }
@@ -191,7 +197,7 @@ export class AuthService {
       });
       await this.accountRepository.save(newAccount);
 
-      newProfile.accountId = newAccount;
+      newProfile.accountId = newAccount.id;
 
       await this.profileRepository.save(newProfile);
     }

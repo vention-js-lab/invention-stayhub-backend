@@ -7,9 +7,11 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { Review } from '#/modules/review/entities/review.entity';
 
 @Entity('booking')
 export class Booking {
@@ -44,4 +46,7 @@ export class Booking {
 
   @Column({ name: 'accommodation_id' })
   accommodationId: string;
+
+  @OneToOne(() => Review, (review) => review.booking)
+  review: Review;
 }

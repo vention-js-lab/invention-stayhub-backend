@@ -51,6 +51,7 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@faker-js/faker": "^9.2.0",
     "@nestjs/cli": "^10.0.0",
     "@nestjs/config": "^3.3.0",
     "@nestjs/schematics": "^10.0.0",
@@ -97,6 +98,9 @@
       "**/*.(t|j)s"
     ],
     "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "moduleNameMapper": {
+      "^#/(.*)$": "<rootDir>/$1"
+    }
   }
 }
