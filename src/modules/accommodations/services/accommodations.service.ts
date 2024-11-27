@@ -126,10 +126,15 @@ export class AccommodationService {
         id: review.id,
         content: review.content,
         rating: review.rating,
+        createdAt: review.createdAt,
+        updatedAt: review.updatedAt,
         user: {
           id: review.account.id,
           firstName: review.account.profile.firstName,
           lastName: review.account.profile.lastName,
+          country: review.account.profile.country,
+          photo: review.account.profile.image,
+          сreatedAt: review.account.profile.createdAt,
         },
       })),
     };
