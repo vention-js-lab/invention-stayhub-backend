@@ -3,7 +3,7 @@ version: '3.9'
 services:
   invention:
     container_name: invention
-    image: ${DOCKER_USERNAME}/invention-airbnb:1.0.0
+    image: ${DOCKER_USERNAME}/${DOCKER_IMAGE_TAG}
     build: .
     ports:
       - '${APP_PORT}:${APP_PORT}'

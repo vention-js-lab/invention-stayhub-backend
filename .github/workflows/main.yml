@@ -2,7 +2,9 @@ name: CI/CD
 
 on:
   push:
-    branches: [INV-26/deploy-to-vps]
+    branches:
+      - main
+      - INV-26/deploy-to-vps
 
 jobs:
     build-and-test:
@@ -25,6 +27,9 @@ jobs:
 
           - name: Lint code
             run: npm run lint
+
+          - name: Run tests
+            run: npm run test
           
           - name: Build the project
             run: npm run build
@@ -42,10 +47,10 @@ jobs:
             run: |
               docker build \
                 --file Dockerfile \
-                --tag ${{ secrets.DOCKER_USERNAME}}/invention-airbnb:1.0.0 .
+                --tag ${{ secrets.DOCKER_USERNAME}}/${{ secrets.DOCKER_IMAGE_TAG }} .
 
           - name: Push Docker image
-            run: docker push ${{ secrets.DOCKER_USERNAME }}/invention-airbnb:1.0.0
+            run: docker push ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGE_TAG }}
 
                 
     deploy:
@@ -57,9 +62,9 @@ jobs:
         uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.EC2_HOST }}
-          username: ubuntu
+          username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           script: |
-            cd /home/ubuntu/invention-stayhub-backend
-            docker-compose pull
-            docker-compose up -d --build
+            sudo cd /home/ubuntu/invention-stayhub-backend
+            sudo docker-compose pull
+            sudo docker-compose up -d --build
