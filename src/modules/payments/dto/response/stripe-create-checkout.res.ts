@@ -8,7 +8,7 @@ class StripeCreateCheckoutResData {
   url: string;
 }
 
-export class StripeCreateCheckoutResDto extends BaseResponse<StripeCreateCheckoutResData> {
+export class StripeCreateCheckoutResDto extends BaseResponse {
   @ApiProperty({
     description: 'Response data',
     type: StripeCreateCheckoutResData,
