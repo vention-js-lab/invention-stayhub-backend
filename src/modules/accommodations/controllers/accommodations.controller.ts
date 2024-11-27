@@ -78,17 +78,21 @@ export class AccommodationController {
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Get accommodation by ID' })
+  @ApiOperation({ summary: 'Get accommodation by ID with reviews' })
   @ApiResponse({
     status: 200,
-    description: 'Accommodation fetched successfully',
+    description: 'Accommodation fetched successfully with reviews',
     type: Accommodation,
   })
   async getAccommodationById(@Param('id') id: string) {
     const accommodation =
       await this.accommodationService.getAccommodationById(id);
 
-    return accommodation;
+    return withBaseResponse({
+      status: 200,
+      message: 'Accommodation is retrieved successfully',
+      data: accommodation,
+    });
   }
 
   @Patch(':id')

@@ -6,5 +6,6 @@ import { MinioService } from './minio.service';
 @Module({
   providers: [UploadService, MinioService],
   controllers: [UploadController],
+  exports: [UploadService],
 })
 export class UploadModule {}
