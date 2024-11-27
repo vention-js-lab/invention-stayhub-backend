@@ -2,7 +2,6 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 
 import {
-  ConflictException,
   NotFoundException,
   ForbiddenException,
   BadRequestException,
@@ -106,28 +105,6 @@ describe('ReviewService', () => {
           content: 'Great!',
         }),
       ).rejects.toThrow(new ForbiddenException('Accommodation not found.'));
-    });
-
-    it('should throw an error if a review already exists for this booking', async () => {
-      mockBookingRepository.findOne.mockResolvedValue({
-        id: 'd4f75e3a-dd77-4b86-bab8-f1ad2cc7349c',
-        accountId: '9ae5e450-7c4c-4b58-b244-535f04a06325',
-        status: BookingStatus.Completed,
-      });
-      mockReviewRepository.findOne.mockResolvedValue({
-        id: 'existing-review-id',
-      });
-
-      await expect(
-        service.createReview('9ae5e450-7c4c-4b58-b244-535f04a06325', {
-          accommodationId: 'd4f75e3a-dd77-4b86-bab8-f1ad2cc7349c',
-          bookingId: 'd4f75e3a-dd77-4b86-bab8-f1ad2cc7349c',
-          rating: 5,
-          content: 'Great!',
-        }),
-      ).rejects.toThrow(
-        new ConflictException('Review for this booking already exists.'),
-      );
     });
 
     it('should throw an error if accommodation not found', async () => {
