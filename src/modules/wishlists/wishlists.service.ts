@@ -1,10 +1,5 @@
 import { Accommodation } from '#/modules/accommodations/entities/accommodations.entity';
-import {
-  ConflictException,
-  ForbiddenException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Wishlist } from '#/modules/wishlists/entities/wishlist.entity';
@@ -30,7 +25,7 @@ export class WishlistService {
       where: { accountId, accommodationId },
     });
     if (existingWishlistItem) {
-      throw new ConflictException('Wishlist item already exists');
+      return existingWishlistItem;
     }
 
     const wishlistItem = this.wishlistRepository.create({
@@ -43,28 +38,35 @@ export class WishlistService {
   }
 
   async getUserWishlist(accountId: string) {
-    const userWishlist = await this.wishlistRepository.find({
-      where: { accountId },
-      relations: ['accommodation'],
-    });
+    const userWishlist = await this.accommodationRepository
+      .createQueryBuilder('accommodation')
+      .leftJoinAndSelect('accommodation.wishlist', 'wishlist')
+      .where('wishlist.accountId = :accountId', { accountId })
+      .select([
+        'accommodation.id',
+        'accommodation.name',
+        'accommodation.coverImage',
+        'accommodation.price',
+        'accommodation.available',
+        'accommodation.availableFrom',
+        'accommodation.availableTo',
+        'accommodation.squareMeters',
+        'accommodation.numberOfRooms',
+      ])
+      .getMany();
 
     return userWishlist;
   }
 
-  async removeFromWishlist(accountId: string, wishlistItemId: string) {
+  async removeFromWishlist(accountId: string, accommodationId: string) {
     const wishlistItem = await this.wishlistRepository.findOne({
-      where: { id: wishlistItemId },
+      where: { accountId, accommodationId },
     });
 
-    if (wishlistItem.accountId !== accountId) {
-      throw new ForbiddenException(
-        'Only author can delete items from wishlist',
-      );
+    if (!wishlistItem) {
+      throw new NotFoundException('Accommodation not found');
     }
 
-    const result = await this.wishlistRepository.delete(wishlistItemId);
-    if (result.affected === 0) {
-      throw new NotFoundException(`Wished item not found`);
-    }
+    await this.wishlistRepository.remove(wishlistItem);
   }
 }

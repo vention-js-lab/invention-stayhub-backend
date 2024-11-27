@@ -37,7 +37,7 @@ export class WishlistController {
     );
 
     return withBaseResponse({
-      status: 200,
+      status: 201,
       message: 'Accommodation successfully added to user wishlist',
       data: result,
     });
@@ -61,7 +61,7 @@ export class WishlistController {
     });
   }
 
-  @Delete(':wishlistItemId')
+  @Delete(':accommodationId')
   @ApiOperation({ summary: 'Removing wishlist item' })
   @ApiOkResponse({
     description: 'Wishlist item successfully deleted',
@@ -69,11 +69,11 @@ export class WishlistController {
   @UseGuards(AccessTokenGuard)
   async removeFromWishlist(
     @GetAccount('accountId') accountId: string,
-    @Param('wishlistItemId') wishlistItemId: string,
+    @Param('accommodationId') accommodationId: string,
   ) {
     const result = await this.wishlistService.removeFromWishlist(
       accountId,
-      wishlistItemId,
+      accommodationId,
     );
 
     return withBaseResponse({
