@@ -82,6 +82,7 @@ export class AccommodationController {
   @ApiResponse({
     status: 200,
     description: 'Accommodation fetched successfully with reviews',
+    type: Accommodation,
   })
   async getAccommodationById(@Param('id') id: string) {
     const accommodation =

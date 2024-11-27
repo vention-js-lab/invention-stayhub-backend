@@ -120,7 +120,7 @@ export class AccommodationService {
       throw new NotFoundException(`Accommodation with ID ${id} not found`);
     }
 
-    const transformed = {
+    const result = {
       ...accommodation,
       reviews: accommodation.reviews.map((review) => ({
         id: review.id,
@@ -134,7 +134,7 @@ export class AccommodationService {
       })),
     };
 
-    return transformed;
+    return result;
   }
 
   async update({
