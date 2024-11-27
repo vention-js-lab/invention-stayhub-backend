@@ -80,7 +80,7 @@ export class AuthService {
 
   async login({ email, password }: LoginDto) {
     const user = await this.accountRepository.findOne({
-      where: { email, isDeleted: false },
+      where: { email, deletedAt: null },
     });
 
     if (!user) {
@@ -125,7 +125,7 @@ export class AuthService {
 
     if (
       !existingRefreshTokenEntity ||
-      existingRefreshTokenEntity.account.isDeleted
+      existingRefreshTokenEntity.account.deletedAt
     ) {
       throw new UnauthorizedException();
     }

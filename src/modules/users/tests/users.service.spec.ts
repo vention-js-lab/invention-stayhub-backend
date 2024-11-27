@@ -52,6 +52,7 @@ describe('UserService', () => {
         leftJoinAndSelect: jest.fn().mockReturnThis(),
         select: jest.fn().mockReturnThis(),
         where: jest.fn().mockReturnThis(),
+        withDeleted: jest.fn().mockReturnThis(),
         skip: jest.fn().mockReturnThis(),
         take: jest.fn().mockReturnThis(),
         getManyAndCount: jest
@@ -88,7 +89,7 @@ describe('UserService', () => {
       const result = await userService.getProfile(userId);
 
       expect(accountRepo.findOne).toHaveBeenCalledWith({
-        where: { id: userId, isDeleted: false },
+        where: { id: userId, deletedAt: null },
         relations: ['profile'],
       });
       expect(result).toEqual(profile);
@@ -114,7 +115,7 @@ describe('UserService', () => {
       const result = await userService.updateProfile(userId, updateProfileDto);
 
       expect(accountRepo.findOne).toHaveBeenCalledWith({
-        where: { id: userId, isDeleted: false },
+        where: { id: userId, deletedAt: null },
         relations: ['profile'],
       });
       expect(result).toEqual({
@@ -143,7 +144,7 @@ describe('UserService', () => {
       const result = await userService.updateProfileAvatar(userId, imageUrl);
 
       expect(accountRepo.findOne).toHaveBeenCalledWith({
-        where: { id: userId, isDeleted: false },
+        where: { id: userId, deletedAt: null },
         relations: ['profile'],
       });
       expect(result).toEqual({
@@ -166,7 +167,7 @@ describe('UserService', () => {
       const result = await userService.toggleUserRole(userId);
 
       expect(accountRepo.findOne).toHaveBeenCalledWith({
-        where: { id: userId, isDeleted: false },
+        where: { id: userId, deletedAt: null },
       });
       expect(accountRepo.save).toHaveBeenCalledWith({
         ...account,
@@ -187,7 +188,7 @@ describe('UserService', () => {
       const result = await userService.toggleUserRole(userId);
 
       expect(accountRepo.findOne).toHaveBeenCalledWith({
-        where: { id: userId, isDeleted: false },
+        where: { id: userId, deletedAt: null },
       });
       expect(accountRepo.save).toHaveBeenCalledWith({
         ...account,
@@ -221,27 +222,19 @@ describe('UserService', () => {
         .fn()
         .mockResolvedValueOnce(admin)
         .mockResolvedValueOnce(userToDelete);
-      accountRepo.save = jest.fn().mockResolvedValue({
-        ...userToDelete,
-        isDeleted: true,
-      });
+      accountRepo.count = jest.fn().mockResolvedValue(2);
       accountRepo.softRemove = jest.fn().mockResolvedValue({
         ...userToDelete,
-        isDeleted: true,
         deletedAt: Date.now(),
       });
 
       await userService.softDeleteAccount(deleteActorId, deletingUserId);
 
       expect(accountRepo.findOne).toHaveBeenCalledWith({
-        where: { id: deleteActorId, isDeleted: false },
+        where: { id: deleteActorId, deletedAt: null },
       });
       expect(accountRepo.findOne).toHaveBeenCalledWith({
-        where: { id: deletingUserId, isDeleted: false },
-      });
-      expect(accountRepo.save).toHaveBeenCalledWith({
-        ...userToDelete,
-        isDeleted: true,
+        where: { id: deletingUserId, deletedAt: null },
       });
       expect(accountRepo.softRemove).toHaveBeenCalledWith(userToDelete);
     });
@@ -255,27 +248,20 @@ describe('UserService', () => {
         .fn()
         .mockResolvedValueOnce(userToDelete)
         .mockResolvedValueOnce(userToDelete);
-      accountRepo.save = jest.fn().mockResolvedValue({
-        ...userToDelete,
-        isDeleted: true,
-      });
+      accountRepo.count = jest.fn().mockResolvedValue(2);
+
       accountRepo.softRemove = jest.fn().mockResolvedValue({
         ...userToDelete,
-        isDeleted: true,
         deletedAt: Date.now(),
       });
 
       await userService.softDeleteAccount(deleteActorId, deletingUserId);
 
       expect(accountRepo.findOne).toHaveBeenCalledWith({
-        where: { id: deleteActorId, isDeleted: false },
+        where: { id: deleteActorId, deletedAt: null },
       });
       expect(accountRepo.findOne).toHaveBeenCalledWith({
-        where: { id: deletingUserId, isDeleted: false },
-      });
-      expect(accountRepo.save).toHaveBeenCalledWith({
-        ...userToDelete,
-        isDeleted: true,
+        where: { id: deletingUserId, deletedAt: null },
       });
       expect(accountRepo.softRemove).toHaveBeenCalledWith(userToDelete);
     });
@@ -286,9 +272,9 @@ describe('UserService', () => {
       const userToDelete = {
         ...mockUser,
         id: deletingUserId,
-        isDeleted: false,
+        deletedAt: null,
       };
-      const nonAdminUser = { ...mockUser, role: Roles.User, isDeleted: false };
+      const nonAdminUser = { ...mockUser, role: Roles.User, deletedAt: null };
 
       accountRepo.findOne = jest
         .fn()
@@ -316,7 +302,7 @@ describe('UserService', () => {
       const result = userService.softDeleteAccount(deleterId, deletingUserId);
 
       expect(accountRepo.findOne).toHaveBeenCalledWith({
-        where: { id: deleterId, isDeleted: false },
+        where: { id: deleterId, deletedAt: null },
       });
       await expect(result).rejects.toThrow(NotFoundException);
     });

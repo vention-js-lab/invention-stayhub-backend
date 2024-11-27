@@ -1,40 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  IsBoolean,
-  IsEnum,
-  IsInt,
-  IsOptional,
-  IsPositive,
-  IsString,
-  Max,
-} from 'class-validator';
+import { IsBoolean, IsEnum, IsOptional, IsString } from 'class-validator';
 import { TransformToBoolean } from '#/shared/transformers/transform-type.transformer';
 import { Roles } from '#/shared/constants/user-roles.constant';
-import { ParseInt } from '#/shared/transformers/parse-int.transformer';
 import { Gender } from '#/shared/constants/gender.constant';
+import { PaginationQueryDto } from '#/shared/dto/pagination-query.req';
 
-export class UserFiltersReqQueryDto {
-  @ApiProperty({
-    description: 'Page is provided to calculate pagination',
-    required: false,
-  })
-  @ParseInt()
-  @IsOptional()
-  @IsInt()
-  @IsPositive()
-  page: number | undefined;
-
-  @ApiProperty({
-    description: 'Limit is provided to calculate pagination',
-    required: false,
-  })
-  @ParseInt()
-  @IsOptional()
-  @IsInt()
-  @IsPositive()
-  @Max(1000)
-  limit: number | undefined;
-
+export class UserFiltersReqQueryDto extends PaginationQueryDto {
   @ApiProperty({
     description: 'Search by first name, last name, phone number',
     required: false,
@@ -46,7 +17,17 @@ export class UserFiltersReqQueryDto {
   search: string | undefined;
 
   @ApiProperty({
-    description: 'User country',
+    description: 'Filter user phone number',
+    required: false,
+    type: String,
+    example: '+14155552671',
+  })
+  @IsOptional()
+  @IsString()
+  phoneNumber: string | undefined;
+
+  @ApiProperty({
+    description: 'Filter by user country',
     required: false,
     type: String,
     example: 'New York',

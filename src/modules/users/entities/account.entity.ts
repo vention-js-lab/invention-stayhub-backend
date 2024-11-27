@@ -42,14 +42,6 @@ export class Account {
   @Column({ type: 'enum', name: 'type', enum: AccountType })
   type: AccountType;
 
-  @Column({
-    type: 'boolean',
-    name: 'is_deleted',
-    nullable: false,
-    default: false,
-  })
-  isDeleted: boolean;
-
   @CreateDateColumn({
     name: 'created_at',
     type: 'timestamp',

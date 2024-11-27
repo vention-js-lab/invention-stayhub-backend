@@ -10,8 +10,8 @@ export const mockUsers = [
     id: faker.string.uuid(),
     email: faker.internet.email(),
     role: faker.helpers.arrayElement([Roles.User, Roles.Admin]),
-    isDeleted: faker.datatype.boolean(),
     createdAt: faker.date.anytime(),
+    deletedAt: null,
     profile: {
       firstName: faker.person.firstName(),
       lastName: faker.person.lastName(),
@@ -24,8 +24,8 @@ export const mockUsers = [
     id: faker.string.uuid(),
     email: faker.internet.email(),
     role: faker.helpers.arrayElement([Roles.User, Roles.Admin]),
-    isDeleted: faker.datatype.boolean(),
     createdAt: faker.date.anytime(),
+    deletedAt: null,
     profile: {
       firstName: faker.person.firstName(),
       lastName: faker.person.lastName(),
@@ -40,7 +40,6 @@ export const mockUser = {
   id: faker.string.uuid(),
   email: faker.internet.email(),
   role: faker.helpers.arrayElement([Roles.User, Roles.Admin]),
-  isDeleted: false,
   createdAt: faker.date.anytime(),
   updatedAt: faker.date.anytime(),
   deletedAt: null,

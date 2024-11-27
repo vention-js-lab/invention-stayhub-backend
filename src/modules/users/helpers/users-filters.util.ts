@@ -8,11 +8,15 @@ export function addUserFilters(
 ) {
   if (filters.search) {
     queryBuilder.andWhere(
-      'profile.firstName ILIKE :search OR profile.lastName ILIKE :search OR profile.phoneNumber ILIKE :search',
+      'profile.firstName ILIKE :search OR profile.lastName ILIKE :search',
       { search: `%${filters.search}%` },
     );
   }
-
+  if (filters.phoneNumber) {
+    queryBuilder.andWhere('profile.phoneNumber LIKE :phoneNumber', {
+      phoneNumber: `%+${filters.phoneNumber}%`,
+    });
+  }
   if (filters.country) {
     queryBuilder.andWhere('profile.country ILIKE :country', {
       country: `%${filters.country}%`,
@@ -29,8 +33,10 @@ export function addUserFilters(
     });
   }
   if (filters.isDeleted !== undefined) {
-    queryBuilder.andWhere('account.isDeleted = :isDeleted', {
-      isDeleted: filters.isDeleted,
-    });
+    queryBuilder.andWhere(
+      filters.isDeleted
+        ? 'account.deleted_at IS NOT NULL'
+        : 'account.deleted_at IS NULL',
+    );
   }
 }

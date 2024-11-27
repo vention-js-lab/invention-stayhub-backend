@@ -17,11 +17,14 @@ export class UserResDto {
   @ApiProperty({ description: 'User role', example: 'admin' })
   role: string;
 
-  @ApiProperty({ description: 'Did account deleted', format: 'boolean' })
-  isDeleted: boolean;
-
   @ApiProperty({ description: 'Account created date', format: 'date-time' })
   createdAt: string;
+
+  @ApiProperty({ description: 'Account updated date', format: 'date-time' })
+  updatedAt: string;
+
+  @ApiProperty({ description: 'Account deleted date', format: 'date-time' })
+  deletedAt: string;
 
   @ApiProperty({ type: ProfilePartialResDto })
   profile: ProfilePartialResDto;

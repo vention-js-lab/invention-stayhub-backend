@@ -7,7 +7,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Account } from './entities/account.entity';
 import { Profile } from './entities/profile.entity';
-import { Not, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { Roles } from '#/shared/constants/user-roles.constant';
 import { UserFiltersReqQueryDto } from './dto/requests/users-filters.req';
 import { addUserFilters } from './helpers/users-filters.util';
@@ -39,9 +39,10 @@ export class UserService {
         'profile.gender',
         'profile.country',
         'account.role',
-        'account.isDeleted',
         'account.createdAt',
-      ]);
+        'account.deletedAt',
+      ])
+      .withDeleted();
 
     addUserFilters(queryBuilder, filters);
 
@@ -59,7 +60,7 @@ export class UserService {
 
   async getProfile(accountId: string) {
     const account = await this.accountRepository.findOne({
-      where: { id: accountId, isDeleted: false },
+      where: { id: accountId, deletedAt: null },
       relations: ['profile'],
     });
 
@@ -68,7 +69,7 @@ export class UserService {
 
   async updateProfile(accountId: string, updateProfileDto: UpdateProfileDto) {
     const account = await this.accountRepository.findOne({
-      where: { id: accountId, isDeleted: false },
+      where: { id: accountId, deletedAt: null },
       relations: ['profile'],
     });
 
@@ -80,7 +81,7 @@ export class UserService {
 
   async updateProfileAvatar(accountId: string, avatarUrl: string) {
     const account = await this.accountRepository.findOne({
-      where: { id: accountId, isDeleted: false },
+      where: { id: accountId, deletedAt: null },
       relations: ['profile'],
     });
 
@@ -92,7 +93,7 @@ export class UserService {
 
   async toggleUserRole(accountId: string) {
     const account = await this.accountRepository.findOne({
-      where: { id: accountId, isDeleted: false },
+      where: { id: accountId, deletedAt: null },
     });
     if (!account) {
       throw new NotFoundException('Account not found');
@@ -106,14 +107,14 @@ export class UserService {
 
   async softDeleteAccount(deleteActorId: string, deletingAccountId: string) {
     const deleteActor = await this.accountRepository.findOne({
-      where: { id: deleteActorId, isDeleted: false },
+      where: { id: deleteActorId, deletedAt: null },
     });
     if (deleteActor.role != Roles.Admin && deleteActorId != deletingAccountId) {
       throw new ForbiddenException('Only owner or admin can delete account');
     }
 
     const deletingAccount = await this.accountRepository.findOne({
-      where: { id: deletingAccountId, isDeleted: false },
+      where: { id: deletingAccountId, deletedAt: null },
     });
     if (!deletingAccount) {
       throw new NotFoundException('User not found or already deleted');
@@ -123,18 +124,15 @@ export class UserService {
       const remainingAdmins = await this.accountRepository.count({
         where: {
           role: Roles.Admin,
-          isDeleted: false,
-          id: Not(deletingAccountId),
+          deletedAt: null,
         },
       });
 
-      if (remainingAdmins === 0) {
+      if (remainingAdmins === 1) {
         throw new ForbiddenException('Cannot delete the last admin');
       }
     }
 
-    deletingAccount.isDeleted = true;
-    await this.accountRepository.save(deletingAccount);
     await this.accountRepository.softRemove(deletingAccount);
   }
 }
