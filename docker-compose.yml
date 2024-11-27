@@ -4,6 +4,7 @@ services:
   invention:
     container_name: invention
     image: ${DOCKER_USERNAME}/invention-airbnb:1.0.0
+    build: .
     ports:
       - '${APP_PORT}:${APP_PORT}'
     environment:
