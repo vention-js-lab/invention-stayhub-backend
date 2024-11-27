@@ -11,6 +11,7 @@ import { Roles } from '#/shared/constants/user-roles.constant';
 import { AccountType } from '#/shared/constants/user-account.constant';
 import { Accommodation } from '#/modules/accommodations/entities/accommodations.entity';
 import { Profile } from './profile.entity';
+import { Review } from '#/modules/review/entities/review.entity';
 
 @Entity('account')
 export class Account {
@@ -63,4 +64,7 @@ export class Account {
 
   @OneToOne(() => Profile, (profile) => profile.accountId)
   profile: Profile;
+
+  @OneToMany(() => Review, (review) => review.account)
+  reviews: Review[];
 }
