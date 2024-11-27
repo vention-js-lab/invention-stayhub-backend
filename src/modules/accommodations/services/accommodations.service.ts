@@ -103,22 +103,45 @@ export class AccommodationService {
     };
   }
 
-  async getAccommodationById(id: string): Promise<Accommodation> {
-    const accommodation = await this.accommodationRepository.findOne({
-      where: { id },
-      relations: ['address', 'amenity', 'images'],
-    });
+  async getAccommodationById(id: string) {
+    const accommodation = await this.accommodationRepository
+      .createQueryBuilder('accommodation')
+      .leftJoinAndSelect('accommodation.address', 'address')
+      .leftJoinAndSelect('accommodation.amenity', 'amenity')
+      .leftJoinAndSelect('accommodation.images', 'images')
+      .leftJoinAndSelect('accommodation.reviews', 'reviews')
+      .leftJoinAndSelect('reviews.account', 'account')
+      .leftJoinAndSelect('account.profile', 'profile')
+      .where('accommodation.id = :id', { id })
+      .andWhere('accommodation.deletedAt IS NULL')
+      .getOne();
+
     if (!accommodation) {
       throw new NotFoundException(`Accommodation with ID ${id} not found`);
     }
-    return accommodation;
+
+    const transformed = {
+      ...accommodation,
+      reviews: accommodation.reviews.map((review) => ({
+        id: review.id,
+        content: review.content,
+        rating: review.rating,
+        user: {
+          id: review.account.id,
+          firstName: review.account.profile.firstName,
+          lastName: review.account.profile.lastName,
+        },
+      })),
+    };
+
+    return transformed;
   }
 
   async update({
     accommodationId,
     ownerId,
     updateAccommodationDto,
-  }: UpdateAccommodationParams): Promise<Accommodation> {
+  }: UpdateAccommodationParams) {
     const accommodation = await this.getAccommodationById(accommodationId);
 
     if (accommodation.ownerId !== ownerId) {
