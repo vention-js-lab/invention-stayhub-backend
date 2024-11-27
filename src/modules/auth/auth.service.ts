@@ -15,7 +15,7 @@ import { JwtService } from '@nestjs/jwt';
 import { LoginDto } from './dto/login.dto';
 import { GoogleUser } from './types/google-user.type';
 import { Profile } from '../users/entities/profile.entity';
-import { AccountType } from '../../shared/constants/user-account.constant';
+import { AccountType } from '#/shared/constants/user-account.constant';
 import { AccountRefreshToken } from './entities/account-refresh-token.entity';
 
 @Injectable()

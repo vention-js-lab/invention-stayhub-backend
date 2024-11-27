@@ -15,7 +15,7 @@ import { Wishlist } from '#/modules/wishlists/entities/wishlist.entity';
 import { GetAccount } from '../auth/decorators/get-account.decorator';
 import { AccessTokenGuard } from '#/shared/guards/access-token.guard';
 import { RolesGuard, UserRoles } from '#/shared/guards/roles.guard';
-import { Roles } from '../../shared/constants/user-roles.constant';
+import { Roles } from '#/shared/constants/user-roles.constant';
 import { CreateWishlistDto } from './dto/create-wishlist.dto';
 
 @Controller('wishlists')

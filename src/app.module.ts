@@ -8,7 +8,7 @@ import { UserModule } from './modules/users/users.module';
 import { validateEnv } from './shared/configs/env.config';
 import { AccommodationModule } from './modules/accommodations/accommodations.module';
 import { WishlistsModule } from './modules/wishlists/wishlists.module';
-import { PaymentModule } from './modules/payment/payment.module';
+import { PaymentsModule } from './modules/payments/payments.module';
 import { UploadModule } from './modules/uploads/upload.module';
 import { BookingsModule } from './modules/bookings/bookings.module';
 
@@ -30,7 +30,7 @@ import { BookingsModule } from './modules/bookings/bookings.module';
     AuthModule,
     DatabaseModule,
     AccommodationModule,
-    PaymentModule,
+    PaymentsModule,
     BookingsModule,
   ],
   providers: [],

@@ -46,6 +46,7 @@
     "pg": "^8.13.1",
     "reflect-metadata": "^0.2.0",
     "rxjs": "^7.8.1",
+    "stripe": "^17.4.0",
     "typeorm": "^0.3.20",
     "zod": "^3.23.8"
   },
@@ -62,6 +63,7 @@
     "@types/node": "^20.3.1",
     "@types/passport-google-oauth20": "^2.0.16",
     "@types/passport-jwt": "^4.0.1",
+    "@types/stripe": "^8.0.416",
     "@types/supertest": "^6.0.0",
     "@typescript-eslint/eslint-plugin": "^7.18.0",
     "@typescript-eslint/parser": "^7.18.0",

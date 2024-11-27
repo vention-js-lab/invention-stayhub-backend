@@ -162,6 +162,26 @@ export class AccommodationService {
     return await this.getAccommodationById(accommodationId);
   }
 
+  async updateAccommodationStatus({
+    accommodationId,
+    newStatus,
+  }: {
+    accommodationId: string;
+    newStatus: boolean;
+  }) {
+    const existingAccommodation = await this.accommodationRepository.findOneBy({
+      id: accommodationId,
+    });
+
+    if (!existingAccommodation) {
+      throw new BadRequestException('Accommodation does not exist');
+    }
+
+    existingAccommodation.available = newStatus;
+
+    await this.accommodationRepository.save(existingAccommodation);
+  }
+
   async softDeleteAccommodationByOwner(
     accommodationId: string,
     ownerId: string,

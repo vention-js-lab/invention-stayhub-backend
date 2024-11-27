@@ -6,22 +6,22 @@ import { ValidationConfig } from './shared/configs/validation.config';
 import { SwaggerConfig } from './shared/configs/swagger.config';
 import { ConfigService } from '@nestjs/config';
 import { EnvConfig } from './shared/configs/env.config';
+import { getCorsValues } from './shared/utils/cors.util';
+import { NestExpressApplication } from '@nestjs/platform-express';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+    rawBody: true,
+  });
+
   const configService = app.get(ConfigService<EnvConfig>);
 
   const port = configService.getOrThrow('APP_PORT', {
     infer: true,
   });
 
-  const isCorsEnabled = configService.get<boolean>('CORS_ENABLED');
-  const corsOrigins = configService
-    .get<string>('CORS_ALLOWED_ORIGINS')
-    ?.split(',');
-  const corsMethods = configService
-    .get<string>('CORS_ALLOWED_METHODS')
-    ?.split(',');
+  const { isCorsEnabled, corsOrigins, corsMethods } =
+    getCorsValues(configService);
 
   if (isCorsEnabled) {
     app.enableCors({

@@ -48,4 +48,37 @@ export class BookingsService {
 
     return this.bookingRepository.save(booking);
   }
+
+  async getBookingById(bookingId: string, accountId?: string) {
+    const existingBooking = await this.bookingRepository.findOneBy({
+      id: bookingId,
+      accountId: accountId,
+    });
+
+    if (!existingBooking) {
+      throw new NotFoundException('Booking not found');
+    }
+
+    return existingBooking;
+  }
+
+  async updateBookingStatus({
+    bookingId,
+    newStatus,
+  }: {
+    bookingId: string;
+    newStatus: BookingStatus;
+  }) {
+    const existingBooking = await this.bookingRepository.findOneBy({
+      id: bookingId,
+    });
+
+    if (!existingBooking) {
+      throw new BadRequestException('Booking does not exist');
+    }
+
+    existingBooking.status = newStatus;
+
+    await this.bookingRepository.save(existingBooking);
+  }
 }
