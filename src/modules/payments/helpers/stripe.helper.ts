@@ -1,4 +1,4 @@
-import { StripeItemReqDto } from '../dto/request/stripe-items.req';
+import { StripeItemReqDto } from '../dto/request/stripe-create-checkout.req';
 
 export function buildStripeLineItems(items: StripeItemReqDto[]) {
   const lineItems = items.map((item) => ({

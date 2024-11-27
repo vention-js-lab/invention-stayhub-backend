@@ -10,19 +10,32 @@ export class PaymentsService {
     @InjectRepository(Payment) private paymentRepository: Repository<Payment>,
   ) {}
 
-  async createPaymentRecord({
+  async savePaymentRecord({
     amount,
     status,
     transactionId,
     bookingId,
   }: PaymentRecord) {
+    const existingPaymentRecord =
+      await this.getPaymentRecordByBookingId(bookingId);
+
     const newPaymentRecord = this.paymentRepository.create({
       amount,
-      status,
       transactionId,
       bookingId,
     });
 
-    await this.paymentRepository.save(newPaymentRecord);
+    const paymentRecord = existingPaymentRecord
+      ? existingPaymentRecord
+      : newPaymentRecord;
+
+    paymentRecord.status = status;
+    await this.paymentRepository.save(paymentRecord);
+  }
+
+  async getPaymentRecordByBookingId(bookingId: string) {
+    const paymentRecord = this.paymentRepository.findOneBy({ bookingId });
+
+    return paymentRecord;
   }
 }

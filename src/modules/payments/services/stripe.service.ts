@@ -9,16 +9,13 @@ import {
   extractPaymentIntent,
   extractStripeMetadata,
 } from '#/shared/extractors/payment-intent.extractor';
-import { StripeItemsListReqDto } from '../dto/request/stripe-items.req';
+import { StripeCreateCheckoutReqDto } from '../dto/request/stripe-create-checkout.req';
 import { PaymentStatus } from '#/shared/constants/payment-status.constant';
 import { buildStripeLineItems } from '../helpers/stripe.helper';
 import { StripeConfig } from '../types/stripe-config.type';
 import { PaymentsService } from './payments.service';
 import { BookingsService } from '#/modules/bookings/services/bookings.service';
 import { BookingStatus } from '#/shared/constants/booking-status.constant';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { Payment } from '../entities/payment.entity';
 import { AccommodationService } from '#/modules/accommodations/services/accommodations.service';
 
 @Injectable()
@@ -29,14 +26,13 @@ export class StripeService {
     private accommodationsService: AccommodationService,
     @Inject('STRIPE') private stripe: Stripe,
     @Inject('STRIPE_CONFIG') private stripeConfig: StripeConfig,
-    @InjectRepository(Payment) private paymentRepository: Repository<Payment>,
   ) {}
 
   async createCheckoutSession(
     accountId: string,
-    stripeItemsListReqDto: StripeItemsListReqDto,
+    stripeCreateCheckoutReqDto: StripeCreateCheckoutReqDto,
   ) {
-    const { bookingId, items } = stripeItemsListReqDto;
+    const { bookingId, items } = stripeCreateCheckoutReqDto;
 
     const existingBooking = await this.bookingsService.getBookingById(
       bookingId,
@@ -47,9 +43,8 @@ export class StripeService {
       throw new BadRequestException('Booking does not exist');
     }
 
-    const existingPaymentRecord = await this.paymentRepository.findOneBy({
-      bookingId,
-    });
+    const existingPaymentRecord =
+      await this.paymentsService.getPaymentRecordByBookingId(bookingId);
 
     if (
       existingPaymentRecord &&
@@ -109,12 +104,16 @@ export class StripeService {
       accommodationId: string;
     }>(metadata);
 
-    await this.paymentsService.createPaymentRecord({
+    await this.paymentsService.savePaymentRecord({
       amount: amount,
       status: paymentStatus,
       transactionId: id,
       bookingId: bookingId,
     });
+
+    if (paymentStatus !== PaymentStatus.Success) {
+      return;
+    }
 
     await this.bookingsService.updateBookingStatus({
       bookingId,

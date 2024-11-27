@@ -35,4 +35,12 @@ export class CreateReviewDto {
   @IsUUID('4')
   @IsString()
   bookingId: string;
+
+  @ApiProperty({
+    description: 'ID of the accommodation associated with the review',
+  })
+  @IsString()
+  @IsNotEmpty()
+  @IsUUID('4')
+  accommodationId: string;
 }
