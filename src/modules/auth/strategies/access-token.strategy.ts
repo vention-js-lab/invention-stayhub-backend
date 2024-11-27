@@ -31,7 +31,7 @@ export class AccessTokenStrategy extends PassportStrategy(
   public async validate({ sub, userEmail, userRole }: AuthTokenPayload) {
     const existingAccount = await this.accountRepository.findOneBy({
       id: sub,
-      isDeleted: false,
+      deletedAt: null,
     });
 
     if (!existingAccount || existingAccount.role != userRole) {
