@@ -48,7 +48,7 @@ export class RefreshTokenStrategy extends PassportStrategy(
 
     if (
       !existingRefreshTokenEntity ||
-      existingRefreshTokenEntity.account.isDeleted
+      existingRefreshTokenEntity.account.deletedAt
     ) {
       throw new UnauthorizedException();
     }

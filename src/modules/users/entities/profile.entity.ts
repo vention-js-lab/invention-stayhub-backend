@@ -56,9 +56,12 @@ export class Profile {
   })
   updatedAt: Date;
 
+  @Column({ name: 'account_id' })
+  accountId: string;
+
   @OneToOne(() => Account, (account) => account.profile, {
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'account_id' })
-  accountId: Account;
+  account: Account;
 }

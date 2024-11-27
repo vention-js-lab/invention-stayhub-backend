@@ -6,9 +6,7 @@ import {
   IsInt,
   IsNumber,
   IsOptional,
-  IsPositive,
   IsString,
-  Max,
   Min,
 } from 'class-validator';
 import {
@@ -17,31 +15,10 @@ import {
   TransformToNumber,
 } from '#/shared/transformers/transform-type.transformer';
 import { SortOrder } from '#/shared/constants/sort-order.constant';
-import { ParseInt } from '#/shared/transformers/parse-int.transformer';
 import { SortBy } from '#/modules/accommodations/constants/sort-by.constant';
+import { PaginationQueryDto } from '#/shared/dto/pagination-query.req';
 
-export class AccommodationFiltersReqQueryDto {
-  @ApiProperty({
-    description: 'Page is provided to calculate pagination',
-    required: false,
-  })
-  @ParseInt()
-  @IsOptional()
-  @IsInt()
-  @IsPositive()
-  page?: number;
-
-  @ApiProperty({
-    description: 'Limit is provided to calculate pagination',
-    required: false,
-  })
-  @ParseInt()
-  @IsOptional()
-  @IsInt()
-  @IsPositive()
-  @Max(1000)
-  limit?: number;
-
+export class AccommodationFiltersReqQueryDto extends PaginationQueryDto {
   @ApiProperty({
     description: 'Sort options to get sorted accommodations',
     required: false,
