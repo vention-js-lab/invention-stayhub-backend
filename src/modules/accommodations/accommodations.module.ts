@@ -26,5 +26,6 @@ import { AccommodationImage } from './entities/accommodation-image.entity';
     AccommodationImageService,
     AccommodationAmenityService,
   ],
+  exports: [AccommodationService],
 })
 export class AccommodationModule {}

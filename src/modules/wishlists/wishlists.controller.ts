@@ -14,6 +14,7 @@ import { CreateWishlistItemDto } from './dto/requests/create-wishlist.req';
 import { withBaseResponse } from '#/shared/utils/with-base-response.util';
 import { ApiOkResponse, ApiOperation } from '@nestjs/swagger';
 import { WishlistResDto } from './dto/responses/wishlist-item.res';
+import { UUIDValidationPipe } from '#/shared/pipes/uuid-validation.pipe';
 
 @Controller('wishlists')
 export class WishlistController {
@@ -69,7 +70,7 @@ export class WishlistController {
   @UseGuards(AccessTokenGuard)
   async removeFromWishlist(
     @GetAccount('accountId') accountId: string,
-    @Param('accommodationId') accommodationId: string,
+    @Param('accommodationId', new UUIDValidationPipe()) accommodationId: string,
   ) {
     const result = await this.wishlistService.removeFromWishlist(
       accountId,

@@ -1,25 +1,19 @@
-import { Accommodation } from '#/modules/accommodations/entities/accommodations.entity';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Wishlist } from '#/modules/wishlists/entities/wishlist.entity';
+import { AccommodationService } from '#/modules/accommodations/services/accommodations.service';
 
 @Injectable()
 export class WishlistService {
   constructor(
     @InjectRepository(Wishlist)
     private readonly wishlistRepository: Repository<Wishlist>,
-    @InjectRepository(Accommodation)
-    private readonly accommodationRepository: Repository<Accommodation>,
+    private readonly accommodationService: AccommodationService,
   ) {}
 
   async addToWishlist(accountId: string, accommodationId: string) {
-    const accommodation = await this.accommodationRepository.findOne({
-      where: { id: accommodationId },
-    });
-    if (!accommodation) {
-      throw new NotFoundException('Accomodation not found');
-    }
+    await this.accommodationService.getAccommodationById(accommodationId);
 
     const existingWishlistItem = await this.wishlistRepository.findOne({
       where: { accountId, accommodationId },
@@ -38,22 +32,10 @@ export class WishlistService {
   }
 
   async getUserWishlist(accountId: string) {
-    const userWishlist = await this.accommodationRepository
-      .createQueryBuilder('accommodation')
-      .leftJoinAndSelect('accommodation.wishlist', 'wishlist')
-      .where('wishlist.accountId = :accountId', { accountId })
-      .select([
-        'accommodation.id',
-        'accommodation.name',
-        'accommodation.coverImage',
-        'accommodation.price',
-        'accommodation.available',
-        'accommodation.availableFrom',
-        'accommodation.availableTo',
-        'accommodation.squareMeters',
-        'accommodation.numberOfRooms',
-      ])
-      .getMany();
+    const userWishlist = await this.wishlistRepository.find({
+      where: { accountId },
+      relations: ['accommodation'],
+    });
 
     return userWishlist;
   }
