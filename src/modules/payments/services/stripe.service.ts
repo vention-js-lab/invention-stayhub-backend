@@ -115,14 +115,16 @@ export class StripeService {
       return;
     }
 
-    await this.bookingsService.updateBookingStatus({
+    await this.bookingsService.updateStatus({
       bookingId,
       newStatus: BookingStatus.Upcoming,
     });
 
-    await this.accommodationsService.updateAccommodationStatus({
+    await this.accommodationsService.updateAvailability({
       accommodationId,
       newStatus: false,
     });
+
+    return { received: true };
   }
 }

@@ -185,7 +185,7 @@ export class AccommodationService {
     return await this.getAccommodationById(accommodationId);
   }
 
-  async updateAccommodationStatus({
+  async updateAvailability({
     accommodationId,
     newStatus,
   }: {

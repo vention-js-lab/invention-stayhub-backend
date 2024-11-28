@@ -21,15 +21,15 @@ describe('StripeService', () => {
   beforeEach(async () => {
     mockBookingsService = {
       getBookingById: jest.fn(),
-      updateBookingStatus: jest.fn(),
+      updateStatus: jest.fn(),
     };
 
     mockPaymentsService = {
-      createPaymentRecord: jest.fn(),
+      savePaymentRecord: jest.fn(),
     };
 
     mockAccommodationService = {
-      updateAccommodationStatus: jest.fn(),
+      updateAvailability: jest.fn(),
     };
 
     mockStripe = {
@@ -149,21 +149,19 @@ describe('StripeService', () => {
 
       await service.handleWebhook(Buffer.from(''), 'signature');
 
-      expect(mockPaymentsService.createPaymentRecord).toHaveBeenCalledWith({
+      expect(mockPaymentsService.savePaymentRecord).toHaveBeenCalledWith({
         amount: 1000,
         status: PaymentStatus.Success,
         transactionId: 'payment-intent-id',
         bookingId: 'booking-id',
       });
 
-      expect(mockBookingsService.updateBookingStatus).toHaveBeenCalledWith({
+      expect(mockBookingsService.updateStatus).toHaveBeenCalledWith({
         bookingId: 'booking-id',
         newStatus: BookingStatus.Upcoming,
       });
 
-      expect(
-        mockAccommodationService.updateAccommodationStatus,
-      ).toHaveBeenCalledWith({
+      expect(mockAccommodationService.updateAvailability).toHaveBeenCalledWith({
         accommodationId: 'accommodation-id',
         newStatus: false,
       });

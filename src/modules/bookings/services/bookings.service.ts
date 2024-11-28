@@ -62,7 +62,7 @@ export class BookingsService {
     return existingBooking;
   }
 
-  async updateBookingStatus({
+  async updateStatus({
     bookingId,
     newStatus,
   }: {
