@@ -16,6 +16,7 @@ import { AccommodationAddress } from './accommodation-address.entity';
 import { Account } from '#/modules/users/entities/account.entity';
 import { Wishlist } from '#/modules/wishlists/entities/wishlist.entity';
 import { Review } from '#/modules/review/entities/review.entity';
+import { Booking } from '../../bookings/entities/booking.entity';
 
 @Entity('accommodation')
 export class Accommodation {
@@ -84,4 +85,7 @@ export class Accommodation {
 
   @OneToMany(() => Review, (review) => review.accommodation)
   reviews: Review[];
+
+  @OneToMany(() => Booking, (booking) => booking.accommodation)
+  bookings: Booking[];
 }

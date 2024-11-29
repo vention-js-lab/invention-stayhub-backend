@@ -29,6 +29,7 @@ import {
   UpdateAccommodationParams,
 } from '../types/accommodations-service.type';
 import { paginationParams } from '../utils/pagination-params.util';
+import * as dayjs from 'dayjs';
 
 @Injectable()
 export class AccommodationService {
@@ -110,6 +111,7 @@ export class AccommodationService {
       .leftJoinAndSelect('accommodation.amenity', 'amenity')
       .leftJoinAndSelect('accommodation.images', 'images')
       .leftJoinAndSelect('accommodation.reviews', 'reviews')
+      .leftJoinAndSelect('accommodation.bookings', 'bookings')
       .leftJoinAndSelect('reviews.account', 'account')
       .leftJoinAndSelect('account.profile', 'profile')
       .where('accommodation.id = :id', { id })
@@ -122,19 +124,26 @@ export class AccommodationService {
 
     const result = {
       ...accommodation,
+      bookings: accommodation.bookings.map((booking) => ({
+        startDate: dayjs(booking.startDate).format('YYYY-MM-DD'),
+        endDate: dayjs(booking.endDate).format('YYYY-MM-DD'),
+        status: booking.status,
+      })),
       reviews: accommodation.reviews.map((review) => ({
         id: review.id,
         content: review.content,
         rating: review.rating,
-        createdAt: review.createdAt,
-        updatedAt: review.updatedAt,
+        createdAt: dayjs(review.createdAt).format('YYYY-MM-DD HH:mm:ss'),
+        updatedAt: dayjs(review.updatedAt).format('YYYY-MM-DD HH:mm:ss'),
         user: {
           id: review.account.id,
           firstName: review.account.profile.firstName,
           lastName: review.account.profile.lastName,
           country: review.account.profile.country,
           photo: review.account.profile.image,
-          сreatedAt: review.account.profile.createdAt,
+          createdAt: dayjs(review.account.profile.createdAt).format(
+            'YYYY-MM-DD HH:mm:ss',
+          ),
         },
       })),
     };
