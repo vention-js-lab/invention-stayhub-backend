@@ -4,12 +4,12 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, Between } from 'typeorm';
 import { Booking } from '../entities/booking.entity';
 import { Accommodation } from '#/modules/accommodations/entities/accommodations.entity';
 import { CreateBookingDto } from '../dto/create-booking.dto';
 import { BookingStatus } from '#/shared/constants/booking-status.constant';
-import { Between } from 'typeorm';
+import * as dayjs from 'dayjs';
 
 @Injectable()
 export class BookingsService {
@@ -33,15 +33,18 @@ export class BookingsService {
       throw new NotFoundException('Accommodation not found');
     }
 
+    const parsedStartDate = dayjs(startDate).toDate();
+    const parsedEndDate = dayjs(endDate).toDate();
+
     const overlappingBookings = await this.bookingRepository.find({
       where: [
         {
           accommodationId,
-          startDate: Between(new Date(startDate), new Date(endDate)),
+          startDate: Between(parsedStartDate, parsedEndDate),
         },
         {
           accommodationId,
-          endDate: Between(new Date(startDate), new Date(endDate)),
+          endDate: Between(parsedStartDate, parsedEndDate),
         },
       ],
     });
@@ -51,8 +54,8 @@ export class BookingsService {
     }
 
     const booking = this.bookingRepository.create({
-      startDate: new Date(startDate),
-      endDate: new Date(endDate),
+      startDate: parsedStartDate,
+      endDate: parsedEndDate,
       status: BookingStatus.Pending,
       accountId: userId,
       accommodationId,
