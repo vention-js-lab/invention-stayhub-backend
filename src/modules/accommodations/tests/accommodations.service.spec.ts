@@ -51,7 +51,7 @@ describe('AccommodationService', () => {
   });
 
   describe('getAccommodationById', () => {
-    it('should return accommodation with reviews and user details', async () => {
+    it('should return accommodation with reviews, user details, and unavailable dates', async () => {
       const mockAccommodation = {
         id: 'accommodation-id',
         name: 'Test Accommodation',
@@ -67,6 +67,16 @@ describe('AccommodationService', () => {
               id: 'user-id',
               profile: { firstName: 'John', lastName: 'Doe' },
             },
+          },
+        ],
+        bookings: [
+          {
+            startDate: new Date('2024-12-01'),
+            endDate: new Date('2024-12-10'),
+          },
+          {
+            startDate: new Date('2024-12-15'),
+            endDate: new Date('2024-12-20'),
           },
         ],
       };
@@ -92,6 +102,16 @@ describe('AccommodationService', () => {
               firstName: 'John',
               lastName: 'Doe',
             },
+          },
+        ],
+        unavailableDates: [
+          {
+            startDate: new Date('2024-12-01'),
+            endDate: new Date('2024-12-10'),
+          },
+          {
+            startDate: new Date('2024-12-15'),
+            endDate: new Date('2024-12-20'),
           },
         ],
       });

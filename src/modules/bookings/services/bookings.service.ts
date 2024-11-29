@@ -9,6 +9,7 @@ import { Booking } from '../entities/booking.entity';
 import { Accommodation } from '#/modules/accommodations/entities/accommodations.entity';
 import { CreateBookingDto } from '../dto/create-booking.dto';
 import { BookingStatus } from '#/shared/constants/booking-status.constant';
+import { Between } from 'typeorm';
 
 @Injectable()
 export class BookingsService {
@@ -32,18 +33,29 @@ export class BookingsService {
       throw new NotFoundException('Accommodation not found');
     }
 
-    if (!accommodation.available) {
-      throw new BadRequestException('Accommodation is not available');
+    const overlappingBookings = await this.bookingRepository.find({
+      where: [
+        {
+          accommodationId,
+          startDate: Between(new Date(startDate), new Date(endDate)),
+        },
+        {
+          accommodationId,
+          endDate: Between(new Date(startDate), new Date(endDate)),
+        },
+      ],
+    });
+
+    if (overlappingBookings.length > 0) {
+      throw new BadRequestException('The selected dates are not available');
     }
 
-    accommodation.available = false;
-    await this.accommodationRepository.save(accommodation);
     const booking = this.bookingRepository.create({
-      startDate,
-      endDate,
+      startDate: new Date(startDate),
+      endDate: new Date(endDate),
       status: BookingStatus.Pending,
       accountId: userId,
-      accommodationId: accommodation.id,
+      accommodationId,
     });
 
     return this.bookingRepository.save(booking);

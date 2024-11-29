@@ -110,6 +110,7 @@ export class AccommodationService {
       .leftJoinAndSelect('accommodation.amenity', 'amenity')
       .leftJoinAndSelect('accommodation.images', 'images')
       .leftJoinAndSelect('accommodation.reviews', 'reviews')
+      .leftJoinAndSelect('accommodation.bookings', 'bookings')
       .leftJoinAndSelect('reviews.account', 'account')
       .leftJoinAndSelect('account.profile', 'profile')
       .where('accommodation.id = :id', { id })
@@ -120,8 +121,14 @@ export class AccommodationService {
       throw new NotFoundException(`Accommodation with ID ${id} not found`);
     }
 
+    const unavailableDates = accommodation.bookings.map((booking) => ({
+      startDate: booking.startDate,
+      endDate: booking.endDate,
+    }));
+
     const result = {
       ...accommodation,
+      unavailableDates,
       reviews: accommodation.reviews.map((review) => ({
         id: review.id,
         content: review.content,
@@ -138,7 +145,6 @@ export class AccommodationService {
         },
       })),
     };
-
     return result;
   }
 
