@@ -6,6 +6,7 @@ import { NotFoundException } from '@nestjs/common';
 import { AccommodationAddressService } from '../services/accommodation-address.service';
 import { AccommodationAmenityService } from '../services/accommodation-amenity.service';
 import { AccommodationImageService } from '../services/accommodation-image.service';
+import * as dayjs from 'dayjs';
 
 const mockAccommodationRepository = {
   createQueryBuilder: jest.fn(),
@@ -51,7 +52,7 @@ describe('AccommodationService', () => {
   });
 
   describe('getAccommodationById', () => {
-    it('should return accommodation with reviews, user details, and unavailable dates', async () => {
+    it('should return accommodation with bookings and reviews', async () => {
       const mockAccommodation = {
         id: 'accommodation-id',
         name: 'Test Accommodation',
@@ -63,20 +64,30 @@ describe('AccommodationService', () => {
             id: 'review-id',
             content: 'Great place!',
             rating: 5,
+            createdAt: '2024-01-01T10:00:00Z',
+            updatedAt: '2024-01-02T12:00:00Z',
             account: {
               id: 'user-id',
-              profile: { firstName: 'John', lastName: 'Doe' },
+              profile: {
+                firstName: 'John',
+                lastName: 'Doe',
+                country: 'USA',
+                image: 'user-image-url',
+                createdAt: '2024-01-01T09:00:00Z',
+              },
             },
           },
         ],
         bookings: [
           {
-            startDate: new Date('2024-12-01'),
-            endDate: new Date('2024-12-10'),
+            startDate: '2024-12-01',
+            endDate: '2024-12-10',
+            status: 'Pending',
           },
           {
-            startDate: new Date('2024-12-15'),
-            endDate: new Date('2024-12-20'),
+            startDate: '2024-12-15',
+            endDate: '2024-12-20',
+            status: 'Confirmed',
           },
         ],
       };
@@ -92,26 +103,39 @@ describe('AccommodationService', () => {
 
       expect(result).toEqual({
         ...mockAccommodation,
+        bookings: [
+          {
+            startDate: dayjs('2024-12-01').format('YYYY-MM-DD'),
+            endDate: dayjs('2024-12-10').format('YYYY-MM-DD'),
+            status: 'Pending',
+          },
+          {
+            startDate: dayjs('2024-12-15').format('YYYY-MM-DD'),
+            endDate: dayjs('2024-12-20').format('YYYY-MM-DD'),
+            status: 'Confirmed',
+          },
+        ],
         reviews: [
           {
             id: 'review-id',
             content: 'Great place!',
             rating: 5,
+            createdAt: dayjs('2024-01-01T10:00:00Z').format(
+              'YYYY-MM-DD HH:mm:ss',
+            ),
+            updatedAt: dayjs('2024-01-02T12:00:00Z').format(
+              'YYYY-MM-DD HH:mm:ss',
+            ),
             user: {
               id: 'user-id',
               firstName: 'John',
               lastName: 'Doe',
+              country: 'USA',
+              photo: 'user-image-url',
+              createdAt: dayjs('2024-01-01T09:00:00Z').format(
+                'YYYY-MM-DD HH:mm:ss',
+              ),
             },
-          },
-        ],
-        unavailableDates: [
-          {
-            startDate: new Date('2024-12-01'),
-            endDate: new Date('2024-12-10'),
-          },
-          {
-            startDate: new Date('2024-12-15'),
-            endDate: new Date('2024-12-20'),
           },
         ],
       });
