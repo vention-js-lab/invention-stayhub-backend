@@ -11,16 +11,26 @@
     "outDir": "./dist",
     "baseUrl": "./src",
     "paths": {
-      "#/*": ["*"],
+      "#/*": [
+        "*"
+      ],
     },
     "incremental": true,
     "skipLibCheck": true,
-    "strictNullChecks": false,
+    "alwaysStrict": true,
+    "strictNullChecks": true,
+    "strictBindCallApply": true,
+    "strictFunctionTypes": true,
+    "strictPropertyInitialization": false,
     "noImplicitAny": false,
-    "strictBindCallApply": false,
-    "forceConsistentCasingInFileNames": false,
-    "noFallthroughCasesInSwitch": false
+    "noImplicitThis": true,
+    "useUnknownInCatchVariables": true,
+    "noFallthroughCasesInSwitch": true,
+    "forceConsistentCasingInFileNames": true,
+    "noUncheckedIndexedAccess": true,
   },
-  "include": ["src/**/*.ts", "typeorm.config.ts"]
+  "include": [
+    "src/**/*.ts",
+    "typeorm.config.ts"
+  ]
 }
-
