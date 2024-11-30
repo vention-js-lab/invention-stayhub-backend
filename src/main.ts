@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import * as cookieParser from 'cookie-parser';
+import cookieParser from 'cookie-parser';
 import { SwaggerModule } from '@nestjs/swagger';
 import { ValidationConfig } from './shared/configs/validation.config';
 import { SwaggerConfig } from './shared/configs/swagger.config';
@@ -34,7 +34,7 @@ async function bootstrap() {
   SwaggerModule.setup('/docs', app, document);
 
   await app.listen(port, () => {
-    Logger.log(`Server is running in ${configService.get('APP_ENV')} mode on http://localhost:${port}`);
+    Logger.log(`Server is running in ${configService.get('APP_ENV')} mode on http://localhost:${port}`, 'Bootstrap');
   });
 }
 

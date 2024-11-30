@@ -27,6 +27,7 @@ export class Account {
 
   @Column({
     nullable: true,
+    type: 'varchar',
   })
   password: string | null;
 
@@ -37,7 +38,7 @@ export class Account {
   })
   role: Roles;
 
-  @Column({ unique: true, name: 'google_id', nullable: true })
+  @Column({ unique: true, name: 'google_id', nullable: true, type: 'varchar' })
   googleId: string | null;
 
   @Column({ type: 'enum', name: 'type', enum: AccountType })

@@ -10,6 +10,7 @@ export default tseslint.config(
     ignores: [
       'eslint.config.mjs',
       'lint-staged.config.js',
+      'database/migrations/**',
       'typeorm.config.ts',
       'dist/**',
       'node_modules',

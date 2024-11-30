@@ -24,7 +24,7 @@ export class Review {
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, type: 'text' })
   content: string | null;
 
   @Column({ nullable: false })
