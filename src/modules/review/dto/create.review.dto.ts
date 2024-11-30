@@ -35,9 +35,4 @@ export class CreateReviewDto {
   @IsUUID('4')
   @IsString()
   bookingId: string;
-
-  @IsNotEmpty()
-  @IsUUID('4')
-  @IsString()
-  accommodationId: string;
 }
