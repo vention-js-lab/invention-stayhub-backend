@@ -11,29 +11,19 @@ export class AccommodationAmenityService {
     private accommodationAmenityRepository: Repository<AccommodationAmenity>,
   ) {}
 
-  async create(
-    accommodationId: string,
-    createAccommodationAmenityDto: AccommodationAmenityDto,
-  ): Promise<AccommodationAmenity> {
+  async create(accommodationId: string, createAccommodationAmenityDto: AccommodationAmenityDto): Promise<AccommodationAmenity> {
     const newAccommodationAmenity = this.accommodationAmenityRepository.create({
-      accommodationId,
       ...createAccommodationAmenityDto,
+      accommodationId,
     });
 
-    const createdAccommodationAmenity =
-      await this.accommodationAmenityRepository.save(newAccommodationAmenity);
+    const createdAccommodationAmenity = await this.accommodationAmenityRepository.save(newAccommodationAmenity);
 
     return createdAccommodationAmenity;
   }
 
-  async update(
-    accommodationAmenityId: string,
-    updateAccommodationAmenityDto: AccommodationAmenityDto,
-  ) {
-    await this.accommodationAmenityRepository.update(
-      accommodationAmenityId,
-      updateAccommodationAmenityDto,
-    );
+  async update(accommodationAmenityId: string, updateAccommodationAmenityDto: AccommodationAmenityDto) {
+    await this.accommodationAmenityRepository.update(accommodationAmenityId, updateAccommodationAmenityDto);
 
     return await this.accommodationAmenityRepository.findOne({
       where: { id: accommodationAmenityId },

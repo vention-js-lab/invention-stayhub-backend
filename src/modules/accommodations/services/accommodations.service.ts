@@ -1,9 +1,4 @@
-import {
-  BadRequestException,
-  ForbiddenException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Accommodation } from '../entities/accommodations.entity';
 import { Repository } from 'typeorm';
@@ -11,12 +6,8 @@ import { AccommodationAddressService } from './accommodation-address.service';
 import { AccommodationAmenityService } from './accommodation-amenity.service';
 import { AccommodationImageService } from './accommodation-image.service';
 import { AccommodationFiltersReqQueryDto } from '../dto/requests/accommodation-filters.req';
-import {
-  getPaginationMetadata,
-  getPaginationOffset,
-} from '#/shared/utils/pagination.util';
+import { getPaginationMetadata, getPaginationOffset } from '#/shared/utils/pagination.util';
 import { sortByParams } from '../utils/sort-by-params.util';
-
 import {
   addPriceFilters,
   addAvailabilityFilters,
@@ -24,12 +15,10 @@ import {
   addSearchFilters,
   addApartmentFilters,
 } from '../helpers/accommodation-filters.util';
-import {
-  CreateAccommodationParams,
-  UpdateAccommodationParams,
-} from '../types/accommodations-service.type';
+import { CreateAccommodationParams, UpdateAccommodationParams } from '../types/accommodations-service.type';
 import { paginationParams } from '../utils/pagination-params.util';
-import * as dayjs from 'dayjs';
+import { time } from '#/shared/libs/time.lib';
+import { TimeFormat } from '#/shared/constants/time.constant';
 
 @Injectable()
 export class AccommodationService {
@@ -41,33 +30,20 @@ export class AccommodationService {
     private accommodationImageService: AccommodationImageService,
   ) {}
 
-  async create({
-    createAccommodationDto,
-    ownerId,
-  }: CreateAccommodationParams): Promise<Accommodation> {
+  async create({ createAccommodationDto, ownerId }: CreateAccommodationParams): Promise<Accommodation> {
     const accommodation = this.accommodationRepository.create({
       ...createAccommodationDto,
       ownerId,
     });
-    const createdAccommodation =
-      await this.accommodationRepository.save(accommodation);
+    const createdAccommodation = await this.accommodationRepository.save(accommodation);
 
-    await this.accommodationAddressService.create(
-      createdAccommodation.id,
-      createAccommodationDto.address,
-    );
+    await this.accommodationAddressService.create(createdAccommodation.id, createAccommodationDto.address);
 
-    await this.accommodationAmenityService.create(
-      createdAccommodation.id,
-      createAccommodationDto.amenity,
-    );
+    await this.accommodationAmenityService.create(createdAccommodation.id, createAccommodationDto.amenity);
 
-    await this.accommodationImageService.create(
-      createdAccommodation.id,
-      createAccommodationDto.images,
-    );
+    await this.accommodationImageService.create(createdAccommodation.id, createAccommodationDto.images);
 
-    return this.accommodationRepository.findOne({
+    return this.accommodationRepository.findOneOrFail({
       where: { id: createdAccommodation.id },
       relations: ['address', 'amenity', 'images'],
     });
@@ -125,25 +101,23 @@ export class AccommodationService {
     const result = {
       ...accommodation,
       bookings: accommodation.bookings.map((booking) => ({
-        startDate: dayjs(booking.startDate).format('YYYY-MM-DD'),
-        endDate: dayjs(booking.endDate).format('YYYY-MM-DD'),
+        startDate: time(booking.startDate).format(TimeFormat.Calendar),
+        endDate: time(booking.endDate).format(TimeFormat.Calendar),
         status: booking.status,
       })),
       reviews: accommodation.reviews.map((review) => ({
         id: review.id,
         content: review.content,
         rating: review.rating,
-        createdAt: dayjs(review.createdAt).format('YYYY-MM-DD HH:mm:ss'),
-        updatedAt: dayjs(review.updatedAt).format('YYYY-MM-DD HH:mm:ss'),
+        createdAt: time(review.createdAt).format(TimeFormat.CalendarWithTime),
+        updatedAt: time(review.updatedAt).format(TimeFormat.CalendarWithTime),
         user: {
           id: review.account.id,
           firstName: review.account.profile.firstName,
           lastName: review.account.profile.lastName,
           country: review.account.profile.country,
           photo: review.account.profile.image,
-          createdAt: dayjs(review.account.profile.createdAt).format(
-            'YYYY-MM-DD HH:mm:ss',
-          ),
+          createdAt: time(review.account.profile.createdAt).format(TimeFormat.CalendarWithTime),
         },
       })),
     };
@@ -151,66 +125,41 @@ export class AccommodationService {
     return result;
   }
 
-  async update({
-    accommodationId,
-    ownerId,
-    updateAccommodationDto,
-  }: UpdateAccommodationParams) {
+  async update({ accommodationId, ownerId, updateAccommodationDto }: UpdateAccommodationParams) {
     const accommodation = await this.getAccommodationById(accommodationId);
 
     if (accommodation.ownerId !== ownerId) {
-      throw new ForbiddenException(
-        'You are not the owner of this accommodation',
-      );
+      throw new ForbiddenException('You are not the owner of this accommodation');
     }
 
-    const { address, amenity, ...accommodationDetails } =
-      updateAccommodationDto;
+    const { address, amenity, ...accommodationDetails } = updateAccommodationDto;
 
-    const filteredDetaills = Object.entries(updateAccommodationDto).filter(
-      ([, value]) => value !== undefined,
-    );
+    const filteredDetaills = Object.entries(updateAccommodationDto).filter(([, value]) => value !== undefined);
     const definedDetails = Object.fromEntries(filteredDetaills);
 
     if (Object.keys(definedDetails).length === 0) {
-      throw new BadRequestException(
-        'Please provide at least one field to update.',
-      );
+      throw new BadRequestException('Please provide at least one field to update.');
     }
 
-    await this.accommodationRepository.update(
-      accommodationId,
-      accommodationDetails,
-    );
+    await this.accommodationRepository.update(accommodationId, accommodationDetails);
 
     if (address) {
-      await this.accommodationAddressService.update(
-        accommodation.address.id,
-        updateAccommodationDto.address,
-      );
+      await this.accommodationAddressService.update(accommodation.address.id, address);
     }
 
     if (amenity) {
-      await this.accommodationAmenityService.update(
-        accommodation.amenity.id,
-        updateAccommodationDto.amenity,
-      );
+      await this.accommodationAmenityService.update(accommodation.amenity.id, amenity);
     }
     return await this.getAccommodationById(accommodationId);
   }
 
-  async softDeleteAccommodationByOwner(
-    accommodationId: string,
-    ownerId: string,
-  ): Promise<void> {
+  async softDeleteAccommodationByOwner(accommodationId: string, ownerId: string): Promise<void> {
     const accommodation = await this.accommodationRepository.findOne({
-      where: { id: accommodationId, owner: { id: ownerId }, deletedAt: null },
+      where: { id: accommodationId, owner: { id: ownerId } },
     });
 
     if (!accommodation) {
-      throw new NotFoundException(
-        'Accommodation not found or already deleted.',
-      );
+      throw new NotFoundException('Accommodation not found or already deleted.');
     }
 
     await this.accommodationRepository.softRemove(accommodation);

@@ -1,13 +1,6 @@
-import {
-  MigrationInterface,
-  QueryRunner,
-  TableColumn,
-  TableForeignKey,
-} from 'typeorm';
+import { MigrationInterface, QueryRunner, TableColumn, TableForeignKey } from 'typeorm';
 
-export class UpdateAccommodationAmenityTable1731498135557
-  implements MigrationInterface
-{
+export class UpdateAccommodationAmenityTable1731498135557 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.addColumn(
       'accommodation_amenity',
@@ -29,13 +22,13 @@ export class UpdateAccommodationAmenityTable1731498135557
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    const foreignKey = await queryRunner
-      .getTable('accommodation_amenity')
-      .then((table) =>
-        table.foreignKeys.find((fk) =>
-          fk.columnNames.includes('accommodation_id'),
-        ),
-      );
+    const table = await queryRunner.getTable('accommodation_amenity');
+    if (!table) {
+      throw new Error('Table accommodation_amenity not found');
+    }
+
+    const foreignKey = table.foreignKeys.find((fk) => fk.columnNames.includes('accommodation_id'));
+
     if (foreignKey) {
       await queryRunner.dropForeignKey('accommodation_amenity', foreignKey);
     }

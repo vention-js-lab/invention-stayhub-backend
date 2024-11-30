@@ -1,14 +1,10 @@
-import {
-  ConflictException,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { RegisterDto } from './dto/register.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Account } from '../users/entities/account.entity';
 import { Repository } from 'typeorm';
 import { Hasher } from '#/shared/libs/hasher.lib';
-import { AuthTokenPayload } from './types/auth-payload.type';
+import { AuthTokenPayload, RefreshTokenPayload } from './types/auth-payload.type';
 import { ConfigService } from '@nestjs/config';
 import { EnvConfig } from '#/shared/configs/env.config';
 import { JwtService } from '@nestjs/jwt';
@@ -17,6 +13,7 @@ import { GoogleUser } from './types/google-user.type';
 import { Profile } from '../users/entities/profile.entity';
 import { AccountType } from '../../shared/constants/user-account.constant';
 import { AccountRefreshToken } from './entities/account-refresh-token.entity';
+import { time } from '#/shared/libs/time.lib';
 
 @Injectable()
 export class AuthService {
@@ -54,8 +51,7 @@ export class AuthService {
 
     await this.profileRepository.save(userProfile);
 
-    const { ...result } = user;
-    delete result.password;
+    const { password: _password, ...userWithoutPassword } = user;
 
     const payload = {
       sub: user.id,
@@ -70,7 +66,7 @@ export class AuthService {
     await this.refreshTokenRepository.insert(refreshTokenEntity);
 
     const data = {
-      result: result,
+      result: userWithoutPassword,
       accessToken,
       refreshToken,
     };
@@ -80,14 +76,14 @@ export class AuthService {
 
   async login({ email, password }: LoginDto) {
     const user = await this.accountRepository.findOne({
-      where: { email, deletedAt: null },
+      where: { email },
     });
 
     if (!user) {
       throw new UnauthorizedException('Invalid email or password');
     }
 
-    const isPasswordValid = await Hasher.verifyHash(user.password, password);
+    const isPasswordValid = await Hasher.verifyHash(user.password ?? '', password);
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid email or password');
     }
@@ -111,22 +107,18 @@ export class AuthService {
   }
 
   async issueNewTokens(refreshToken: string, sub: string) {
-    const existingRefreshTokenEntity =
-      await this.refreshTokenRepository.findOne({
-        where: {
-          accountId: sub,
-          token: refreshToken,
-          isDeleted: false,
-        },
-        relations: {
-          account: true,
-        },
-      });
+    const existingRefreshTokenEntity = await this.refreshTokenRepository.findOne({
+      where: {
+        accountId: sub,
+        token: refreshToken,
+        isDeleted: false,
+      },
+      relations: {
+        account: true,
+      },
+    });
 
-    if (
-      !existingRefreshTokenEntity ||
-      existingRefreshTokenEntity.account.deletedAt
-    ) {
+    if (!existingRefreshTokenEntity || existingRefreshTokenEntity.account.deletedAt) {
       throw new UnauthorizedException();
     }
 
@@ -139,8 +131,7 @@ export class AuthService {
     const newAccessToken = await this.generateAuthToken(payload, 'access');
     const newRefreshToken = await this.generateAuthToken(payload, 'refresh');
 
-    const newRefreshTokenEntity =
-      this.createRefreshTokenEntity(newRefreshToken);
+    const newRefreshTokenEntity = this.createRefreshTokenEntity(newRefreshToken);
     await this.refreshTokenRepository.remove(existingRefreshTokenEntity);
     await this.refreshTokenRepository.insert(newRefreshTokenEntity);
 
@@ -150,10 +141,7 @@ export class AuthService {
     };
   }
 
-  async generateAuthToken(
-    payload: AuthTokenPayload,
-    type: 'access' | 'refresh',
-  ) {
+  async generateAuthToken(payload: AuthTokenPayload, type: 'access' | 'refresh') {
     const secret =
       type === 'access'
         ? this.configService.get('JWT_ACCESS_TOKEN_SECRET', {
@@ -207,14 +195,14 @@ export class AuthService {
     };
   }
 
-  async findByGoogleId(id: string) {
+  async findByGoogleId(id: string | undefined) {
     const user = await this.accountRepository.findOneBy({ googleId: id });
     return user;
   }
 
   private createRefreshTokenEntity(refreshToken: string) {
-    const decodedRefreshToken = this.jwtService.decode(refreshToken);
-    const expiresAt = new Date(decodedRefreshToken.exp * 1000).valueOf();
+    const decodedRefreshToken = this.jwtService.decode<RefreshTokenPayload>(refreshToken);
+    const expiresAt = time(decodedRefreshToken.exp * 1000).valueOf();
 
     const refreshTokenEntity = this.refreshTokenRepository.create({
       accountId: decodedRefreshToken.sub,
