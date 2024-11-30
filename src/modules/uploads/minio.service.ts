@@ -7,7 +7,7 @@ import { EnvConfig } from '#/shared/configs/env.config';
 export class MinioService {
   private client: Client;
 
-  constructor(private readonly configService: ConfigService<EnvConfig>) {
+  constructor(private readonly configService: ConfigService<EnvConfig, true>) {
     this.client = new Client({
       endPoint: 'localhost',
       port: 9000,

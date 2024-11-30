@@ -5,7 +5,8 @@ import { SwaggerModule } from '@nestjs/swagger';
 import { ValidationConfig } from './shared/configs/validation.config';
 import { SwaggerConfig } from './shared/configs/swagger.config';
 import { ConfigService } from '@nestjs/config';
-import { EnvConfig } from './shared/configs/env.config';
+import { type EnvConfig } from './shared/configs/env.config';
+import { Logger } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -16,12 +17,8 @@ async function bootstrap() {
   });
 
   const isCorsEnabled = configService.get<boolean>('CORS_ENABLED');
-  const corsOrigins = configService
-    .get<string>('CORS_ALLOWED_ORIGINS')
-    ?.split(',');
-  const corsMethods = configService
-    .get<string>('CORS_ALLOWED_METHODS')
-    ?.split(',');
+  const corsOrigins = configService.get<string>('CORS_ALLOWED_ORIGINS')?.split(',');
+  const corsMethods = configService.get<string>('CORS_ALLOWED_METHODS')?.split(',');
 
   if (isCorsEnabled) {
     app.enableCors({
@@ -37,8 +34,8 @@ async function bootstrap() {
   SwaggerModule.setup('/docs', app, document);
 
   await app.listen(port, () => {
-    console.log(`Server has started on ${port}-port!`);
+    Logger.log(`Server is running in ${configService.get('APP_ENV')} mode on http://localhost:${port}`);
   });
 }
 
-bootstrap();
+void bootstrap();

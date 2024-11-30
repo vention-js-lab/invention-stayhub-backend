@@ -1,15 +1,11 @@
-import {
-  Injectable,
-  NotFoundException,
-  BadRequestException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Between } from 'typeorm';
 import { Booking } from '../entities/booking.entity';
 import { Accommodation } from '#/modules/accommodations/entities/accommodations.entity';
 import { CreateBookingDto } from '../dto/create-booking.dto';
 import { BookingStatus } from '#/shared/constants/booking-status.constant';
-import * as dayjs from 'dayjs';
+import { time } from '#/shared/libs/time.lib';
 
 @Injectable()
 export class BookingsService {
@@ -19,10 +15,7 @@ export class BookingsService {
     private accommodationRepository: Repository<Accommodation>,
   ) {}
 
-  async createBooking(
-    createBookingDto: CreateBookingDto,
-    userId: string,
-  ): Promise<Booking> {
+  async createBooking(createBookingDto: CreateBookingDto, userId: string): Promise<Booking> {
     const { accommodationId, startDate, endDate } = createBookingDto;
 
     const accommodation = await this.accommodationRepository.findOne({
@@ -33,8 +26,8 @@ export class BookingsService {
       throw new NotFoundException('Accommodation not found');
     }
 
-    const parsedStartDate = dayjs(startDate).toDate();
-    const parsedEndDate = dayjs(endDate).toDate();
+    const parsedStartDate = time(startDate).toDate();
+    const parsedEndDate = time(endDate).toDate();
 
     const overlappingBookings = await this.bookingRepository.find({
       where: [
