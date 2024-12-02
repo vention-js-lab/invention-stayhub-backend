@@ -72,15 +72,12 @@ export class WishlistController {
     @GetAccount('accountId') accountId: string,
     @Param('accommodationId', new UUIDValidationPipe()) accommodationId: string,
   ) {
-    const result = await this.wishlistService.removeFromWishlist(
-      accountId,
-      accommodationId,
-    );
+    await this.wishlistService.removeFromWishlist(accountId, accommodationId);
 
     return withBaseResponse({
-      status: 200,
+      status: 204,
       message: 'Wishlist item successfully deleted',
-      data: result,
+      data: null,
     });
   }
 }

@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
@@ -11,9 +11,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { RequestAccount } from '../types/request-account.type';
 
 @Injectable()
-export class AccessTokenStrategy extends PassportStrategy(
+export class OptionalAccessTokenStrategy extends PassportStrategy(
   Strategy,
-  JwtAuthConfig.AccessTokenKey,
+  JwtAuthConfig.OptionalAccessTokenKey,
 ) {
   constructor(
     private configService: ConfigService<EnvConfig, true>,
@@ -34,7 +34,7 @@ export class AccessTokenStrategy extends PassportStrategy(
     });
 
     if (!existingAccount || existingAccount.role != userRole) {
-      throw new UnauthorizedException();
+      return null;
     }
 
     const requestAccount: RequestAccount = {

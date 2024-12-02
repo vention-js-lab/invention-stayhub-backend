@@ -30,6 +30,7 @@ import {
 } from '../types/accommodations-service.type';
 import { paginationParams } from '../utils/pagination-params.util';
 import * as dayjs from 'dayjs';
+import { parseWishlist } from '../helpers/parse-wishlist.util';
 
 @Injectable()
 export class AccommodationService {
@@ -73,12 +74,21 @@ export class AccommodationService {
     });
   }
 
-  async listAccommodations(filters: AccommodationFiltersReqQueryDto) {
+  async listAccommodations(
+    filters: AccommodationFiltersReqQueryDto,
+    accountId: string,
+  ) {
     const queryBuilder = this.accommodationRepository
       .createQueryBuilder('accommodation')
       .leftJoinAndSelect('accommodation.address', 'address')
       .leftJoinAndSelect('accommodation.amenity', 'amenity')
       .leftJoinAndSelect('accommodation.images', 'image')
+      .leftJoinAndSelect(
+        'accommodation.wishlist',
+        'wishlist',
+        'wishlist.accountId = :accountId',
+        { accountId },
+      )
       .where('accommodation.deletedAt is NULL');
 
     addPriceFilters(queryBuilder, filters);
@@ -97,9 +107,12 @@ export class AccommodationService {
     }
 
     const [result, total] = await queryBuilder.getManyAndCount();
+
+    const parsedResult = parseWishlist(result);
+
     const metadata = getPaginationMetadata({ page, limit, total });
     return {
-      result,
+      parsedResult,
       metadata,
     };
   }

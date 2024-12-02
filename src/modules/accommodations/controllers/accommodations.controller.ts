@@ -27,6 +27,8 @@ import { AccommodationFiltersReqQueryDto } from '../dto/requests/accommodation-f
 import { UpdateAccommodationDto } from './../dto/requests/update-accommodation.req';
 import { UUIDValidationPipe } from '#/shared/pipes/uuid-validation.pipe';
 import { withBaseResponse } from '#/shared/utils/with-base-response.util';
+import { OptionalAccessTokenGuard } from '#/shared/guards/optional-access-token.guard';
+import { GetOptionalAccount } from '#/shared/decorators/get-optional-account.decorator';
 
 @ApiTags('Accommodations')
 @Controller('accommodations')
@@ -67,8 +69,15 @@ export class AccommodationController {
     status: 200,
     description: 'List of accommodations fetched successfully',
   })
-  async listAccommodations(@Query() filters: AccommodationFiltersReqQueryDto) {
-    const result = await this.accommodationService.listAccommodations(filters);
+  @UseGuards(OptionalAccessTokenGuard)
+  async listAccommodations(
+    @Query() filters: AccommodationFiltersReqQueryDto,
+    @GetOptionalAccount('accountId') accountId: string,
+  ) {
+    const result = await this.accommodationService.listAccommodations(
+      filters,
+      accountId,
+    );
 
     return withBaseResponse({
       status: 200,

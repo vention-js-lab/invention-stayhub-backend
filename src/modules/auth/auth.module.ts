@@ -10,6 +10,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { AccountRefreshToken } from './entities/account-refresh-token.entity';
 import { AccessTokenStrategy } from './strategies/access-token.strategy';
 import { RefreshTokenStrategy } from './strategies/refresh-token.strategy';
+import { OptionalAccessTokenStrategy } from './strategies/optional-access-token.strategy';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { RefreshTokenStrategy } from './strategies/refresh-token.strategy';
     GoogleStrategy,
     AccessTokenStrategy,
     RefreshTokenStrategy,
+    OptionalAccessTokenStrategy,
   ],
 })
 export class AuthModule {}
