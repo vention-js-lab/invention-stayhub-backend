@@ -11,10 +11,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { RequestAccount } from '../types/request-account.type';
 
 @Injectable()
-export class AccessTokenStrategy extends PassportStrategy(
-  Strategy,
-  JwtAuthConfig.AccessTokenKey,
-) {
+export class AccessTokenStrategy extends PassportStrategy(Strategy, JwtAuthConfig.AccessTokenKey) {
   constructor(
     private configService: ConfigService<EnvConfig, true>,
     @InjectRepository(Account) private accountRepository: Repository<Account>,
@@ -30,10 +27,9 @@ export class AccessTokenStrategy extends PassportStrategy(
   public async validate({ sub, userEmail, userRole }: AuthTokenPayload) {
     const existingAccount = await this.accountRepository.findOneBy({
       id: sub,
-      deletedAt: null,
     });
 
-    if (!existingAccount || existingAccount.role != userRole) {
+    if (!existingAccount || existingAccount.role !== userRole) {
       throw new UnauthorizedException();
     }
 

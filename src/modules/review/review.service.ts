@@ -1,9 +1,4 @@
-import {
-  BadRequestException,
-  ForbiddenException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { Review } from './entities/review.entity';
 import { CreateReviewDto } from './dto/create.review.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -23,10 +18,7 @@ export class ReviewService {
     private readonly accommodationRepository: Repository<Accommodation>,
   ) {}
 
-  async createReview(
-    accountId: string,
-    createReviewDto: CreateReviewDto,
-  ): Promise<Review> {
+  async createReview(accountId: string, createReviewDto: CreateReviewDto): Promise<Review> {
     const { bookingId, rating, content } = createReviewDto;
 
     const booking = await this.bookingRepository.findOne({
@@ -42,9 +34,7 @@ export class ReviewService {
     }
 
     if (booking.status !== BookingStatus.Completed) {
-      throw new BadRequestException(
-        'You can only add a review after your booking has been completed.',
-      );
+      throw new BadRequestException('You can only add a review after your booking has been completed.');
     }
     const accommodationId = booking.accommodationId;
 

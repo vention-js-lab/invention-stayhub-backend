@@ -1,11 +1,6 @@
-import { Test, TestingModule } from '@nestjs/testing';
+import { Test, type TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-
-import {
-  NotFoundException,
-  ForbiddenException,
-  BadRequestException,
-} from '@nestjs/common';
+import { NotFoundException, ForbiddenException, BadRequestException } from '@nestjs/common';
 import { ReviewService } from '../review.service';
 import { Booking } from '#/modules/bookings/entities/booking.entity';
 import { Review } from '../entities/review.entity';
@@ -61,7 +56,6 @@ describe('ReviewService', () => {
 
       await expect(
         service.createReview('d4f75e3a-dd77-4b86-bab8-f1ad2cc7349c', {
-          accommodationId: '99fd04ec-189f-481f-80c6-5f0d41ebcd5e',
           bookingId: '9ae5e450-7c4c-4b58-b244-535f04a06325',
           rating: 5,
           content: 'Great!',
@@ -78,16 +72,11 @@ describe('ReviewService', () => {
 
       await expect(
         service.createReview('d4f75e3a-dd77-4b86-bab8-f1ad2cc7349c', {
-          accommodationId: '9ae5e450-7c4c-4b58-b244-535f04a06325',
           bookingId: '9ae5e450-7c4c-4b58-b244-535f04a06325',
           rating: 5,
           content: 'Great!',
         }),
-      ).rejects.toThrow(
-        new BadRequestException(
-          'You can only add a review after your booking has been completed.',
-        ),
-      );
+      ).rejects.toThrow(new BadRequestException('You can only add a review after your booking has been completed.'));
     });
 
     it('should throw an error if the account does not match the booking account', async () => {
@@ -99,7 +88,6 @@ describe('ReviewService', () => {
 
       await expect(
         service.createReview('246651f3-3b4e-462b-8eeb-7da855cd2b88', {
-          accommodationId: '9ae5e450-7c4c-4b58-b244-535f04a06325',
           bookingId: 'd4f75e3a-dd77-4b86-bab8-f1ad2cc7349c',
           rating: 5,
           content: 'Great!',
@@ -118,7 +106,6 @@ describe('ReviewService', () => {
 
       await expect(
         service.createReview('9ae5e450-7c4c-4b58-b244-535f04a06325', {
-          accommodationId: 'd4f75e3a-dd77-4b86-bab8-f1ad2cc7349c',
           bookingId: 'd4f75e3a-dd77-4b86-bab8-f1ad2cc7349c',
           rating: 5,
           content: 'Great!',
@@ -131,7 +118,6 @@ describe('ReviewService', () => {
         content: 'Great!',
         rating: 5,
         accountId: '9ae5e450-7c4c-4b58-b244-535f04a06325',
-        accommodationId: 'd4f75e3a-dd77-4b86-bab8-f1ad2cc7349c',
         bookingId: 'd4f75e3a-dd77-4b86-bab8-f1ad2cc7349c',
       };
 
@@ -147,15 +133,11 @@ describe('ReviewService', () => {
       mockReviewRepository.create.mockReturnValue(mockReviewData);
       mockReviewRepository.save.mockResolvedValue(mockReviewData);
 
-      const result = await service.createReview(
-        '9ae5e450-7c4c-4b58-b244-535f04a06325',
-        {
-          accommodationId: 'd4f75e3a-dd77-4b86-bab8-f1ad2cc7349c',
-          bookingId: '9ae5e450-7c4c-4b58-b244-535f04a06325',
-          rating: 5,
-          content: 'Great!',
-        },
-      );
+      const result = await service.createReview('9ae5e450-7c4c-4b58-b244-535f04a06325', {
+        bookingId: '9ae5e450-7c4c-4b58-b244-535f04a06325',
+        rating: 5,
+        content: 'Great!',
+      });
 
       expect(result).toEqual(mockReviewData);
     });
