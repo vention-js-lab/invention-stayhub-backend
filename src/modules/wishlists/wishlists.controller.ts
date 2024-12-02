@@ -61,7 +61,7 @@ export class WishlistController {
     await this.wishlistService.removeFromWishlist(accountId, accommodationId);
 
     return withBaseResponse({
-      status: 200,
+      status: 204,
       message: 'Wishlist item successfully deleted',
       data: null,
     });
