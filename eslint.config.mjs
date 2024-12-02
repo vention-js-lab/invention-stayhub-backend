@@ -108,6 +108,7 @@ export default tseslint.config(
       // ==== TypeScript rules ==== //
       // ==== TypeScript rules ==== //
       '@typescript-eslint/no-misused-promises': 'off',
+      '@typescript-eslint/unbound-method': 'off',
       '@typescript-eslint/consistent-type-exports': 'error',
       'consistent-return': 'off',
       '@typescript-eslint/consistent-return': 'error',
