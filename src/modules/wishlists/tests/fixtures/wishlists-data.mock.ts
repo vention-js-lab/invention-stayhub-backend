@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker';
-import { Wishlist } from '#/modules/wishlists/entities/wishlist.entity';
-import { Accommodation } from '#/modules/accommodations/entities/accommodations.entity';
+import { type Wishlist } from '#/modules/wishlists/entities/wishlist.entity';
+import { type Accommodation } from '#/modules/accommodations/entities/accommodations.entity';
 
 export const mockUserId = faker.string.uuid();
 
@@ -39,4 +39,10 @@ export const mockWishlist = [
   },
 ] as Wishlist[];
 
-export const mockWishlistItem = mockWishlist[0];
+export const mockWishlistItem = {
+  id: faker.string.uuid(),
+  accountId: mockUserId,
+  accommodationId: mockAccommodation.id,
+  createdAt: faker.date.anytime(),
+  updatedAt: faker.date.anytime(),
+} as Wishlist;
