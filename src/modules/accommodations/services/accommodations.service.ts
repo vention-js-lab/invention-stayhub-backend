@@ -19,7 +19,7 @@ import { CreateAccommodationParams, UpdateAccommodationParams } from '../types/a
 import { paginationParams } from '../utils/pagination-params.util';
 import { time } from '#/shared/libs/time.lib';
 import { TimeFormat } from '#/shared/constants/time.constant';
-import { parseWishlist } from '../helpers/parse-wishlist.util';
+import { addIsSavedToWishlistProperty } from '../helpers/is-saved-to-wishlist.util';
 
 @Injectable()
 export class AccommodationService {
@@ -56,8 +56,11 @@ export class AccommodationService {
       .leftJoinAndSelect('accommodation.address', 'address')
       .leftJoinAndSelect('accommodation.amenity', 'amenity')
       .leftJoinAndSelect('accommodation.images', 'image')
-      .leftJoinAndSelect('accommodation.wishlist', 'wishlist', 'wishlist.accountId = :accountId', { accountId })
       .where('accommodation.deletedAt is NULL');
+
+    if (accountId) {
+      queryBuilder.leftJoinAndSelect('accommodation.wishlist', 'wishlist', 'wishlist.accountId = :accountId', { accountId });
+    }
 
     addPriceFilters(queryBuilder, filters);
     addAvailabilityFilters(queryBuilder, filters);
@@ -74,13 +77,13 @@ export class AccommodationService {
       queryBuilder.addOrderBy(`accommodation.${key}`, value);
     }
 
-    const [result, total] = await queryBuilder.getManyAndCount();
+    const [rawResult, total] = await queryBuilder.getManyAndCount();
 
-    const parsedResult = parseWishlist(result);
+    const result = addIsSavedToWishlistProperty(rawResult);
 
     const metadata = getPaginationMetadata({ page, limit, total });
     return {
-      parsedResult,
+      result,
       metadata,
     };
   }
