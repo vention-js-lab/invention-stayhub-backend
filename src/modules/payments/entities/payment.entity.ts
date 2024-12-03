@@ -1,14 +1,6 @@
 import { Booking } from '#/modules/bookings/entities/booking.entity';
 import { PaymentStatus } from '#/shared/constants/payment-status.constant';
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  JoinColumn,
-  OneToOne,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+import { Column, CreateDateColumn, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 
 @Entity('payment')
 export class Payment {

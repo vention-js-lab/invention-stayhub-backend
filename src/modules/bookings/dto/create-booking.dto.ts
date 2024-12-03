@@ -1,9 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsUUID, IsDateString, Validate } from 'class-validator';
-import {
-  IsFutureDate,
-  IsStartDateBeforeEndDate,
-} from '../validators/date-validators';
+import { IsFutureDate, IsStartDateBeforeEndDate } from '../validators/date-validators';
 
 export class CreateBookingDto {
   @ApiProperty({ description: 'ID of the accommodation being booked' })

@@ -1,8 +1,8 @@
-import { Account } from '#/modules/users/entities/account.entity';
-import { Profile } from '#/modules/users/entities/profile.entity';
+import { type Account } from '#/modules/users/entities/account.entity';
+import { type Profile } from '#/modules/users/entities/profile.entity';
 import { Gender } from '#/shared/constants/gender.constant';
 import { Roles } from '#/shared/constants/user-roles.constant';
-import { UpdateProfileDto } from '#/modules/users/dto/requests/update-profile.req';
+import { type UpdateProfileDto } from '#/modules/users/dto/requests/update-profile.req';
 import { faker } from '@faker-js/faker';
 
 export const mockUsers = [

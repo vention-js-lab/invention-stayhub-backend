@@ -1,12 +1,4 @@
-import {
-  Column,
-  CreateDateColumn,
-  OneToOne,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
-  JoinColumn,
-  Entity,
-} from 'typeorm';
+import { Column, CreateDateColumn, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn, JoinColumn, Entity } from 'typeorm';
 import { Gender } from '#/shared/constants/gender.constant';
 import { Account } from './account.entity';
 

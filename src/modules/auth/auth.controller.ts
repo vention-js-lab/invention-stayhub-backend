@@ -1,11 +1,4 @@
-import {
-  Controller,
-  Post,
-  Body,
-  HttpCode,
-  Get,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Post, Body, HttpCode, Get, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -54,7 +47,7 @@ export class AuthController {
     status: 200,
     description: 'User info from Google',
   })
-  async googleAuthRedirect(@GetAccount() user: GoogleUser) {
+  googleAuthRedirect(@GetAccount() user: GoogleUser) {
     return this.authService.googleLogin(user);
   }
 
@@ -70,14 +63,8 @@ export class AuthController {
     description: 'Invalid or expired token',
   })
   @UseGuards(RefreshTokenGuard)
-  async issueNewTokens(
-    @Body() refreshTokenDto: RefreshTokenDto,
-    @GetAccount('accountId') accountId: string,
-  ) {
-    const newTokens = await this.authService.issueNewTokens(
-      refreshTokenDto.refreshToken,
-      accountId,
-    );
+  async issueNewTokens(@Body() refreshTokenDto: RefreshTokenDto, @GetAccount('accountId') accountId: string) {
+    const newTokens = await this.authService.issueNewTokens(refreshTokenDto.refreshToken, accountId);
 
     return {
       message: 'New tokens retrieved successfully',

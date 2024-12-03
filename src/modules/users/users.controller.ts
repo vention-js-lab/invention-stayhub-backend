@@ -23,12 +23,7 @@ import { RolesGuard, UserRoles } from '#/shared/guards/roles.guard';
 import { Roles } from '#/shared/constants/user-roles.constant';
 import { withBaseResponse } from '#/shared/utils/with-base-response.util';
 import { UserFiltersReqQueryDto } from './dto/requests/users-filters.req';
-import {
-  ApiOkResponse,
-  ApiOperation,
-  ApiQuery,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiOkResponse, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { SnakeToCamelInterceptor } from '#/shared/interceptors/snake-to-camel.interceptor';
 
 @ApiTags('Users')
@@ -88,14 +83,8 @@ export class UserController {
     type: ProfileResDto,
   })
   @UseGuards(AccessTokenGuard)
-  async updateProfile(
-    @GetAccount('accountId') accountId: string,
-    @Body() updateProfileDto: UpdateProfileDto,
-  ) {
-    const result = await this.userService.updateProfile(
-      accountId,
-      updateProfileDto,
-    );
+  async updateProfile(@GetAccount('accountId') accountId: string, @Body() updateProfileDto: UpdateProfileDto) {
+    const result = await this.userService.updateProfile(accountId, updateProfileDto);
 
     return withBaseResponse({
       status: 200,
@@ -113,7 +102,7 @@ export class UserController {
   @UseGuards(AccessTokenGuard)
   @UseInterceptors(FileInterceptor('avatar'))
   async updateProfileAvatar(
-    @UploadedFile() avatarImg: Express.Multer.File,
+    @UploadedFile() avatarImg: Express.Multer.File | undefined,
     @GetAccount('accountId') accountId: string,
   ) {
     if (!avatarImg) {
@@ -121,10 +110,7 @@ export class UserController {
     }
 
     const avatarUrl = await this.uploadService.uploadImage(avatarImg);
-    const result = await this.userService.updateProfileAvatar(
-      accountId,
-      avatarUrl,
-    );
+    const result = await this.userService.updateProfileAvatar(accountId, avatarUrl);
 
     return withBaseResponse({
       status: 200,
@@ -157,14 +143,8 @@ export class UserController {
     description: 'User soft deleted successfully',
   })
   @UseGuards(AccessTokenGuard)
-  async deleteAccount(
-    @GetAccount('accountId') deleteActorId: string,
-    @Param('userId') deletingAccountId: string,
-  ) {
-    const result = await this.userService.softDeleteAccount(
-      deleteActorId,
-      deletingAccountId,
-    );
+  async deleteAccount(@GetAccount('accountId') deleteActorId: string, @Param('userId') deletingAccountId: string) {
+    const result = await this.userService.softDeleteAccount(deleteActorId, deletingAccountId);
 
     return withBaseResponse({
       status: 200,

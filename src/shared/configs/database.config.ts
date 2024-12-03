@@ -1,6 +1,6 @@
-import { ConfigService } from '@nestjs/config';
-import { DataSourceOptions } from 'typeorm';
-import { EnvConfig } from './env.config';
+import { type ConfigService } from '@nestjs/config';
+import { type DataSourceOptions } from 'typeorm';
+import { type EnvConfig } from './env.config';
 import { Account } from '#/modules/users/entities/account.entity';
 import { Accommodation } from '#/modules/accommodations/entities/accommodations.entity';
 import { AccommodationImage } from '#/modules/accommodations/entities/accommodation-image.entity';
@@ -13,9 +13,7 @@ import { Payment } from '#/modules/payments/entities/payment.entity';
 import { Booking } from '#/modules/bookings/entities/booking.entity';
 import { Review } from '#/modules/review/entities/review.entity';
 
-export const databaseConfig = (
-  configService: ConfigService<EnvConfig>,
-): DataSourceOptions => ({
+export const databaseConfig = (configService: ConfigService<EnvConfig>): DataSourceOptions => ({
   type: 'postgres',
   host: configService.get('DB_HOST'),
   port: configService.get('DB_PORT'),
