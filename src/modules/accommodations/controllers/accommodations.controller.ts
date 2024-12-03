@@ -1,22 +1,5 @@
-import {
-  Controller,
-  Post,
-  Body,
-  UseGuards,
-  UseInterceptors,
-  Get,
-  Query,
-  Param,
-  Patch,
-  Delete,
-} from '@nestjs/common';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiBearerAuth,
-  ApiResponse,
-  ApiQuery,
-} from '@nestjs/swagger';
+import { Controller, Post, Body, UseGuards, UseInterceptors, Get, Query, Param, Patch, Delete } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiBearerAuth, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import { AccommodationService } from '#/modules/accommodations/services/accommodations.service';
 import { Accommodation } from '#/modules/accommodations/entities/accommodations.entity';
 import { AccommodationDto } from '#/modules/accommodations/dto/requests/create-accommodation.req';
@@ -46,11 +29,8 @@ export class AccommodationController {
   })
   @ApiResponse({ status: 400, description: 'Invalid data provided.' })
   @ApiResponse({ status: 401, description: 'Unauthorized request.' })
-  async create(
-    @Body() accommodationDto: AccommodationDto,
-    @GetAccount('accountId') ownerId: string,
-  ): Promise<Accommodation> {
-    return this.accommodationService.create({
+  async create(@Body() accommodationDto: AccommodationDto, @GetAccount('accountId') ownerId: string): Promise<Accommodation> {
+    return await this.accommodationService.create({
       createAccommodationDto: accommodationDto,
       ownerId,
     });
@@ -72,12 +52,9 @@ export class AccommodationController {
   @UseGuards(OptionalAccessTokenGuard)
   async listAccommodations(
     @Query() filters: AccommodationFiltersReqQueryDto,
-    @GetOptionalAccount('accountId') accountId: string,
+    @GetOptionalAccount('accountId') accountId: string | null,
   ) {
-    const result = await this.accommodationService.listAccommodations(
-      filters,
-      accountId,
-    );
+    const result = await this.accommodationService.listAccommodations(filters, accountId);
 
     return withBaseResponse({
       status: 200,
@@ -94,8 +71,7 @@ export class AccommodationController {
     type: Accommodation,
   })
   async getAccommodationById(@Param('id') id: string) {
-    const accommodation =
-      await this.accommodationService.getAccommodationById(id);
+    const accommodation = await this.accommodationService.getAccommodationById(id);
 
     return withBaseResponse({
       status: 200,
@@ -117,7 +93,7 @@ export class AccommodationController {
     @GetAccount('accountId') ownerId: string,
     @Body() updateAccommodationDto: UpdateAccommodationDto,
   ) {
-    return this.accommodationService.update({
+    return await this.accommodationService.update({
       accommodationId,
       ownerId,
       updateAccommodationDto,
@@ -141,10 +117,7 @@ export class AccommodationController {
     @Param('id') accommodationId: string,
     @GetAccount('accountId') ownerId: string,
   ): Promise<{ message: string }> {
-    await this.accommodationService.softDeleteAccommodationByOwner(
-      accommodationId,
-      ownerId,
-    );
+    await this.accommodationService.softDeleteAccommodationByOwner(accommodationId, ownerId);
 
     return {
       message: `Accommodation with ID ${accommodationId} has been successfully deleted.`,

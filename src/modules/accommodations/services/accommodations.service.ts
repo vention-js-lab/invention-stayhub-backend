@@ -50,7 +50,7 @@ export class AccommodationService {
     });
   }
 
-  async listAccommodations(filters: AccommodationFiltersReqQueryDto, accountId: string) {
+  async listAccommodations(filters: AccommodationFiltersReqQueryDto, accountId: string | null) {
     const queryBuilder = this.accommodationRepository
       .createQueryBuilder('accommodation')
       .leftJoinAndSelect('accommodation.address', 'address')
@@ -79,7 +79,7 @@ export class AccommodationService {
 
     const [rawResult, total] = await queryBuilder.getManyAndCount();
 
-    const result = addIsSavedToWishlistProperty(rawResult);
+    const result = addIsSavedToWishlistProperty(rawResult, accountId);
 
     const metadata = getPaginationMetadata({ page, limit, total });
     return {
