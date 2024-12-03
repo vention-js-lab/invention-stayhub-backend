@@ -11,21 +11,9 @@ import { AccommodationAddress } from './entities/accommodation-address.entity';
 import { AccommodationImage } from './entities/accommodation-image.entity';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([
-      Accommodation,
-      AccommodationAmenity,
-      AccommodationAddress,
-      AccommodationImage,
-    ]),
-  ],
+  imports: [TypeOrmModule.forFeature([Accommodation, AccommodationAmenity, AccommodationAddress, AccommodationImage])],
   controllers: [AccommodationController],
-  providers: [
-    AccommodationService,
-    AccommodationAddressService,
-    AccommodationImageService,
-    AccommodationAmenityService,
-  ],
+  providers: [AccommodationService, AccommodationAddressService, AccommodationImageService, AccommodationAmenityService],
   exports: [AccommodationService],
 })
 export class AccommodationModule {}

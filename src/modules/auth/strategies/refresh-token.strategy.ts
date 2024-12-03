@@ -13,10 +13,7 @@ import { extractRequestBody } from '#/shared/extractors/request-body.extractor';
 import { RefreshTokenDto } from '../dto/refresh-token.dto';
 
 @Injectable()
-export class RefreshTokenStrategy extends PassportStrategy(
-  Strategy,
-  JwtAuthConfig.RefreshTokenKey,
-) {
+export class RefreshTokenStrategy extends PassportStrategy(Strategy, JwtAuthConfig.RefreshTokenKey) {
   constructor(
     private configService: ConfigService<EnvConfig, true>,
     @InjectRepository(AccountRefreshToken)
@@ -34,22 +31,18 @@ export class RefreshTokenStrategy extends PassportStrategy(
   public async validate(request: Request, { sub }: AuthTokenPayload) {
     const { refreshToken } = extractRequestBody<RefreshTokenDto>(request);
 
-    const existingRefreshTokenEntity =
-      await this.refreshTokenRepository.findOne({
-        where: {
-          accountId: sub,
-          token: refreshToken,
-          isDeleted: false,
-        },
-        relations: {
-          account: true,
-        },
-      });
+    const existingRefreshTokenEntity = await this.refreshTokenRepository.findOne({
+      where: {
+        accountId: sub,
+        token: refreshToken,
+        isDeleted: false,
+      },
+      relations: {
+        account: true,
+      },
+    });
 
-    if (
-      !existingRefreshTokenEntity ||
-      existingRefreshTokenEntity.account.deletedAt
-    ) {
+    if (!existingRefreshTokenEntity || existingRefreshTokenEntity.account.deletedAt) {
       throw new UnauthorizedException();
     }
 
