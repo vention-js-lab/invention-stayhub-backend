@@ -1,4 +1,4 @@
-import { Test, TestingModule } from '@nestjs/testing';
+import { Test, type TestingModule } from '@nestjs/testing';
 import { AccommodationService } from '../services/accommodations.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Accommodation } from '../entities/accommodations.entity';
@@ -6,7 +6,8 @@ import { NotFoundException } from '@nestjs/common';
 import { AccommodationAddressService } from '../services/accommodation-address.service';
 import { AccommodationAmenityService } from '../services/accommodation-amenity.service';
 import { AccommodationImageService } from '../services/accommodation-image.service';
-import * as dayjs from 'dayjs';
+import { time } from '#/shared/libs/time.lib';
+import { TimeFormat } from '#/shared/constants/time.constant';
 
 const mockAccommodationRepository = {
   createQueryBuilder: jest.fn(),
@@ -105,13 +106,13 @@ describe('AccommodationService', () => {
         ...mockAccommodation,
         bookings: [
           {
-            startDate: dayjs('2024-12-01').format('YYYY-MM-DD'),
-            endDate: dayjs('2024-12-10').format('YYYY-MM-DD'),
+            startDate: time('2024-12-01').format(TimeFormat.Calendar),
+            endDate: time('2024-12-10').format(TimeFormat.Calendar),
             status: 'Pending',
           },
           {
-            startDate: dayjs('2024-12-15').format('YYYY-MM-DD'),
-            endDate: dayjs('2024-12-20').format('YYYY-MM-DD'),
+            startDate: time('2024-12-15').format(TimeFormat.Calendar),
+            endDate: time('2024-12-20').format(TimeFormat.Calendar),
             status: 'Confirmed',
           },
         ],
@@ -120,21 +121,15 @@ describe('AccommodationService', () => {
             id: 'review-id',
             content: 'Great place!',
             rating: 5,
-            createdAt: dayjs('2024-01-01T10:00:00Z').format(
-              'YYYY-MM-DD HH:mm:ss',
-            ),
-            updatedAt: dayjs('2024-01-02T12:00:00Z').format(
-              'YYYY-MM-DD HH:mm:ss',
-            ),
+            createdAt: time('2024-01-01T10:00:00Z').format(TimeFormat.CalendarWithTime),
+            updatedAt: time('2024-01-02T12:00:00Z').format(TimeFormat.CalendarWithTime),
             user: {
               id: 'user-id',
               firstName: 'John',
               lastName: 'Doe',
               country: 'USA',
               photo: 'user-image-url',
-              createdAt: dayjs('2024-01-01T09:00:00Z').format(
-                'YYYY-MM-DD HH:mm:ss',
-              ),
+              createdAt: time('2024-01-01T09:00:00Z').format(TimeFormat.CalendarWithTime),
             },
           },
         ],
@@ -151,9 +146,7 @@ describe('AccommodationService', () => {
         getOne: jest.fn().mockResolvedValue(null),
       });
 
-      await expect(service.getAccommodationById('invalid-id')).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(service.getAccommodationById('invalid-id')).rejects.toThrow(NotFoundException);
 
       expect(mockAccommodationRepository.createQueryBuilder).toHaveBeenCalled();
     });

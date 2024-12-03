@@ -1,12 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Param,
-  Delete,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, UseGuards } from '@nestjs/common';
 import { WishlistService } from '#/modules/wishlists/wishlists.service';
 import { GetAccount } from '../auth/decorators/get-account.decorator';
 import { AccessTokenGuard } from '#/shared/guards/access-token.guard';
@@ -27,15 +19,9 @@ export class WishlistController {
     type: WishlistResDto,
   })
   @UseGuards(AccessTokenGuard)
-  async addToWishlist(
-    @GetAccount('accountId') accountId: string,
-    @Body() createWishlistItemDto: CreateWishlistItemDto,
-  ) {
+  async addToWishlist(@GetAccount('accountId') accountId: string, @Body() createWishlistItemDto: CreateWishlistItemDto) {
     const accommodationId = createWishlistItemDto.accommodationId;
-    const result = await this.wishlistService.addToWishlist(
-      accountId,
-      accommodationId,
-    );
+    const result = await this.wishlistService.addToWishlist(accountId, accommodationId);
 
     return withBaseResponse({
       status: 201,
@@ -72,15 +58,12 @@ export class WishlistController {
     @GetAccount('accountId') accountId: string,
     @Param('accommodationId', new UUIDValidationPipe()) accommodationId: string,
   ) {
-    const result = await this.wishlistService.removeFromWishlist(
-      accountId,
-      accommodationId,
-    );
+    await this.wishlistService.removeFromWishlist(accountId, accommodationId);
 
     return withBaseResponse({
-      status: 200,
+      status: 204,
       message: 'Wishlist item successfully deleted',
-      data: result,
+      data: null,
     });
   }
 }
