@@ -22,8 +22,7 @@ export class ProfileResDto extends ProfilePartialResDto {
   id: string;
 
   @ApiProperty({
-    example:
-      'http://localhost:9001/uploads/306975f7-529d-44eb-bfea-aef2deb4e933.jpg',
+    example: 'http://localhost:9001/uploads/306975f7-529d-44eb-bfea-aef2deb4e933.jpg',
     nullable: true,
   })
   image: string | null;

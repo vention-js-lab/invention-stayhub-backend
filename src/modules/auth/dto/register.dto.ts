@@ -23,8 +23,7 @@ export class RegisterDto {
 
   @ApiProperty({
     example: 'John',
-    description:
-      'The first name of the user, with a length between 3 and 20 characters',
+    description: 'The first name of the user, with a length between 3 and 20 characters',
     minLength: 3,
     maxLength: 20,
     required: true,
@@ -36,8 +35,7 @@ export class RegisterDto {
 
   @ApiProperty({
     example: 'Doe',
-    description:
-      'The last name of the user, with a length between 3 and 20 characters',
+    description: 'The last name of the user, with a length between 3 and 20 characters',
     minLength: 3,
     maxLength: 20,
     required: true,

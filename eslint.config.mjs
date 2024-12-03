@@ -191,6 +191,7 @@ export default tseslint.config(
       '@typescript-eslint/switch-exhaustiveness-check': 'error',
       '@typescript-eslint/no-floating-promises': 'error',
       'no-useless-assignment': 'off',
+      '@typescript-eslint/unbound-method': 'off',
     },
   },
   {

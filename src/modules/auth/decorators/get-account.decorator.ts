@@ -1,28 +1,23 @@
-import {
-  createParamDecorator,
-  ExecutionContext,
-  UnauthorizedException,
-} from '@nestjs/common';
-import { RequestAccount } from '../types/request-account.type';
+import { createParamDecorator, type ExecutionContext, UnauthorizedException } from '@nestjs/common';
+import { type RequestAccount } from '../types/request-account.type';
 import { extractRequestAccount } from '#/shared/extractors/request-account.extractor';
+import { type Request } from 'express';
 
-export const GetAccount = createParamDecorator(
-  (data: keyof RequestAccount | undefined, ctx: ExecutionContext) => {
-    const request = ctx.switchToHttp().getRequest();
-    const account = extractRequestAccount(request);
+export const GetAccount = createParamDecorator((data: keyof RequestAccount | undefined, ctx: ExecutionContext) => {
+  const request = ctx.switchToHttp().getRequest<Request>();
+  const account = extractRequestAccount(request);
 
-    if (!account) {
-      throw new UnauthorizedException();
-    }
+  if (!account) {
+    throw new UnauthorizedException();
+  }
 
-    if (!data) {
-      return account;
-    }
+  if (!data) {
+    return account;
+  }
 
-    if (!account[data]) {
-      throw new UnauthorizedException();
-    }
+  if (!account[data]) {
+    throw new UnauthorizedException();
+  }
 
-    return account[data];
-  },
-);
+  return account[data];
+});

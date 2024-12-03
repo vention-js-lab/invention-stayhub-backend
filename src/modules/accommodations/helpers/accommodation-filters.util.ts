@@ -1,12 +1,10 @@
-import { SelectQueryBuilder } from 'typeorm';
-import { AccommodationFiltersReqQueryDto } from '../dto/requests/accommodation-filters.req';
-import { Accommodation } from '../entities/accommodations.entity';
+import { type SelectQueryBuilder } from 'typeorm';
+import { type AccommodationFiltersReqQueryDto } from '../dto/requests/accommodation-filters.req';
+import { type Accommodation } from '../entities/accommodations.entity';
 import { BadRequestException } from '@nestjs/common';
+import { time } from '#/shared/libs/time.lib';
 
-export function addPriceFilters(
-  queryBuilder: SelectQueryBuilder<Accommodation>,
-  filters: AccommodationFiltersReqQueryDto,
-) {
+export function addPriceFilters(queryBuilder: SelectQueryBuilder<Accommodation>, filters: AccommodationFiltersReqQueryDto) {
   if (filters.minPrice) {
     queryBuilder.andWhere('accommodation.price >= :minPrice', {
       minPrice: filters.minPrice,
@@ -30,19 +28,14 @@ export function addAvailabilityFilters(
   }
 
   if (filters.availableFrom && filters.availableTo) {
-    if (new Date(filters.availableFrom) > new Date(filters.availableTo)) {
-      throw new BadRequestException(
-        'availableFrom date cannot be greater then availableTo date',
-      );
+    if (time(filters.availableFrom).toDate() > time(filters.availableTo).toDate()) {
+      throw new BadRequestException('availableFrom date cannot be greater then availableTo date');
     }
 
-    queryBuilder.andWhere(
-      'accommodation.availableFrom <= :availableFrom AND accommodation.availableTo >= :availableTo',
-      {
-        availableFrom: filters.availableFrom,
-        availableTo: filters.availableTo,
-      },
-    );
+    queryBuilder.andWhere('accommodation.availableFrom <= :availableFrom AND accommodation.availableTo >= :availableTo', {
+      availableFrom: filters.availableFrom,
+      availableTo: filters.availableTo,
+    });
   } else {
     if (filters.availableFrom) {
       queryBuilder.andWhere('accommodation.availableFrom <= :availableFrom', {
@@ -58,10 +51,7 @@ export function addAvailabilityFilters(
   }
 }
 
-export function addApartmentFilters(
-  queryBuilder: SelectQueryBuilder<Accommodation>,
-  filters: AccommodationFiltersReqQueryDto,
-) {
+export function addApartmentFilters(queryBuilder: SelectQueryBuilder<Accommodation>, filters: AccommodationFiltersReqQueryDto) {
   if (filters.rooms) {
     queryBuilder.andWhere('accommodation.numberOfRooms = :numberOfRooms', {
       numberOfRooms: filters.rooms,
@@ -69,15 +59,11 @@ export function addApartmentFilters(
   }
 }
 
-export function addSearchFilters(
-  queryBuilder: SelectQueryBuilder<Accommodation>,
-  filters: AccommodationFiltersReqQueryDto,
-) {
+export function addSearchFilters(queryBuilder: SelectQueryBuilder<Accommodation>, filters: AccommodationFiltersReqQueryDto) {
   if (filters.search) {
-    queryBuilder.andWhere(
-      '(accommodation.name ILIKE :search OR accommodation.description ILIKE :search)',
-      { search: `%${filters.search}%` },
-    );
+    queryBuilder.andWhere('(accommodation.name ILIKE :search OR accommodation.description ILIKE :search)', {
+      search: `%${filters.search}%`,
+    });
   }
   if (filters.street) {
     queryBuilder.andWhere('address.street ILIKE :street', {
@@ -96,10 +82,7 @@ export function addSearchFilters(
   }
 }
 
-export function addAmenityFilters(
-  queryBuilder: SelectQueryBuilder<Accommodation>,
-  filters: AccommodationFiltersReqQueryDto,
-) {
+export function addAmenityFilters(queryBuilder: SelectQueryBuilder<Accommodation>, filters: AccommodationFiltersReqQueryDto) {
   const amenityFilters = {
     hasWifi: 'amenity.hasWifi = :hasWifi',
     hasParking: 'amenity.hasParking = :hasParking',

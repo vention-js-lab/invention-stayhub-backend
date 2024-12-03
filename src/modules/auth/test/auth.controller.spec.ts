@@ -1,4 +1,4 @@
-import { Test, TestingModule } from '@nestjs/testing';
+import { Test, type TestingModule } from '@nestjs/testing';
 import { AuthController } from '../auth.controller';
 import { AuthService } from '../auth.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
@@ -39,9 +39,7 @@ describe('AuthController', () => {
 
     const mockJwtService = {
       signAsync: jest.fn().mockResolvedValue('mocked-token'),
-      decode: jest
-        .fn()
-        .mockReturnValue({ sub: 'mock-sub', exp: Date.now() / 1000 + 3600 }),
+      decode: jest.fn().mockReturnValue({ sub: 'mock-sub', exp: Date.now() / 1000 + 3600 }),
     };
 
     const module: TestingModule = await Test.createTestingModule({

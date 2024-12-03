@@ -19,12 +19,6 @@ import { OptionalAccessTokenStrategy } from './strategies/optional-access-token.
     PassportModule.register({ defaultStrategy: 'google' }),
   ],
   controllers: [AuthController],
-  providers: [
-    AuthService,
-    GoogleStrategy,
-    AccessTokenStrategy,
-    RefreshTokenStrategy,
-    OptionalAccessTokenStrategy,
-  ],
+  providers: [AuthService, GoogleStrategy, AccessTokenStrategy, RefreshTokenStrategy, OptionalAccessTokenStrategy],
 })
 export class AuthModule {}

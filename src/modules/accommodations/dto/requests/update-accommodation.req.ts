@@ -1,13 +1,4 @@
-import {
-  IsBoolean,
-  IsDateString,
-  IsNotEmpty,
-  IsNumber,
-  IsOptional,
-  IsString,
-  Min,
-  ValidateNested,
-} from 'class-validator';
+import { IsBoolean, IsDateString, IsNotEmpty, IsNumber, IsOptional, IsString, Min, ValidateNested } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { AccommodationImageDto } from './create-accommodation-image.req';
 import { AccommodationAmenityDto } from './create-accommodation-amenity.req';
