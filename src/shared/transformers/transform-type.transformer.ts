@@ -1,4 +1,5 @@
 import { Transform } from 'class-transformer';
+import { time } from '../libs/time.lib';
 
 export function TransformToNumber() {
   return Transform(
@@ -20,7 +21,7 @@ export function TransformToBoolean() {
 export function TransformToDate() {
   return Transform(
     ({ value }) => {
-      const date = new Date(value);
+      const date = time(value as string);
       return date;
     },
     {

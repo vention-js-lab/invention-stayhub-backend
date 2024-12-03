@@ -1,19 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  IsBoolean,
-  IsDate,
-  IsEnum,
-  IsInt,
-  IsNumber,
-  IsOptional,
-  IsString,
-  Min,
-} from 'class-validator';
-import {
-  TransformToBoolean,
-  TransformToDate,
-  TransformToNumber,
-} from '#/shared/transformers/transform-type.transformer';
+import { IsBoolean, IsDate, IsEnum, IsInt, IsNumber, IsOptional, IsString, Min } from 'class-validator';
+import { TransformToBoolean, TransformToDate, TransformToNumber } from '#/shared/transformers/transform-type.transformer';
 import { SortOrder } from '#/shared/constants/sort-order.constant';
 import { SortBy } from '#/modules/accommodations/constants/sort-by.constant';
 import { PaginationQueryDto } from '#/shared/dto/pagination-query.req';
@@ -30,8 +17,7 @@ export class AccommodationFiltersReqQueryDto extends PaginationQueryDto {
   sortBy?: SortBy;
 
   @ApiProperty({
-    description:
-      'Order options to clarify in which order will the accommodations be sorted',
+    description: 'Order options to clarify in which order will the accommodations be sorted',
     required: false,
     example: 'ASC',
   })

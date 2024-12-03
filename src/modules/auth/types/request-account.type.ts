@@ -1,4 +1,4 @@
-import { Roles } from '#/shared/constants/user-roles.constant';
+import { type Roles } from '#/shared/constants/user-roles.constant';
 
 export interface RequestAccount {
   accountId: string;

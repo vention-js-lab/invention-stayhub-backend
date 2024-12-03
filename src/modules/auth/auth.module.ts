@@ -18,11 +18,6 @@ import { RefreshTokenStrategy } from './strategies/refresh-token.strategy';
     PassportModule.register({ defaultStrategy: 'google' }),
   ],
   controllers: [AuthController],
-  providers: [
-    AuthService,
-    GoogleStrategy,
-    AccessTokenStrategy,
-    RefreshTokenStrategy,
-  ],
+  providers: [AuthService, GoogleStrategy, AccessTokenStrategy, RefreshTokenStrategy],
 })
 export class AuthModule {}

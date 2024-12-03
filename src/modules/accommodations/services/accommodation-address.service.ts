@@ -12,29 +12,19 @@ export class AccommodationAddressService {
     private accommodationAddressRepository: Repository<AccommodationAddress>,
   ) {}
 
-  async create(
-    accommodationId: string,
-    createAccommodationAddressDto: AccommodationAddressDto,
-  ): Promise<AccommodationAddress> {
+  async create(accommodationId: string, createAccommodationAddressDto: AccommodationAddressDto): Promise<AccommodationAddress> {
     const newAccommodationAddress = this.accommodationAddressRepository.create({
       accommodationId,
       ...createAccommodationAddressDto,
     });
 
-    const createdAccommodationAddress =
-      await this.accommodationAddressRepository.save(newAccommodationAddress);
+    const createdAccommodationAddress = await this.accommodationAddressRepository.save(newAccommodationAddress);
 
     return createdAccommodationAddress;
   }
 
-  async update(
-    accommodationAddressId: string,
-    updateAccommodationAddressDto: UpdateAccommodationAddressDto,
-  ) {
-    await this.accommodationAddressRepository.update(
-      accommodationAddressId,
-      updateAccommodationAddressDto,
-    );
+  async update(accommodationAddressId: string, updateAccommodationAddressDto: UpdateAccommodationAddressDto) {
+    await this.accommodationAddressRepository.update(accommodationAddressId, updateAccommodationAddressDto);
 
     return await this.accommodationAddressRepository.findOne({
       where: { id: accommodationAddressId },

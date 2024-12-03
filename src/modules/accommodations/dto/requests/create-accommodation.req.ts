@@ -1,12 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  IsString,
-  IsBoolean,
-  IsDateString,
-  IsNumber,
-  Min,
-  ValidateNested,
-} from 'class-validator';
+import { IsString, IsBoolean, IsDateString, IsNumber, Min, ValidateNested } from 'class-validator';
 import { AccommodationImageDto } from './create-accommodation-image.req';
 import { AccommodationAmenityDto } from './create-accommodation-amenity.req';
 import { AccommodationAddressDto } from './create-accommodation-address.req';

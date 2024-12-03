@@ -1,19 +1,15 @@
-import {
-  ValidationArguments,
-  ValidatorConstraint,
-  ValidatorConstraintInterface,
-} from 'class-validator';
+import { time } from '#/shared/libs/time.lib';
+import { ValidationArguments, ValidatorConstraint, ValidatorConstraintInterface } from 'class-validator';
 
 @ValidatorConstraint({ name: 'IsFutureDate', async: false })
 export class IsFutureDate implements ValidatorConstraintInterface {
   validate(date: string) {
-    const currentDate = new Date();
-    const providedDate = new Date(date);
+    const currentDate = time().toDate();
+    const providedDate = time(date).toDate();
 
     return (
       providedDate >= currentDate ||
-      (providedDate.toDateString() === currentDate.toDateString() &&
-        providedDate.getTime() >= currentDate.getTime())
+      (providedDate.toDateString() === currentDate.toDateString() && providedDate.getTime() >= currentDate.getTime())
     );
   }
 
@@ -24,10 +20,10 @@ export class IsFutureDate implements ValidatorConstraintInterface {
 
 @ValidatorConstraint({ name: 'IsStartDateBeforeEndDate', async: false })
 export class IsStartDateBeforeEndDate implements ValidatorConstraintInterface {
-  validate(value: any, args: ValidationArguments) {
-    const object = args.object as any;
-    const startDate = new Date(object.startDate);
-    const endDate = new Date(object.endDate);
+  validate(value: unknown, args: ValidationArguments) {
+    const object = args.object as Record<string, string>;
+    const startDate = time(object.startDate);
+    const endDate = time(object.endDate);
 
     return startDate < endDate;
   }
