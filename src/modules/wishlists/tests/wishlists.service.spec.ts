@@ -1,19 +1,14 @@
-import { AccommodationService } from '#/modules/accommodations/services/accommodations.service';
-import { WishlistService } from '#/modules/wishlists/wishlists.service';
+import { AccommodationsService } from '#/modules/accommodations/services/accommodations.service';
+import { WishlistsService } from '#/modules/wishlists/wishlists.service';
 import { Wishlist } from '#/modules/wishlists/entities/wishlist.entity';
-import { Test, TestingModule } from '@nestjs/testing';
+import { Test, type TestingModule } from '@nestjs/testing';
 import { Repository } from 'typeorm';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import {
-  mockUserId,
-  mockWishlist,
-  mockWishlistItem,
-  mockAccommodation,
-} from './fixtures/wishlists-data.mock';
+import { mockUserId, mockWishlist, mockWishlistItem, mockAccommodation } from './fixtures/wishlists-data.mock';
 import { NotFoundException } from '@nestjs/common';
 
 describe('WishlistService', () => {
-  let wishlistService: WishlistService;
+  let wishlistService: WishlistsService;
   let wishlistRepo: Repository<Wishlist>;
 
   const accommodationServiceMock = {
@@ -23,23 +18,21 @@ describe('WishlistService', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        WishlistService,
-        AccommodationService,
+        WishlistsService,
+        AccommodationsService,
         {
           provide: getRepositoryToken(Wishlist),
           useClass: Repository,
         },
         {
-          provide: AccommodationService,
+          provide: AccommodationsService,
           useValue: accommodationServiceMock,
         },
       ],
     }).compile();
 
-    wishlistService = module.get<WishlistService>(WishlistService);
-    wishlistRepo = module.get<Repository<Wishlist>>(
-      getRepositoryToken(Wishlist),
-    );
+    wishlistService = module.get<WishlistsService>(WishlistsService);
+    wishlistRepo = module.get<Repository<Wishlist>>(getRepositoryToken(Wishlist));
   });
 
   afterEach(() => {
@@ -56,10 +49,7 @@ describe('WishlistService', () => {
       wishlistRepo.create = jest.fn().mockReturnValue(wishlistItem);
       wishlistRepo.save = jest.fn().mockResolvedValue(wishlistItem);
 
-      const result = await wishlistService.addToWishlist(
-        accountId,
-        accommodationId,
-      );
+      const result = await wishlistService.addToWishlist(accountId, accommodationId);
 
       expect(wishlistRepo.create).toHaveBeenCalledWith({
         accountId,
@@ -81,7 +71,7 @@ describe('WishlistService', () => {
 
       expect(wishlistRepo.find).toHaveBeenCalledWith({
         where: { accountId: userId },
-        relations: ['accommodation'],
+        relations: ['accommodation', 'accommodation.address'],
       });
       expect(result).toEqual(userWishlist);
     });
@@ -110,9 +100,7 @@ describe('WishlistService', () => {
 
       wishlistRepo.findOne = jest.fn().mockResolvedValue(null);
 
-      await expect(
-        wishlistService.removeFromWishlist(accountId, accommodationId),
-      ).rejects.toThrow(NotFoundException);
+      await expect(wishlistService.removeFromWishlist(accountId, accommodationId)).rejects.toThrow(NotFoundException);
     });
   });
 });

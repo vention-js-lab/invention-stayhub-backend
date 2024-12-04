@@ -1,11 +1,11 @@
 import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Accommodation } from '../entities/accommodations.entity';
+import { Accommodation } from '../entities/accommodation.entity';
 import { Repository } from 'typeorm';
 import { AccommodationAddressService } from './accommodation-address.service';
 import { AccommodationAmenityService } from './accommodation-amenity.service';
 import { AccommodationImageService } from './accommodation-image.service';
-import { AccommodationFiltersReqQueryDto } from '../dto/requests/accommodation-filters.req';
+import { AccommodationFiltersReqQueryDto } from '../dto/request/accommodation-filters.req';
 import { getPaginationMetadata, getPaginationOffset } from '#/shared/utils/pagination.util';
 import { sortByParams } from '../utils/sort-by-params.util';
 import {
@@ -14,14 +14,14 @@ import {
   addAmenityFilters,
   addSearchFilters,
   addApartmentFilters,
-} from '../helpers/accommodation-filters.util';
+} from '../utils/accommodation-filters.util';
 import { CreateAccommodationParams, UpdateAccommodationParams } from '../types/accommodations-service.type';
 import { paginationParams } from '../utils/pagination-params.util';
 import { time } from '#/shared/libs/time.lib';
 import { TimeFormat } from '#/shared/constants/time.constant';
 
 @Injectable()
-export class AccommodationService {
+export class AccommodationsService {
   constructor(
     @InjectRepository(Accommodation)
     private accommodationRepository: Repository<Accommodation>,
@@ -151,20 +151,6 @@ export class AccommodationService {
       await this.accommodationAmenityService.update(accommodation.amenity.id, amenity);
     }
     return await this.getAccommodationById(accommodationId);
-  }
-
-  async updateAvailability({ accommodationId, newStatus }: { accommodationId: string; newStatus: boolean }) {
-    const existingAccommodation = await this.accommodationRepository.findOneBy({
-      id: accommodationId,
-    });
-
-    if (!existingAccommodation) {
-      throw new BadRequestException('Accommodation does not exist');
-    }
-
-    existingAccommodation.available = newStatus;
-
-    await this.accommodationRepository.save(existingAccommodation);
   }
 
   async softDeleteAccommodationByOwner(accommodationId: string, ownerId: string): Promise<void> {

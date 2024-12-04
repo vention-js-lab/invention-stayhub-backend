@@ -2,7 +2,7 @@ import { type ConfigService } from '@nestjs/config';
 import { type DataSourceOptions } from 'typeorm';
 import { type EnvConfig } from './env.config';
 import { Account } from '#/modules/users/entities/account.entity';
-import { Accommodation } from '#/modules/accommodations/entities/accommodations.entity';
+import { Accommodation } from '#/modules/accommodations/entities/accommodation.entity';
 import { AccommodationImage } from '#/modules/accommodations/entities/accommodation-image.entity';
 import { AccommodationAmenity } from '#/modules/accommodations/entities/accommodation-amenity.entity';
 import { AccommodationAddress } from '#/modules/accommodations/entities/accommodation-address.entity';
@@ -11,7 +11,7 @@ import { AccountRefreshToken } from '#/modules/auth/entities/account-refresh-tok
 import { Wishlist } from '#/modules/wishlists/entities/wishlist.entity';
 import { Payment } from '#/modules/payments/entities/payment.entity';
 import { Booking } from '#/modules/bookings/entities/booking.entity';
-import { Review } from '#/modules/review/entities/review.entity';
+import { Review } from '#/modules/reviews/entities/review.entity';
 
 export const databaseConfig = (configService: ConfigService<EnvConfig>): DataSourceOptions => ({
   type: 'postgres',

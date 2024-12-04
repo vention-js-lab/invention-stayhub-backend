@@ -1,110 +1,76 @@
-import Stripe from 'stripe';
-import {
-  Inject,
-  Injectable,
-  BadRequestException,
-  ConflictException,
-} from '@nestjs/common';
-import {
-  extractPaymentIntent,
-  extractStripeMetadata,
-} from '#/shared/extractors/payment-intent.extractor';
-import { StripeCreateCheckoutReqDto } from '../dto/request/stripe-create-checkout.req';
+import { Injectable, BadRequestException, ConflictException } from '@nestjs/common';
+import { CheckoutReqDto } from '../dto/request/checkout.req';
 import { PaymentStatus } from '#/shared/constants/payment-status.constant';
-import { buildStripeLineItems } from '../helpers/stripe.helper';
-import { StripeConfig } from '../types/stripe-config.type';
 import { PaymentsService } from './payments.service';
-import { BookingsService } from '#/modules/bookings/services/bookings.service';
+import { BookingsService } from '#/modules/bookings/bookings.service';
 import { BookingStatus } from '#/shared/constants/booking-status.constant';
-import { AccommodationService } from '#/modules/accommodations/services/accommodations.service';
+import { StripeApiService } from './stripe-api.service';
+import { PaymentIntentMetadata } from '../types/payment-intent-metadata.type';
+import { extractPaymentIntent, extractStripeMetadata } from '../utils/stripe.util';
+import { PaymentIntentEventsMap } from '../constants/payment-intent-events-map.constant';
+import { ConfigService } from '@nestjs/config';
+import { EnvConfig } from '#/shared/configs/env.config';
+import Stripe from 'stripe';
 
 @Injectable()
 export class StripeService {
   constructor(
     private bookingsService: BookingsService,
     private paymentsService: PaymentsService,
-    private accommodationsService: AccommodationService,
-    @Inject('STRIPE') private stripe: Stripe,
-    @Inject('STRIPE_CONFIG') private stripeConfig: StripeConfig,
+    private stripeApiService: StripeApiService,
+    private configService: ConfigService<EnvConfig, true>,
   ) {}
 
-  async createCheckoutSession(
-    accountId: string,
-    stripeCreateCheckoutReqDto: StripeCreateCheckoutReqDto,
-  ) {
-    const { bookingId, items } = stripeCreateCheckoutReqDto;
+  async createPaymentIntent(accountId: string, checkoutReqDto: CheckoutReqDto) {
+    const { bookingId } = checkoutReqDto;
 
-    const existingBooking = await this.bookingsService.getBookingById(
-      bookingId,
-      accountId,
-    );
+    const existingBooking = await this.bookingsService.getBookingById(bookingId, accountId);
 
     if (!existingBooking) {
       throw new BadRequestException('Booking does not exist');
     }
 
-    const existingPaymentRecord =
-      await this.paymentsService.getPaymentRecordByBookingId(bookingId);
+    const existingPayment = await this.paymentsService.getPaymentByBookingId(bookingId);
 
-    if (
-      existingPaymentRecord &&
-      existingPaymentRecord.status === PaymentStatus.Success
-    ) {
+    if (existingPayment && existingPayment.status === PaymentStatus.Success) {
       throw new ConflictException('This booking has already been paid for');
     }
 
-    const lineItems = buildStripeLineItems(items);
-    const checkoutSession = await this.stripe.checkout.sessions.create({
-      mode: 'payment',
-      payment_method_types: ['card'],
-      line_items: lineItems,
-      success_url: this.stripeConfig.successUrl,
-      cancel_url: this.stripeConfig.cancelUrl,
-      payment_intent_data: {
-        metadata: {
-          bookingId,
-          accountId,
-          accommodationId: existingBooking.accommodationId,
-        },
+    const paymentIntent = await this.stripeApiService.stripe.paymentIntents.create({
+      amount: checkoutReqDto.amount,
+      currency: 'usd',
+      metadata: {
+        bookingId,
+        accountId,
       },
     });
 
-    return checkoutSession.url;
+    return paymentIntent.client_secret;
   }
 
   async handleWebhook(rawBody: Buffer, signature: string) {
-    const event = this.stripe.webhooks.constructEvent(
-      rawBody,
-      signature,
-      this.stripeConfig.webhookSecret,
-    );
-
-    let paymentStatus: PaymentStatus = PaymentStatus.Pending;
-
-    switch (event.type) {
-      case 'payment_intent.succeeded':
-        paymentStatus = PaymentStatus.Success;
-        break;
-
-      case 'payment_intent.payment_failed':
-        paymentStatus = PaymentStatus.Declined;
-        break;
-
-      case 'payment_intent.canceled':
-        paymentStatus = PaymentStatus.Canceled;
-        break;
-
-      default:
-        console.error(`Unhandled event type: ${event.type}`);
+    if (!signature) {
+      throw new BadRequestException('No webhook signature header was provided');
     }
 
-    const { amount, id, metadata } = extractPaymentIntent(event);
-    const { bookingId, accommodationId } = extractStripeMetadata<{
-      bookingId: string;
-      accommodationId: string;
-    }>(metadata);
+    if (!Buffer.isBuffer(rawBody)) {
+      throw new BadRequestException('Invalid raw body: Expected a Buffer');
+    }
 
-    await this.paymentsService.savePaymentRecord({
+    const webhookSecret = this.configService.get('STRIPE_WEBHOOK_SECRET', { infer: true });
+    let event: Stripe.Event;
+
+    try {
+      event = this.stripeApiService.stripe.webhooks.constructEvent(rawBody, signature, webhookSecret);
+    } catch {
+      throw new BadRequestException('Webhook signature verification failed');
+    }
+
+    const paymentStatus = PaymentIntentEventsMap.get(event.type) ?? PaymentStatus.Pending;
+    const { amount, id, metadata } = extractPaymentIntent(event);
+    const { bookingId } = extractStripeMetadata<PaymentIntentMetadata>(metadata);
+
+    await this.paymentsService.savePayment({
       amount: amount,
       status: paymentStatus,
       transactionId: id,
@@ -119,12 +85,5 @@ export class StripeService {
       bookingId,
       newStatus: BookingStatus.Upcoming,
     });
-
-    await this.accommodationsService.updateAvailability({
-      accommodationId,
-      newStatus: false,
-    });
-
-    return { received: true };
   }
 }

@@ -34,6 +34,6 @@ export class Payment {
   @JoinColumn({ name: 'booking_id' })
   booking: Booking;
 
-  @Column({ name: 'booking_id' })
+  @Column({ name: 'booking_id', unique: true })
   bookingId: string;
 }

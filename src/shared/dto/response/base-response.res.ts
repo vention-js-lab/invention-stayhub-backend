@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class BaseResponse {
+export class BaseResponse<T> {
   @ApiProperty({
     description: 'HTTP status code',
   })
@@ -10,4 +10,9 @@ export class BaseResponse {
     description: 'Response message',
   })
   message: string;
+
+  @ApiProperty({
+    description: 'Response data',
+  })
+  data: T;
 }

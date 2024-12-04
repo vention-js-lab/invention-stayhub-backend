@@ -31,8 +31,6 @@ const envConfigSchema = z.object({
   MINIO_SECRET_KEY: z.string(),
 
   STRIPE_PRIVATE_API_KEY: z.string(),
-  STRIPE_SUCCESS_URL: z.string().url(),
-  STRIPE_CANCEL_URL: z.string().url(),
   STRIPE_WEBHOOK_SECRET: z.string(),
 });
 
