@@ -8,7 +8,7 @@ export const GetOptionalAccount = createParamDecorator((data: keyof RequestAccou
   const account = extractRequestAccount(request);
 
   if (!account) {
-    return null;
+    return undefined;
   }
 
   if (!data) {
@@ -16,7 +16,7 @@ export const GetOptionalAccount = createParamDecorator((data: keyof RequestAccou
   }
 
   if (!account[data]) {
-    return null;
+    return undefined;
   }
 
   return account[data];
