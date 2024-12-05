@@ -1,14 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { AuthGuard as PAuthGuard } from '@nestjs/passport';
-import { JwtAuthConfig } from '../configs/jwt-auth.config';
+import { AccessTokenGuard } from './access-token.guard';
 
 @Injectable()
-export class OptionalAccessTokenGuard extends PAuthGuard(JwtAuthConfig.OptionalAccessTokenKey) {
+export class OptionalAccessTokenGuard extends AccessTokenGuard {
   handleRequest<RequestAccount>(error, user: RequestAccount | boolean) {
     if (error || !user) {
-      return null;
+      return undefined;
     }
-
     return user;
   }
 }

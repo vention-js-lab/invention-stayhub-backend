@@ -52,7 +52,7 @@ export class AccommodationsController {
   @UseGuards(OptionalAccessTokenGuard)
   async listAccommodations(
     @Query() filters: AccommodationFiltersReqQueryDto,
-    @GetOptionalAccount('accountId') accountId: string | null,
+    @GetOptionalAccount('accountId') accountId: string | undefined,
   ) {
     const result = await this.accommodationsService.listAccommodations(filters, accountId);
 

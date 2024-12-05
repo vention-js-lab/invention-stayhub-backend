@@ -10,7 +10,6 @@ import { JwtModule } from '@nestjs/jwt';
 import { AccountRefreshToken } from './entities/account-refresh-token.entity';
 import { AccessTokenStrategy } from './strategies/access-token.strategy';
 import { RefreshTokenStrategy } from './strategies/refresh-token.strategy';
-import { OptionalAccessTokenStrategy } from './strategies/optional-access-token.strategy';
 
 @Module({
   imports: [
@@ -19,6 +18,6 @@ import { OptionalAccessTokenStrategy } from './strategies/optional-access-token.
     PassportModule.register({ defaultStrategy: 'google' }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, GoogleStrategy, AccessTokenStrategy, RefreshTokenStrategy, OptionalAccessTokenStrategy],
+  providers: [AuthService, GoogleStrategy, AccessTokenStrategy, RefreshTokenStrategy],
 })
 export class AuthModule {}

@@ -50,7 +50,7 @@ export class AccommodationsService {
     });
   }
 
-  async listAccommodations(filters: AccommodationFiltersReqQueryDto, accountId: string | null) {
+  async listAccommodations(filters: AccommodationFiltersReqQueryDto, accountId: string | undefined) {
     const queryBuilder = this.accommodationRepository
       .createQueryBuilder('accommodation')
       .leftJoinAndSelect('accommodation.address', 'address')

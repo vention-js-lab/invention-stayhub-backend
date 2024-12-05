@@ -1,6 +1,6 @@
 import { type Accommodation } from '../entities/accommodation.entity';
 
-export function addIsSavedToWishlistProperty(accommodations: Accommodation[], accoutId: string | null) {
+export function addIsSavedToWishlistProperty(accommodations: Accommodation[], accoutId: string | undefined) {
   const parsedAccommodations = accommodations.map((accommodation) => {
     const { wishlist, ...rest } = accommodation;
 
