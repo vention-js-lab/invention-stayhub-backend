@@ -6,10 +6,14 @@ import { ValidationConfig } from './shared/configs/validation.config';
 import { SwaggerConfig } from './shared/configs/swagger.config';
 import { ConfigService } from '@nestjs/config';
 import { type EnvConfig } from './shared/configs/env.config';
+import { type NestExpressApplication } from '@nestjs/platform-express';
 import { Logger } from '@nestjs/common';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+    rawBody: true,
+  });
+
   const configService = app.get(ConfigService<EnvConfig>);
 
   const port = configService.getOrThrow('APP_PORT', {

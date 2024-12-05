@@ -1,4 +1,4 @@
-import { Accommodation } from '#/modules/accommodations/entities/accommodations.entity';
+import { Accommodation } from '#/modules/accommodations/entities/accommodation.entity';
 import { Account } from '#/modules/users/entities/account.entity';
 import { BookingStatus } from '#/shared/constants/booking-status.constant';
 import {
@@ -11,7 +11,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Review } from '#/modules/review/entities/review.entity';
+import { Review } from '#/modules/reviews/entities/review.entity';
 
 @Entity('booking')
 export class Booking {

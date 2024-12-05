@@ -1,12 +1,12 @@
 import { Controller, Post, Body, HttpCode, Get, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { RegisterDto } from './dto/register.dto';
+import { RegisterDto } from './dto/request/register.req';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { LoginDto } from './dto/login.dto';
+import { LoginDto } from './dto/request/login.req';
 import { AuthGuard } from '@nestjs/passport';
-import { GetAccount } from './decorators/get-account.decorator';
+import { GetAccount } from '#/shared/decorators/get-account.decorator';
 import { GoogleUser } from './types/google-user.type';
-import { RefreshTokenDto } from './dto/refresh-token.dto';
+import { RefreshTokenDto } from './dto/request/refresh-token.req';
 import { RefreshTokenGuard } from '#/shared/guards/refresh-token.guard';
 
 @ApiTags('auth')

@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn, UpdateDateColumn, JoinColumn } from 'typeorm';
-import { Accommodation } from '#/modules/accommodations/entities/accommodations.entity';
+import { Accommodation } from '#/modules/accommodations/entities/accommodation.entity';
 
 @Entity('accommodation_image')
 export class AccommodationImage {

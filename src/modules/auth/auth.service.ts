@@ -1,5 +1,5 @@
 import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
-import { RegisterDto } from './dto/register.dto';
+import { RegisterDto } from './dto/request/register.req';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Account } from '../users/entities/account.entity';
 import { Repository } from 'typeorm';
@@ -8,10 +8,10 @@ import { AuthTokenPayload, RefreshTokenPayload } from './types/auth-payload.type
 import { ConfigService } from '@nestjs/config';
 import { EnvConfig } from '#/shared/configs/env.config';
 import { JwtService } from '@nestjs/jwt';
-import { LoginDto } from './dto/login.dto';
+import { LoginDto } from './dto/request/login.req';
 import { GoogleUser } from './types/google-user.type';
 import { Profile } from '../users/entities/profile.entity';
-import { AccountType } from '../../shared/constants/user-account.constant';
+import { AccountType } from '#/shared/constants/user-account.constant';
 import { AccountRefreshToken } from './entities/account-refresh-token.entity';
 import { time } from '#/shared/libs/time.lib';
 

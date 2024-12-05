@@ -1,22 +1,20 @@
-import { UpdateProfileDto } from './dto/requests/update-profile.req';
+import { UpdateProfileDto } from './dto/request/update-profile.req';
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Account } from './entities/account.entity';
 import { Profile } from './entities/profile.entity';
 import { Repository } from 'typeorm';
 import { Roles } from '#/shared/constants/user-roles.constant';
-import { UserFiltersReqQueryDto } from './dto/requests/users-filters.req';
+import { UserFiltersReqQueryDto } from './dto/request/users-filters.req';
 import { addUserFilters } from './utils/users-filters.util';
 import { paginationParams } from '../accommodations/utils/pagination-params.util';
 import { getPaginationMetadata, getPaginationOffset } from '#/shared/utils/pagination.util';
 
 @Injectable()
-export class UserService {
+export class UsersService {
   constructor(
-    @InjectRepository(Account)
-    private accountRepository: Repository<Account>,
-    @InjectRepository(Profile)
-    private profileRepository: Repository<Profile>,
+    @InjectRepository(Account) private accountRepository: Repository<Account>,
+    @InjectRepository(Profile) private profileRepository: Repository<Profile>,
   ) {}
 
   async listUsers(filters: UserFiltersReqQueryDto) {

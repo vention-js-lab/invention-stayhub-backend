@@ -1,7 +1,7 @@
 import { Test, type TestingModule } from '@nestjs/testing';
-import { AccommodationService } from '../services/accommodations.service';
+import { AccommodationsService } from '../services/accommodations.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Accommodation } from '../entities/accommodations.entity';
+import { Accommodation } from '../entities/accommodation.entity';
 import { NotFoundException } from '@nestjs/common';
 import { AccommodationAddressService } from '../services/accommodation-address.service';
 import { AccommodationAmenityService } from '../services/accommodation-amenity.service';
@@ -23,13 +23,13 @@ const mockAccommodationAmenityService = {
 };
 const mockAccommodationImageService = { create: jest.fn(), update: jest.fn() };
 
-describe('AccommodationService', () => {
-  let service: AccommodationService;
+describe('AccommodationsService', () => {
+  let service: AccommodationsService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        AccommodationService,
+        AccommodationsService,
         {
           provide: getRepositoryToken(Accommodation),
           useValue: mockAccommodationRepository,
@@ -49,7 +49,7 @@ describe('AccommodationService', () => {
       ],
     }).compile();
 
-    service = module.get<AccommodationService>(AccommodationService);
+    service = module.get<AccommodationsService>(AccommodationsService);
   });
 
   describe('getAccommodationById', () => {

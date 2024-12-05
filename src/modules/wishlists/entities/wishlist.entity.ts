@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
 import { Account } from '#/modules/users/entities/account.entity';
-import { Accommodation } from '#/modules/accommodations/entities/accommodations.entity';
+import { Accommodation } from '#/modules/accommodations/entities/accommodation.entity';
 
 @Entity('wishlist')
 export class Wishlist {
