@@ -10,7 +10,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { AccountRefreshToken } from '../entities/account-refresh-token.entity';
 import { Request } from 'express';
 import { extractRequestBody } from '#/shared/extractors/request-body.extractor';
-import { RefreshTokenDto } from '../dto/refresh-token.dto';
+import { RefreshTokenDto } from '../dto/request/refresh-token.req';
 
 @Injectable()
 export class RefreshTokenStrategy extends PassportStrategy(Strategy, JwtAuthConfig.RefreshTokenKey) {

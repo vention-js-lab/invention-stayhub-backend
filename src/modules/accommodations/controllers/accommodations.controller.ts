@@ -1,20 +1,20 @@
 import { Controller, Post, Body, UseGuards, UseInterceptors, Get, Query, Param, Patch, Delete } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiResponse, ApiQuery } from '@nestjs/swagger';
-import { AccommodationService } from '#/modules/accommodations/services/accommodations.service';
-import { Accommodation } from '#/modules/accommodations/entities/accommodations.entity';
-import { AccommodationDto } from '#/modules/accommodations/dto/requests/create-accommodation.req';
+import { AccommodationsService } from '#/modules/accommodations/services/accommodations.service';
+import { Accommodation } from '#/modules/accommodations/entities/accommodation.entity';
+import { AccommodationDto } from '#/modules/accommodations/dto/request/create-accommodation.req';
 import { AccessTokenGuard } from '#/shared/guards/access-token.guard';
-import { GetAccount } from '#/modules/auth/decorators/get-account.decorator';
+import { GetAccount } from '#/shared/decorators/get-account.decorator';
 import { SnakeToCamelInterceptor } from '#/shared/interceptors/snake-to-camel.interceptor';
-import { AccommodationFiltersReqQueryDto } from '../dto/requests/accommodation-filters.req';
-import { UpdateAccommodationDto } from './../dto/requests/update-accommodation.req';
+import { AccommodationFiltersReqQueryDto } from '../dto/request/accommodation-filters.req';
+import { UpdateAccommodationDto } from '../dto/request/update-accommodation.req';
 import { UUIDValidationPipe } from '#/shared/pipes/uuid-validation.pipe';
 import { withBaseResponse } from '#/shared/utils/with-base-response.util';
 
-@ApiTags('Accommodations')
+@ApiTags('accommodations')
 @Controller('accommodations')
-export class AccommodationController {
-  constructor(private readonly accommodationService: AccommodationService) {}
+export class AccommodationsController {
+  constructor(private readonly accommodationsService: AccommodationsService) {}
 
   @Post()
   @ApiBearerAuth()
@@ -28,7 +28,7 @@ export class AccommodationController {
   @ApiResponse({ status: 400, description: 'Invalid data provided.' })
   @ApiResponse({ status: 401, description: 'Unauthorized request.' })
   create(@Body() accommodationDto: AccommodationDto, @GetAccount('accountId') ownerId: string): Promise<Accommodation> {
-    return this.accommodationService.create({
+    return this.accommodationsService.create({
       createAccommodationDto: accommodationDto,
       ownerId,
     });
@@ -48,7 +48,7 @@ export class AccommodationController {
     description: 'List of accommodations fetched successfully',
   })
   async listAccommodations(@Query() filters: AccommodationFiltersReqQueryDto) {
-    const result = await this.accommodationService.listAccommodations(filters);
+    const result = await this.accommodationsService.listAccommodations(filters);
 
     return withBaseResponse({
       status: 200,
@@ -65,7 +65,7 @@ export class AccommodationController {
     type: Accommodation,
   })
   async getAccommodationById(@Param('id') id: string) {
-    const accommodation = await this.accommodationService.getAccommodationById(id);
+    const accommodation = await this.accommodationsService.getAccommodationById(id);
 
     return withBaseResponse({
       status: 200,
@@ -87,7 +87,7 @@ export class AccommodationController {
     @GetAccount('accountId') ownerId: string,
     @Body() updateAccommodationDto: UpdateAccommodationDto,
   ) {
-    return this.accommodationService.update({
+    return this.accommodationsService.update({
       accommodationId,
       ownerId,
       updateAccommodationDto,
@@ -111,7 +111,7 @@ export class AccommodationController {
     @Param('id') accommodationId: string,
     @GetAccount('accountId') ownerId: string,
   ): Promise<{ message: string }> {
-    await this.accommodationService.softDeleteAccommodationByOwner(accommodationId, ownerId);
+    await this.accommodationsService.softDeleteAccommodationByOwner(accommodationId, ownerId);
 
     return {
       message: `Accommodation with ID ${accommodationId} has been successfully deleted.`,

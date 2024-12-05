@@ -1,4 +1,4 @@
-import { type UserFiltersReqQueryDto } from '#/modules/users/dto/requests/users-filters.req';
+import { type UserFiltersReqQueryDto } from '#/modules/users/dto/request/users-filters.req';
 import { type Account } from '#/modules/users/entities/account.entity';
 import { type SelectQueryBuilder } from 'typeorm';
 

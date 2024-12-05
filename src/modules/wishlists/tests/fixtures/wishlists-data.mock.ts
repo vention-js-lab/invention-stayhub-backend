@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker';
 import { type Wishlist } from '#/modules/wishlists/entities/wishlist.entity';
-import { type Accommodation } from '#/modules/accommodations/entities/accommodations.entity';
+import { type Accommodation } from '#/modules/accommodations/entities/accommodation.entity';
 
 export const mockUserId = faker.string.uuid();
 
