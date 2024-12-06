@@ -1,5 +1,5 @@
-import { AccommodationService } from '#/modules/accommodations/services/accommodations.service';
-import { WishlistService } from '#/modules/wishlists/wishlists.service';
+import { AccommodationsService } from '#/modules/accommodations/services/accommodations.service';
+import { WishlistsService } from '#/modules/wishlists/wishlists.service';
 import { Wishlist } from '#/modules/wishlists/entities/wishlist.entity';
 import { Test, type TestingModule } from '@nestjs/testing';
 import { Repository } from 'typeorm';
@@ -8,7 +8,7 @@ import { mockUserId, mockWishlist, mockWishlistItem, mockAccommodation } from '.
 import { NotFoundException } from '@nestjs/common';
 
 describe('WishlistService', () => {
-  let wishlistService: WishlistService;
+  let wishlistService: WishlistsService;
   let wishlistRepo: Repository<Wishlist>;
 
   const accommodationServiceMock = {
@@ -18,20 +18,20 @@ describe('WishlistService', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        WishlistService,
-        AccommodationService,
+        WishlistsService,
+        AccommodationsService,
         {
           provide: getRepositoryToken(Wishlist),
           useClass: Repository,
         },
         {
-          provide: AccommodationService,
+          provide: AccommodationsService,
           useValue: accommodationServiceMock,
         },
       ],
     }).compile();
 
-    wishlistService = module.get<WishlistService>(WishlistService);
+    wishlistService = module.get<WishlistsService>(WishlistsService);
     wishlistRepo = module.get<Repository<Wishlist>>(getRepositoryToken(Wishlist));
   });
 

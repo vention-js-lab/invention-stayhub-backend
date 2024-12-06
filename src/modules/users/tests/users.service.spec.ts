@@ -3,24 +3,24 @@ import { Repository } from 'typeorm';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Account } from '../entities/account.entity';
 import { Profile } from '../entities/profile.entity';
-import { UserService } from '../users.service';
+import { UsersService } from '../users.service';
 import { mockUsers, mockProfile, mockUser, mockUpdateProfileDto } from './fixtures/users-data.mock';
 import { randomUUID } from 'node:crypto';
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { faker } from '@faker-js/faker';
 import { Roles } from '#/shared/constants/user-roles.constant';
-import { type UserFiltersReqQueryDto } from '#/modules/users/dto/requests/users-filters.req';
+import { type UserFiltersReqQueryDto } from '#/modules/users/dto/request/users-filters.req';
 import { AccountType } from '#/shared/constants/user-account.constant';
 
-describe('UserService', () => {
-  let userService: UserService;
+describe('UsersService', () => {
+  let usersService: UsersService;
   let accountRepository: Repository<Account>;
   let profileRepository: Repository<Profile>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        UserService,
+        UsersService,
         {
           provide: getRepositoryToken(Account),
           useClass: Repository,
@@ -32,7 +32,7 @@ describe('UserService', () => {
       ],
     }).compile();
 
-    userService = module.get<UserService>(UserService);
+    usersService = module.get<UsersService>(UsersService);
     accountRepository = module.get<Repository<Account>>(getRepositoryToken(Account));
     profileRepository = module.get<Repository<Profile>>(getRepositoryToken(Profile));
   });
@@ -55,7 +55,7 @@ describe('UserService', () => {
         getManyAndCount: jest.fn().mockResolvedValue([mockUsers, mockUsers.length]),
       } as never);
 
-      const result = await userService.listUsers({} as UserFiltersReqQueryDto);
+      const result = await usersService.listUsers({} as UserFiltersReqQueryDto);
 
       expect(accountRepoBuilderSpy).toHaveBeenCalledWith('account');
       expect(result).toEqual({
@@ -83,7 +83,7 @@ describe('UserService', () => {
         profile,
       });
 
-      const result = await userService.getProfile(userId);
+      const result = await usersService.getProfile(userId);
 
       expect(accountRepositoryFindOneSpy).toHaveBeenCalledWith({
         where: { id: userId },
@@ -110,7 +110,7 @@ describe('UserService', () => {
         ...updateProfileDto,
       });
 
-      const result = await userService.updateProfile(userId, updateProfileDto);
+      const result = await usersService.updateProfile(userId, updateProfileDto);
 
       expect(accountRepositoryFindOneSpy).toHaveBeenCalledWith({
         where: { id: userId },
@@ -140,7 +140,7 @@ describe('UserService', () => {
         image: imageUrl,
       });
 
-      const result = await userService.updateProfileAvatar(userId, imageUrl);
+      const result = await usersService.updateProfileAvatar(userId, imageUrl);
 
       expect(accountRepositoryFindOneSpy).toHaveBeenCalledWith({
         where: { id: userId },
@@ -163,7 +163,7 @@ describe('UserService', () => {
       const accountRepositorySaveSpy = jest.spyOn(accountRepository, 'save');
       accountRepositorySaveSpy.mockResolvedValue({ ...account, role: Roles.Admin });
 
-      const result = await userService.toggleUserRole(userId);
+      const result = await usersService.toggleUserRole(userId);
 
       expect(accountRepositoryFindOneSpy).toHaveBeenCalledWith({
         where: { id: userId },
@@ -184,7 +184,7 @@ describe('UserService', () => {
       const accountRepositorySaveSpy = jest.spyOn(accountRepository, 'save');
       accountRepositorySaveSpy.mockResolvedValue({ ...account, role: Roles.User });
 
-      const result = await userService.toggleUserRole(userId);
+      const result = await usersService.toggleUserRole(userId);
 
       expect(accountRepositoryFindOneSpy).toHaveBeenCalledWith({
         where: { id: userId },
@@ -200,7 +200,7 @@ describe('UserService', () => {
       const userId = randomUUID();
       accountRepository.findOne = jest.fn().mockResolvedValue(null);
 
-      const result = userService.toggleUserRole(userId);
+      const result = usersService.toggleUserRole(userId);
 
       await expect(result).rejects.toThrow(NotFoundException);
     });
@@ -244,7 +244,7 @@ describe('UserService', () => {
       accountRepositoryFindOneSpy.mockResolvedValueOnce(null);
       const softRemoveSpy = jest.spyOn(accountRepository, 'softRemove');
 
-      const result = userService.softDeleteAccount(mockActorId, mockAccountId);
+      const result = usersService.softDeleteAccount(mockActorId, mockAccountId);
       await expect(result).rejects.toThrow(NotFoundException);
 
       expect(accountRepositoryFindOneSpy).toHaveBeenCalledWith({
@@ -259,7 +259,7 @@ describe('UserService', () => {
       accountRepositoryFindOneSpy.mockResolvedValueOnce(mockAccount);
       const softRemoveSpy = jest.spyOn(accountRepository, 'softRemove');
 
-      const result = userService.softDeleteAccount(mockActorId, mockAccountId);
+      const result = usersService.softDeleteAccount(mockActorId, mockAccountId);
       await expect(result).rejects.toThrow(ForbiddenException);
 
       expect(accountRepositoryFindOneSpy).toHaveBeenCalledWith({
@@ -275,7 +275,7 @@ describe('UserService', () => {
       accountRepositoryFindOneSpy.mockResolvedValueOnce(null);
       const softRemoveSpy = jest.spyOn(accountRepository, 'softRemove');
 
-      const result = userService.softDeleteAccount(mockActorId, mockAccountId);
+      const result = usersService.softDeleteAccount(mockActorId, mockAccountId);
       await expect(result).rejects.toThrow(NotFoundException);
 
       expect(accountRepositoryFindOneSpy).toHaveBeenNthCalledWith(1, {
@@ -299,7 +299,7 @@ describe('UserService', () => {
       accountRepositoryCountSpy.mockResolvedValue(1);
       const softRemoveSpy = jest.spyOn(accountRepository, 'softRemove');
 
-      const result = userService.softDeleteAccount(mockActorId, mockAccountId);
+      const result = usersService.softDeleteAccount(mockActorId, mockAccountId);
       await expect(result).rejects.toThrow(ForbiddenException);
 
       expect(accountRepositoryFindOneSpy).toHaveBeenNthCalledWith(1, {
@@ -324,7 +324,7 @@ describe('UserService', () => {
       accountRepositoryCountSpy.mockResolvedValue(2);
       const softRemoveSpy = jest.spyOn(accountRepository, 'softRemove');
 
-      const result = userService.softDeleteAccount(mockActorId, mockAccountId);
+      const result = usersService.softDeleteAccount(mockActorId, mockAccountId);
       await expect(result).resolves.not.toThrow();
 
       expect(accountRepositoryFindOneSpy).toHaveBeenNthCalledWith(1, {

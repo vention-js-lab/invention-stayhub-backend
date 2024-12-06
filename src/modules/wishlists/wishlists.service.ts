@@ -2,18 +2,18 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Wishlist } from '#/modules/wishlists/entities/wishlist.entity';
-import { AccommodationService } from '#/modules/accommodations/services/accommodations.service';
+import { AccommodationsService } from '#/modules/accommodations/services/accommodations.service';
 
 @Injectable()
-export class WishlistService {
+export class WishlistsService {
   constructor(
     @InjectRepository(Wishlist)
     private readonly wishlistRepository: Repository<Wishlist>,
-    private readonly accommodationService: AccommodationService,
+    private readonly accommodationsService: AccommodationsService,
   ) {}
 
   async addToWishlist(accountId: string, accommodationId: string) {
-    await this.accommodationService.getAccommodationById(accommodationId);
+    await this.accommodationsService.getAccommodationById(accommodationId);
 
     const existingWishlistItem = await this.wishlistRepository.findOne({
       where: { accountId, accommodationId },
