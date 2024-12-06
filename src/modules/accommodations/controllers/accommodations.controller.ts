@@ -27,10 +27,15 @@ export class AccommodationController {
   })
   @ApiResponse({ status: 400, description: 'Invalid data provided.' })
   @ApiResponse({ status: 401, description: 'Unauthorized request.' })
-  create(@Body() accommodationDto: AccommodationDto, @GetAccount('accountId') ownerId: string): Promise<Accommodation> {
-    return this.accommodationService.create({
+  async create(@Body() accommodationDto: AccommodationDto, @GetAccount('accountId') ownerId: string) {
+    const result = await this.accommodationService.create({
       createAccommodationDto: accommodationDto,
       ownerId,
+    });
+    return withBaseResponse({
+      status: 201,
+      message: 'Accommodation created successfully',
+      data: result,
     });
   }
 
@@ -82,15 +87,20 @@ export class AccommodationController {
     status: 200,
     description: 'Accommodation updated successfully',
   })
-  update(
+  async update(
     @Param('id', new UUIDValidationPipe()) accommodationId: string,
     @GetAccount('accountId') ownerId: string,
     @Body() updateAccommodationDto: UpdateAccommodationDto,
   ) {
-    return this.accommodationService.update({
+    const result = await this.accommodationService.update({
       accommodationId,
       ownerId,
       updateAccommodationDto,
+    });
+    return withBaseResponse({
+      status: 200,
+      message: 'Accommodation is updated successfully',
+      data: result,
     });
   }
 
@@ -107,14 +117,13 @@ export class AccommodationController {
     description: 'Accommodation not found or already deleted.',
   })
   @ApiResponse({ status: 401, description: 'Unauthorized request.' })
-  async softDeleteAccommodation(
-    @Param('id') accommodationId: string,
-    @GetAccount('accountId') ownerId: string,
-  ): Promise<{ message: string }> {
-    await this.accommodationService.softDeleteAccommodationByOwner(accommodationId, ownerId);
+  async softDeleteAccommodation(@Param('id') accommodationId: string, @GetAccount('accountId') ownerId: string) {
+    const result = await this.accommodationService.softDeleteAccommodationByOwner(accommodationId, ownerId);
 
-    return {
-      message: `Accommodation with ID ${accommodationId} has been successfully deleted.`,
-    };
+    return withBaseResponse({
+      status: 200,
+      message: 'Accommodation is soft deleted successfully',
+      data: result,
+    });
   }
 }
