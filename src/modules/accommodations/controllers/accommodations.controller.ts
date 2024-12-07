@@ -28,14 +28,14 @@ export class AccommodationsController {
   @ApiResponse({ status: 400, description: 'Invalid data provided.' })
   @ApiResponse({ status: 401, description: 'Unauthorized request.' })
   async create(@Body() accommodationDto: AccommodationDto, @GetAccount('accountId') ownerId: string) {
-    const result = await this.accommodationsService.create({
+    const createdAccommodation = await this.accommodationsService.create({
       createAccommodationDto: accommodationDto,
       ownerId,
     });
     return withBaseResponse({
       status: 201,
       message: 'Accommodation created successfully',
-      data: result,
+      data: createdAccommodation,
     });
   }
 
@@ -53,12 +53,12 @@ export class AccommodationsController {
     description: 'List of accommodations fetched successfully',
   })
   async listAccommodations(@Query() filters: AccommodationFiltersReqQueryDto) {
-    const result = await this.accommodationsService.listAccommodations(filters);
+    const accommodations = await this.accommodationsService.listAccommodations(filters);
 
     return withBaseResponse({
       status: 200,
       message: 'Accommodations are retrieved successfully',
-      data: result,
+      data: accommodations,
     });
   }
 
@@ -92,7 +92,7 @@ export class AccommodationsController {
     @GetAccount('accountId') ownerId: string,
     @Body() updateAccommodationDto: UpdateAccommodationDto,
   ) {
-    const result = await this.accommodationsService.update({
+    const updatedAccommodation = await this.accommodationsService.update({
       accommodationId,
       ownerId,
       updateAccommodationDto,
@@ -100,7 +100,7 @@ export class AccommodationsController {
     return withBaseResponse({
       status: 200,
       message: 'Accommodation is updated successfully',
-      data: result,
+      data: updatedAccommodation,
     });
   }
 
@@ -118,12 +118,12 @@ export class AccommodationsController {
   })
   @ApiResponse({ status: 401, description: 'Unauthorized request.' })
   async softDeleteAccommodation(@Param('id') accommodationId: string, @GetAccount('accountId') ownerId: string) {
-    const result = await this.accommodationsService.softDeleteAccommodationByOwner(accommodationId, ownerId);
+    await this.accommodationsService.softDeleteAccommodationByOwner(accommodationId, ownerId);
 
     return withBaseResponse({
-      status: 200,
+      status: 204,
       message: 'Accommodation is soft deleted successfully',
-      data: result,
+      data: null,
     });
   }
 }
