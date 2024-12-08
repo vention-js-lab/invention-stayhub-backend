@@ -8,6 +8,7 @@ import { GetAccount } from '#/shared/decorators/get-account.decorator';
 import { GoogleUser } from './types/google-user.type';
 import { RefreshTokenDto } from './dto/request/refresh-token.req';
 import { RefreshTokenGuard } from '#/shared/guards/refresh-token.guard';
+import { withBaseResponse } from '#/shared/utils/with-base-response.util';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -21,8 +22,13 @@ export class AuthController {
     status: 409,
     description: 'User with this email already exists',
   })
-  register(@Body() registerDto: RegisterDto) {
-    return this.authService.register(registerDto);
+  async register(@Body() registerDto: RegisterDto) {
+    const result = await this.authService.register(registerDto);
+    return withBaseResponse({
+      status: 201,
+      message: 'User registered successfully',
+      data: result,
+    });
   }
 
   @Post('login')
@@ -33,8 +39,13 @@ export class AuthController {
     status: 401,
     description: 'Invalid email or password',
   })
-  login(@Body() loginDto: LoginDto) {
-    return this.authService.login(loginDto);
+  async login(@Body() loginDto: LoginDto) {
+    const result = await this.authService.login(loginDto);
+    return withBaseResponse({
+      status: 200,
+      message: 'User logged in successfully',
+      data: result,
+    });
   }
 
   @Get('google/redirect')
@@ -47,8 +58,13 @@ export class AuthController {
     status: 200,
     description: 'User info from Google',
   })
-  googleAuthRedirect(@GetAccount() user: GoogleUser) {
-    return this.authService.googleLogin(user);
+  async googleAuthRedirect(@GetAccount() user: GoogleUser) {
+    const result = await this.authService.googleLogin(user);
+    return withBaseResponse({
+      status: 200,
+      message: 'User logged in successfully via Google',
+      data: result,
+    });
   }
 
   @Post('refresh-token')
@@ -66,9 +82,10 @@ export class AuthController {
   async issueNewTokens(@Body() refreshTokenDto: RefreshTokenDto, @GetAccount('accountId') accountId: string) {
     const newTokens = await this.authService.issueNewTokens(refreshTokenDto.refreshToken, accountId);
 
-    return {
+    return withBaseResponse({
+      status: 200,
       message: 'New tokens retrieved successfully',
       data: newTokens,
-    };
+    });
   }
 }
