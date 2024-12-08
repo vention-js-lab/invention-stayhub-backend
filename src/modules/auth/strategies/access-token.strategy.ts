@@ -14,8 +14,7 @@ import { RequestAccount } from '../types/request-account.type';
 export class AccessTokenStrategy extends PassportStrategy(Strategy, JwtAuthConfig.AccessTokenKey) {
   constructor(
     private configService: ConfigService<EnvConfig, true>,
-    @InjectRepository(Account)
-    private accountRepository: Repository<Account>,
+    @InjectRepository(Account) private accountRepository: Repository<Account>,
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
