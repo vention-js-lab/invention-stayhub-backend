@@ -1,5 +1,4 @@
-import { Injectable, BadRequestException, ConflictException } from '@nestjs/common';
-import { CheckoutReqDto } from '../dto/request/checkout.req';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { PaymentStatus } from '#/shared/constants/payment-status.constant';
 import { PaymentsService } from './payments.service';
 import { BookingsService } from '#/modules/bookings/bookings.service';
@@ -21,28 +20,14 @@ export class StripeService {
     private configService: ConfigService<EnvConfig, true>,
   ) {}
 
-  async createPaymentIntent(accountId: string, checkoutReqDto: CheckoutReqDto) {
-    const { bookingId } = checkoutReqDto;
-
-    const existingBooking = await this.bookingsService.getBookingById(bookingId, accountId);
-
-    if (!existingBooking) {
-      throw new BadRequestException('Booking does not exist');
-    }
-
-    const existingPayment = await this.paymentsService.getPaymentByBookingId(bookingId);
-
-    if (existingPayment && existingPayment.status === PaymentStatus.Success) {
-      throw new ConflictException('This booking has already been paid for');
-    }
-
+  async createPaymentIntent(amount: number, metadata: PaymentIntentMetadata) {
     const paymentIntent = await this.stripeApiService.stripe.paymentIntents.create({
-      amount: checkoutReqDto.amount,
+      amount,
       currency: 'usd',
-      metadata: {
-        bookingId,
-        accountId,
+      automatic_payment_methods: {
+        enabled: true,
       },
+      metadata: { ...metadata },
     });
 
     return paymentIntent.client_secret;

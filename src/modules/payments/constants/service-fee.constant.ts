@@ -1,0 +1,1 @@
+export const SERVICE_FEE_PERCENTAGE = 12 / 100;
