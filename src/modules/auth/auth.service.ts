@@ -100,7 +100,6 @@ export class AuthService {
     await this.refreshTokenRepository.insert(refreshTokenEntity);
 
     return {
-      message: 'User logged in successfully',
       accessToken,
       refreshToken,
     };

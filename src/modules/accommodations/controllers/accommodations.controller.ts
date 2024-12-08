@@ -29,10 +29,15 @@ export class AccommodationsController {
   })
   @ApiResponse({ status: 400, description: 'Invalid data provided.' })
   @ApiResponse({ status: 401, description: 'Unauthorized request.' })
-  async create(@Body() accommodationDto: AccommodationDto, @GetAccount('accountId') ownerId: string): Promise<Accommodation> {
-    return await this.accommodationsService.create({
+  async create(@Body() accommodationDto: AccommodationDto, @GetAccount('accountId') ownerId: string) {
+    const createdAccommodation = await this.accommodationsService.create({
       createAccommodationDto: accommodationDto,
       ownerId,
+    });
+    return withBaseResponse({
+      status: 201,
+      message: 'Accommodation created successfully',
+      data: createdAccommodation,
     });
   }
 
@@ -54,12 +59,12 @@ export class AccommodationsController {
     @Query() filters: AccommodationFiltersReqQueryDto,
     @GetOptionalAccount('accountId') accountId: string | undefined,
   ) {
-    const result = await this.accommodationsService.listAccommodations(filters, accountId);
+    const accommodations = await this.accommodationsService.listAccommodations(filters, accountId);
 
     return withBaseResponse({
       status: 200,
       message: 'Accommodations are retrieved successfully',
-      data: result,
+      data: accommodations,
     });
   }
 
@@ -93,10 +98,15 @@ export class AccommodationsController {
     @GetAccount('accountId') ownerId: string,
     @Body() updateAccommodationDto: UpdateAccommodationDto,
   ) {
-    return await this.accommodationsService.update({
+    const updatedAccommodation = await this.accommodationsService.update({
       accommodationId,
       ownerId,
       updateAccommodationDto,
+    });
+    return withBaseResponse({
+      status: 200,
+      message: 'Accommodation is updated successfully',
+      data: updatedAccommodation,
     });
   }
 
@@ -113,14 +123,13 @@ export class AccommodationsController {
     description: 'Accommodation not found or already deleted.',
   })
   @ApiResponse({ status: 401, description: 'Unauthorized request.' })
-  async softDeleteAccommodation(
-    @Param('id') accommodationId: string,
-    @GetAccount('accountId') ownerId: string,
-  ): Promise<{ message: string }> {
+  async softDeleteAccommodation(@Param('id') accommodationId: string, @GetAccount('accountId') ownerId: string) {
     await this.accommodationsService.softDeleteAccommodationByOwner(accommodationId, ownerId);
 
-    return {
-      message: `Accommodation with ID ${accommodationId} has been successfully deleted.`,
-    };
+    return withBaseResponse({
+      status: 204,
+      message: 'Accommodation is soft deleted successfully',
+      data: null,
+    });
   }
 }
