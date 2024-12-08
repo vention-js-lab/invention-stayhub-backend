@@ -56,10 +56,10 @@ export class BookingsService {
     return this.bookingRepository.save(booking);
   }
 
-  async getBookingById(bookingId: string, accountId?: string) {
-    const existingBooking = await this.bookingRepository.findOneBy({
-      id: bookingId,
-      accountId: accountId,
+  async getBookingById(bookingId: string, accountId: string) {
+    const existingBooking = await this.bookingRepository.findOne({
+      where: { id: bookingId, accountId },
+      relations: ['accommodation'],
     });
 
     return existingBooking;

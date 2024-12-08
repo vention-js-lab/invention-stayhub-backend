@@ -64,7 +64,7 @@ export class AccommodationsController {
     description: 'Accommodation fetched successfully with reviews',
     type: Accommodation,
   })
-  async getAccommodationById(@Param('id') id: string) {
+  async getAccommodationById(@Param('id', new UUIDValidationPipe()) id: string) {
     const accommodation = await this.accommodationsService.getAccommodationById(id);
 
     return withBaseResponse({
@@ -108,7 +108,7 @@ export class AccommodationsController {
   })
   @ApiResponse({ status: 401, description: 'Unauthorized request.' })
   async softDeleteAccommodation(
-    @Param('id') accommodationId: string,
+    @Param('id', new UUIDValidationPipe()) accommodationId: string,
     @GetAccount('accountId') ownerId: string,
   ): Promise<{ message: string }> {
     await this.accommodationsService.softDeleteAccommodationByOwner(accommodationId, ownerId);
