@@ -25,6 +25,7 @@ import { withBaseResponse } from '#/shared/utils/with-base-response.util';
 import { UserFiltersReqQueryDto } from './dto/request/users-filters.req';
 import { ApiOkResponse, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { SnakeToCamelInterceptor } from '#/shared/interceptors/snake-to-camel.interceptor';
+import { UUIDValidationPipe } from '#/shared/pipes/uuid-validation.pipe';
 
 @ApiTags('users')
 @Controller('users')
@@ -127,7 +128,7 @@ export class UsersController {
   })
   @UserRoles(Roles.Admin)
   @UseGuards(AccessTokenGuard, RolesGuard)
-  async toggleUserRole(@Param('accountId') accountId: string) {
+  async toggleUserRole(@Param('accountId', new UUIDValidationPipe()) accountId: string) {
     const result = await this.usersService.toggleUserRole(accountId);
 
     return withBaseResponse({
@@ -143,7 +144,10 @@ export class UsersController {
     description: 'User soft deleted successfully',
   })
   @UseGuards(AccessTokenGuard)
-  async deleteAccount(@GetAccount('accountId') deleteActorId: string, @Param('userId') deletingAccountId: string) {
+  async deleteAccount(
+    @GetAccount('accountId') deleteActorId: string,
+    @Param('userId', new UUIDValidationPipe()) deletingAccountId: string,
+  ) {
     const result = await this.usersService.softDeleteAccount(deleteActorId, deletingAccountId);
 
     return withBaseResponse({
