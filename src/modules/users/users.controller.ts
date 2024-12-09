@@ -1,10 +1,10 @@
-import { ListUsersResponseDto } from './dto/responses/list-users.res';
-import { ProfileResDto } from './dto/responses/profile.res';
-import { UploadService } from './../uploads/upload.service';
+import { ListUsersResponseDto } from './dto/response/list-users.res';
+import { ProfileResDto } from './dto/response/profile.res';
+import { UploadsService } from '../uploads/services/uploads.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AccessTokenGuard } from '#/shared/guards/access-token.guard';
-import { GetAccount } from '#/modules/auth/decorators/get-account.decorator';
-import { UserService } from './users.service';
+import { GetAccount } from '#/shared/decorators/get-account.decorator';
+import { UsersService } from './users.service';
 import {
   Controller,
   Get,
@@ -18,25 +18,21 @@ import {
   BadRequestException,
   Query,
 } from '@nestjs/common';
-import { UpdateProfileDto } from './dto/requests/update-profile.req';
+import { UpdateProfileDto } from './dto/request/update-profile.req';
 import { RolesGuard, UserRoles } from '#/shared/guards/roles.guard';
 import { Roles } from '#/shared/constants/user-roles.constant';
 import { withBaseResponse } from '#/shared/utils/with-base-response.util';
-import { UserFiltersReqQueryDto } from './dto/requests/users-filters.req';
-import {
-  ApiOkResponse,
-  ApiOperation,
-  ApiQuery,
-  ApiTags,
-} from '@nestjs/swagger';
+import { UserFiltersReqQueryDto } from './dto/request/users-filters.req';
+import { ApiOkResponse, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { SnakeToCamelInterceptor } from '#/shared/interceptors/snake-to-camel.interceptor';
+import { UUIDValidationPipe } from '#/shared/pipes/uuid-validation.pipe';
 
-@ApiTags('Users')
+@ApiTags('users')
 @Controller('users')
-export class UserController {
+export class UsersController {
   constructor(
-    private readonly userService: UserService,
-    private readonly uploadService: UploadService,
+    private readonly usersService: UsersService,
+    private readonly uploadsService: UploadsService,
   ) {}
 
   @Get()
@@ -55,7 +51,7 @@ export class UserController {
   @UserRoles(Roles.Admin)
   @UseGuards(AccessTokenGuard, RolesGuard)
   async listUsers(@Query() filters: UserFiltersReqQueryDto) {
-    const result = await this.userService.listUsers(filters);
+    const result = await this.usersService.listUsers(filters);
 
     return withBaseResponse({
       status: 200,
@@ -72,7 +68,7 @@ export class UserController {
   })
   @UseGuards(AccessTokenGuard)
   async getProfile(@GetAccount('accountId') accountId: string) {
-    const result = await this.userService.getProfile(accountId);
+    const result = await this.usersService.getProfile(accountId);
 
     return withBaseResponse({
       status: 200,
@@ -88,14 +84,8 @@ export class UserController {
     type: ProfileResDto,
   })
   @UseGuards(AccessTokenGuard)
-  async updateProfile(
-    @GetAccount('accountId') accountId: string,
-    @Body() updateProfileDto: UpdateProfileDto,
-  ) {
-    const result = await this.userService.updateProfile(
-      accountId,
-      updateProfileDto,
-    );
+  async updateProfile(@GetAccount('accountId') accountId: string, @Body() updateProfileDto: UpdateProfileDto) {
+    const result = await this.usersService.updateProfile(accountId, updateProfileDto);
 
     return withBaseResponse({
       status: 200,
@@ -113,18 +103,15 @@ export class UserController {
   @UseGuards(AccessTokenGuard)
   @UseInterceptors(FileInterceptor('avatar'))
   async updateProfileAvatar(
-    @UploadedFile() avatarImg: Express.Multer.File,
+    @UploadedFile() avatarImg: Express.Multer.File | undefined,
     @GetAccount('accountId') accountId: string,
   ) {
     if (!avatarImg) {
       throw new BadRequestException('Image is required');
     }
 
-    const avatarUrl = await this.uploadService.uploadImage(avatarImg);
-    const result = await this.userService.updateProfileAvatar(
-      accountId,
-      avatarUrl,
-    );
+    const avatarUrl = await this.uploadsService.uploadImage(avatarImg);
+    const result = await this.usersService.updateProfileAvatar(accountId, avatarUrl);
 
     return withBaseResponse({
       status: 200,
@@ -141,8 +128,8 @@ export class UserController {
   })
   @UserRoles(Roles.Admin)
   @UseGuards(AccessTokenGuard, RolesGuard)
-  async toggleUserRole(@Param('accountId') accountId: string) {
-    const result = await this.userService.toggleUserRole(accountId);
+  async toggleUserRole(@Param('accountId', new UUIDValidationPipe()) accountId: string) {
+    const result = await this.usersService.toggleUserRole(accountId);
 
     return withBaseResponse({
       status: 200,
@@ -159,12 +146,9 @@ export class UserController {
   @UseGuards(AccessTokenGuard)
   async deleteAccount(
     @GetAccount('accountId') deleteActorId: string,
-    @Param('userId') deletingAccountId: string,
+    @Param('userId', new UUIDValidationPipe()) deletingAccountId: string,
   ) {
-    const result = await this.userService.softDeleteAccount(
-      deleteActorId,
-      deletingAccountId,
-    );
+    const result = await this.usersService.softDeleteAccount(deleteActorId, deletingAccountId);
 
     return withBaseResponse({
       status: 200,

@@ -1,0 +1,67 @@
+name: CI/CD
+
+on:
+  workflow_dispatch:
+
+jobs:
+    build-and-test:
+      runs-on: ubuntu-latest
+      strategy:
+          matrix:
+              node-version: [20.x]
+
+      steps:
+          - name: Git checkout
+            uses: actions/checkout@v4
+
+          - name: Setup Node.js
+            uses: actions/setup-node@v4
+            with:
+                node-version: ${{ matrix.node-version }}
+
+          - name: Install dependencies
+            run: npm ci
+
+          - name: Lint code
+            run: npm run lint
+
+          - name: Run tests
+            run: npm run test
+          
+          - name: Build the project
+            run: npm run build
+
+          - name: Set up Docker Buildx
+            uses: docker/setup-buildx-action@v3
+
+          - name: Log in to Docker Hub
+            uses: docker/login-action@v2
+            with:
+              username: ${{ secrets.DOCKER_USERNAME}}
+              password: ${{ secrets.DOCKER_PASSWORD }}
+
+          - name: Build Docker image
+            run: |
+              docker build \
+                --file Dockerfile \
+                --tag ${{ secrets.DOCKER_USERNAME}}/${{ secrets.DOCKER_IMAGE_TAG }} .
+
+          - name: Push Docker image
+            run: docker push ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGE_TAG }}
+
+                
+    deploy:
+      needs: build-and-test
+      runs-on: [self-hosted, Linux, X64, aws-ec2]
+
+      steps:
+      - name: SSH into EC2 and pull Docker image
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_PRIVATE_KEY }}
+          script: |
+            cd /home/ubuntu/invention-stayhub-backend
+            sudo docker-compose pull
+            sudo docker-compose up -d --build

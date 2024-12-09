@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { AccommodationAddress } from '#/modules/accommodations/entities/accommodation-address.entity';
-import { AccommodationAddressDto } from '#/modules/accommodations/dto/requests/create-accommodation-address.req';
-import { UpdateAccommodationAddressDto } from '../dto/requests/update-accommodation-address.req';
+import { AccommodationAddressDto } from '#/modules/accommodations/dto/request/create-accommodation-address.req';
+import { UpdateAccommodationAddressDto } from '../dto/request/update-accommodation-address.req';
 
 @Injectable()
 export class AccommodationAddressService {
@@ -12,29 +12,19 @@ export class AccommodationAddressService {
     private accommodationAddressRepository: Repository<AccommodationAddress>,
   ) {}
 
-  async create(
-    accommodationId: string,
-    createAccommodationAddressDto: AccommodationAddressDto,
-  ): Promise<AccommodationAddress> {
+  async create(accommodationId: string, createAccommodationAddressDto: AccommodationAddressDto): Promise<AccommodationAddress> {
     const newAccommodationAddress = this.accommodationAddressRepository.create({
       accommodationId,
       ...createAccommodationAddressDto,
     });
 
-    const createdAccommodationAddress =
-      await this.accommodationAddressRepository.save(newAccommodationAddress);
+    const createdAccommodationAddress = await this.accommodationAddressRepository.save(newAccommodationAddress);
 
     return createdAccommodationAddress;
   }
 
-  async update(
-    accommodationAddressId: string,
-    updateAccommodationAddressDto: UpdateAccommodationAddressDto,
-  ) {
-    await this.accommodationAddressRepository.update(
-      accommodationAddressId,
-      updateAccommodationAddressDto,
-    );
+  async update(accommodationAddressId: string, updateAccommodationAddressDto: UpdateAccommodationAddressDto) {
+    await this.accommodationAddressRepository.update(accommodationAddressId, updateAccommodationAddressDto);
 
     return await this.accommodationAddressRepository.findOne({
       where: { id: accommodationAddressId },

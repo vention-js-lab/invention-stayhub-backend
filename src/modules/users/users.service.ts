@@ -1,29 +1,20 @@
-import { UpdateProfileDto } from './dto/requests/update-profile.req';
-import {
-  ForbiddenException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { UpdateProfileDto } from './dto/request/update-profile.req';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Account } from './entities/account.entity';
 import { Profile } from './entities/profile.entity';
 import { Repository } from 'typeorm';
 import { Roles } from '#/shared/constants/user-roles.constant';
-import { UserFiltersReqQueryDto } from './dto/requests/users-filters.req';
-import { addUserFilters } from './helpers/users-filters.util';
+import { UserFiltersReqQueryDto } from './dto/request/users-filters.req';
+import { addUserFilters } from './utils/users-filters.util';
 import { paginationParams } from '../accommodations/utils/pagination-params.util';
-import {
-  getPaginationMetadata,
-  getPaginationOffset,
-} from '#/shared/utils/pagination.util';
+import { getPaginationMetadata, getPaginationOffset } from '#/shared/utils/pagination.util';
 
 @Injectable()
-export class UserService {
+export class UsersService {
   constructor(
-    @InjectRepository(Account)
-    private accountRepository: Repository<Account>,
-    @InjectRepository(Profile)
-    private profileRepository: Repository<Profile>,
+    @InjectRepository(Account) private accountRepository: Repository<Account>,
+    @InjectRepository(Profile) private profileRepository: Repository<Profile>,
   ) {}
 
   async listUsers(filters: UserFiltersReqQueryDto) {
@@ -60,30 +51,43 @@ export class UserService {
 
   async getProfile(accountId: string) {
     const account = await this.accountRepository.findOne({
-      where: { id: accountId, deletedAt: null },
+      where: { id: accountId },
       relations: ['profile'],
     });
+
+    if (!account) {
+      throw new NotFoundException('Account not found');
+    }
 
     return account.profile;
   }
 
   async updateProfile(accountId: string, updateProfileDto: UpdateProfileDto) {
     const account = await this.accountRepository.findOne({
-      where: { id: accountId, deletedAt: null },
+      where: { id: accountId },
       relations: ['profile'],
     });
+    if (!account) {
+      throw new NotFoundException('Account not found');
+    }
 
-    Object.assign(account.profile, updateProfileDto);
+    const updateProfilePayload = {
+      ...account.profile,
+      ...updateProfileDto,
+    };
 
-    const savedProfile = await this.profileRepository.save(account.profile);
+    const savedProfile = await this.profileRepository.save(updateProfilePayload);
     return savedProfile;
   }
 
   async updateProfileAvatar(accountId: string, avatarUrl: string) {
     const account = await this.accountRepository.findOne({
-      where: { id: accountId, deletedAt: null },
+      where: { id: accountId },
       relations: ['profile'],
     });
+    if (!account) {
+      throw new NotFoundException('Account not found');
+    }
 
     account.profile.image = avatarUrl;
 
@@ -93,7 +97,7 @@ export class UserService {
 
   async toggleUserRole(accountId: string) {
     const account = await this.accountRepository.findOne({
-      where: { id: accountId, deletedAt: null },
+      where: { id: accountId },
     });
     if (!account) {
       throw new NotFoundException('Account not found');
@@ -107,14 +111,18 @@ export class UserService {
 
   async softDeleteAccount(deleteActorId: string, deletingAccountId: string) {
     const deleteActor = await this.accountRepository.findOne({
-      where: { id: deleteActorId, deletedAt: null },
+      where: { id: deleteActorId },
     });
-    if (deleteActor.role != Roles.Admin && deleteActorId != deletingAccountId) {
+    if (!deleteActor) {
+      throw new NotFoundException('Actor not found');
+    }
+
+    if (deleteActor.role !== Roles.Admin && deleteActorId !== deletingAccountId) {
       throw new ForbiddenException('Only owner or admin can delete account');
     }
 
     const deletingAccount = await this.accountRepository.findOne({
-      where: { id: deletingAccountId, deletedAt: null },
+      where: { id: deletingAccountId },
     });
     if (!deletingAccount) {
       throw new NotFoundException('User not found or already deleted');
@@ -124,7 +132,6 @@ export class UserService {
       const remainingAdmins = await this.accountRepository.count({
         where: {
           role: Roles.Admin,
-          deletedAt: null,
         },
       });
 

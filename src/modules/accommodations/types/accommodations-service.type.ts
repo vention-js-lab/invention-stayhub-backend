@@ -1,5 +1,5 @@
-import { AccommodationDto } from '../dto/requests/create-accommodation.req';
-import { UpdateAccommodationDto } from '../dto/requests/update-accommodation.req';
+import { type AccommodationDto } from '../dto/request/create-accommodation.req';
+import { type UpdateAccommodationDto } from '../dto/request/update-accommodation.req';
 
 export interface CreateAccommodationParams {
   createAccommodationDto: AccommodationDto;

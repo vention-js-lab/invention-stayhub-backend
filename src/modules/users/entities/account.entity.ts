@@ -10,9 +10,9 @@ import {
 } from 'typeorm';
 import { Roles } from '#/shared/constants/user-roles.constant';
 import { AccountType } from '#/shared/constants/user-account.constant';
-import { Accommodation } from '#/modules/accommodations/entities/accommodations.entity';
+import { Accommodation } from '#/modules/accommodations/entities/accommodation.entity';
 import { Profile } from './profile.entity';
-import { Review } from '#/modules/review/entities/review.entity';
+import { Review } from '#/modules/reviews/entities/review.entity';
 
 @Entity('account')
 export class Account {
@@ -27,8 +27,9 @@ export class Account {
 
   @Column({
     nullable: true,
+    type: 'varchar',
   })
-  password: string;
+  password: string | null;
 
   @Column({
     type: 'enum',
@@ -37,11 +38,18 @@ export class Account {
   })
   role: Roles;
 
-  @Column({ unique: true, name: 'google_id', nullable: true })
-  googleId: string;
+  @Column({ unique: true, name: 'google_id', nullable: true, type: 'varchar' })
+  googleId: string | null;
 
   @Column({ type: 'enum', name: 'type', enum: AccountType })
   type: AccountType;
+
+  @DeleteDateColumn({
+    name: 'deleted_at',
+    type: 'timestamp',
+    default: () => null,
+  })
+  deletedAt: Date | null;
 
   @CreateDateColumn({
     name: 'created_at',
@@ -56,13 +64,6 @@ export class Account {
     default: () => 'CURRENT_TIMESTAMP',
   })
   updatedAt: Date;
-
-  @DeleteDateColumn({
-    name: 'deleted_at',
-    type: 'timestamp',
-    default: () => null,
-  })
-  deletedAt: Date;
 
   @OneToMany(() => Accommodation, (accommodation) => accommodation.owner)
   accommodations: Accommodation[];

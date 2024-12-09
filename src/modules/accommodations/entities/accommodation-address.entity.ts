@@ -1,13 +1,5 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  OneToOne,
-  CreateDateColumn,
-  UpdateDateColumn,
-  JoinColumn,
-} from 'typeorm';
-import { Accommodation } from '#/modules/accommodations/entities/accommodations.entity';
+import { Entity, PrimaryGeneratedColumn, Column, OneToOne, CreateDateColumn, UpdateDateColumn, JoinColumn } from 'typeorm';
+import { Accommodation } from '#/modules/accommodations/entities/accommodation.entity';
 
 @Entity('accommodation_address')
 export class AccommodationAddress {

@@ -1,13 +1,6 @@
-import {
-  MigrationInterface,
-  QueryRunner,
-  TableColumn,
-  TableForeignKey,
-} from 'typeorm';
+import { MigrationInterface, QueryRunner, TableColumn, TableForeignKey } from 'typeorm';
 
-export class UpdateAccommodationTable1731154775882
-  implements MigrationInterface
-{
+export class UpdateAccommodationTable1731154775882 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.dropColumn('accommodation', 'user_id');
 
@@ -33,9 +26,14 @@ export class UpdateAccommodationTable1731154775882
 
   public async down(queryRunner: QueryRunner): Promise<void> {
     const table = await queryRunner.getTable('accommodation');
-    const foreignKey = table.foreignKeys.find(
-      (fk) => fk.columnNames.indexOf('owner_id') !== -1,
-    );
+    if (!table) {
+      throw new Error('Table accommodation not found');
+    }
+
+    const foreignKey = table.foreignKeys.find((fk) => fk.columnNames.indexOf('owner_id') !== -1);
+    if (!foreignKey) {
+      throw new Error('Foreign key not found');
+    }
     await queryRunner.dropForeignKey('accommodation', foreignKey);
 
     await queryRunner.dropColumn('accommodation', 'owner_id');
