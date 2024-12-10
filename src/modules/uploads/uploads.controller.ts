@@ -2,6 +2,7 @@ import { BadRequestException, Controller, Post, UploadedFile, UseInterceptors } 
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UploadsService } from './services/uploads.service';
 import { ApiTags } from '@nestjs/swagger';
+import { withBaseResponse } from '#/shared/utils/with-base-response.util';
 
 @ApiTags('uploads')
 @Controller('uploads')
@@ -10,11 +11,15 @@ export class UploadsController {
 
   @Post('image')
   @UseInterceptors(FileInterceptor('file'))
-  async uploadImage(@UploadedFile() file: Express.Multer.File | undefined): Promise<{ url: string }> {
+  async uploadImage(@UploadedFile() file: Express.Multer.File | undefined) {
     if (!file) {
       throw new BadRequestException('Invalid file format');
     }
     const url = await this.uploadsService.uploadImage(file);
-    return { url };
+    return withBaseResponse({
+      status: 201,
+      message: 'Image uploaded successfully',
+      data: url,
+    });
   }
 }
