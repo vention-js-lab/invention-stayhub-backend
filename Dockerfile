@@ -25,7 +25,7 @@ COPY . .
 
 RUN npm run build
 RUN npx tsc typeorm.config.ts --outDir dist
-RUN npx tsc database/migrations/*.ts --outDir dist/database/migrations
+RUN npx tsc database/migrations/*.ts --outDir ./database/migrations
 
 # Stage 3: Creating image to run the application
 FROM node:22 AS production
