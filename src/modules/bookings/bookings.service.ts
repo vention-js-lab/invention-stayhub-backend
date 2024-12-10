@@ -1,4 +1,3 @@
-import { UpdateBookingStatusDto } from './dto/request/update-booking-status.req';
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Between } from 'typeorm';
@@ -78,8 +77,7 @@ export class BookingsService {
     return existingBooking;
   }
 
-  async updateStatus(bookingId: string, updateBookingStatusDto: UpdateBookingStatusDto) {
-    const { newStatus } = updateBookingStatusDto;
+  async updateStatus({ bookingId, newStatus }: { bookingId: string; newStatus: BookingStatus }) {
     const existingBooking = await this.bookingRepository.findOneBy({
       id: bookingId,
     });

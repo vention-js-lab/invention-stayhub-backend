@@ -119,7 +119,10 @@ describe('StripeService', () => {
         bookingId: 'mockBookingId',
       });
 
-      expect(bookingsService.updateStatus).toHaveBeenCalledWith('mockBookingId', { newStatus: BookingStatus.Upcoming });
+      expect(bookingsService.updateStatus).toHaveBeenCalledWith({
+        bookingId: 'mockBookingId',
+        newStatus: BookingStatus.Upcoming,
+      });
     });
   });
 });

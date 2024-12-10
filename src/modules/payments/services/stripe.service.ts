@@ -66,6 +66,9 @@ export class StripeService {
       return;
     }
 
-    await this.bookingsService.updateStatus(bookingId, { newStatus: BookingStatus.Upcoming });
+    await this.bookingsService.updateStatus({
+      bookingId,
+      newStatus: BookingStatus.Upcoming,
+    });
   }
 }
