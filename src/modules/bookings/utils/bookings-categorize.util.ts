@@ -12,7 +12,7 @@ export function categorizeBookings(bookings: Booking[]) {
     inactive: [],
     upcoming: [],
     completed: [],
-    cancelled: [],
+    canceled: [],
   };
 
   bookings.forEach((booking) => {

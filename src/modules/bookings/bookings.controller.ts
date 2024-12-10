@@ -34,8 +34,8 @@ export class BookingsController {
     description: 'User bookings successfully received.',
   })
   @ApiResponse({ status: 401, description: 'Unauthorized request.' })
-  async getUserBookings(@GetAccount('accountId') userId: string) {
-    const result = await this.bookingsService.getUserBookings(userId);
+  async getUserBookings(@GetAccount('accountId') accountId: string) {
+    const result = await this.bookingsService.getUserBookings(accountId);
 
     return withBaseResponse({
       status: 200,

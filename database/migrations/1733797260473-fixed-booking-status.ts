@@ -4,7 +4,7 @@ export class FixedBookingStatus1733797260473 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
       ALTER TYPE "booking_status_enum"
-      ADD VALUE 'cancelled';
+      ADD VALUE 'canceled';
     `);
   }
 
