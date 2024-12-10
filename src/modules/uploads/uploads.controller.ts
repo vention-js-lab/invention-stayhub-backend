@@ -15,11 +15,11 @@ export class UploadsController {
     if (!file) {
       throw new BadRequestException('Invalid file format');
     }
-    const url = await this.uploadsService.uploadImage(file);
+    const objectUrl = await this.uploadsService.uploadImage(file);
     return withBaseResponse({
       status: 201,
       message: 'Image uploaded successfully',
-      data: url,
+      data: { objectUrl },
     });
   }
 }
