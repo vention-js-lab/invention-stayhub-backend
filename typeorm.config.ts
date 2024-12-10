@@ -11,7 +11,7 @@ const DataSourceConfig = new DataSource({
   username: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
-  migrations: ['./database/migrations/*'],
+  migrations: ['./dist/database/migrations/*'],
   synchronize: false,
   migrationsTableName: 'migrations',
   uuidExtension: 'uuid-ossp',
