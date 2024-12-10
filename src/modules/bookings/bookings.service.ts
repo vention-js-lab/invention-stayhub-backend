@@ -1,3 +1,4 @@
+import { UpdateBookingStatusDto } from './dto/request/update-booking-status.req';
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Between } from 'typeorm';
@@ -6,6 +7,7 @@ import { Accommodation } from '#/modules/accommodations/entities/accommodation.e
 import { CreateBookingDto } from './dto/request/create-booking.req';
 import { BookingStatus } from '#/shared/constants/booking-status.constant';
 import { time } from '#/shared/libs/time.lib';
+import { categorizeBookings } from './utils/bookings-categorize.util';
 
 @Injectable()
 export class BookingsService {
@@ -56,6 +58,17 @@ export class BookingsService {
     return this.bookingRepository.save(booking);
   }
 
+  async getUserBookings(accountId: string) {
+    const userBookings = await this.bookingRepository.find({
+      where: { accountId },
+      relations: ['accommodation', 'accommodation.address'],
+    });
+
+    const categorizedBookings = categorizeBookings(userBookings);
+
+    return categorizedBookings;
+  }
+
   async getBookingById(bookingId: string, accountId: string) {
     const existingBooking = await this.bookingRepository.findOne({
       where: { id: bookingId, accountId },
@@ -65,7 +78,8 @@ export class BookingsService {
     return existingBooking;
   }
 
-  async updateStatus({ bookingId, newStatus }: { bookingId: string; newStatus: BookingStatus }) {
+  async updateStatus(bookingId: string, updateBookingStatusDto: UpdateBookingStatusDto) {
+    const { newStatus } = updateBookingStatusDto;
     const existingBooking = await this.bookingRepository.findOneBy({
       id: bookingId,
     });
