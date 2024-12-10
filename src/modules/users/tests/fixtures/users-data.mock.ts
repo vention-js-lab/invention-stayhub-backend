@@ -66,4 +66,5 @@ export const mockUpdateProfileDto: UpdateProfileDto = {
   country: faker.location.country(),
   description: faker.food.description(),
   phoneNumber: faker.phone.number(),
+  image: faker.image.avatar(),
 };

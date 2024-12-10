@@ -56,4 +56,13 @@ export class UpdateProfileDto {
   @IsOptional()
   @IsPhoneNumber()
   phoneNumber: string | undefined;
+
+  @ApiPropertyOptional({
+    description: 'Upload image',
+    required: false,
+    format: 'image url',
+  })
+  @IsOptional()
+  @IsString()
+  image: string | undefined;
 }
