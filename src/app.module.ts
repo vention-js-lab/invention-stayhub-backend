@@ -12,6 +12,7 @@ import { PaymentsModule } from './modules/payments/payments.module';
 import { UploadsModule } from './modules/uploads/uploads.module';
 import { BookingsModule } from './modules/bookings/bookings.module';
 import { ReviewsModule } from './modules/reviews/reviews.module';
+import { CategoriesModule } from './modules/categories/categories.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { ReviewsModule } from './modules/reviews/reviews.module';
     AccommodationsModule,
     PaymentsModule,
     BookingsModule,
+    CategoriesModule,
   ],
   providers: [],
 })
