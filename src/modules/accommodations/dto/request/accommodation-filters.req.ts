@@ -299,4 +299,13 @@ export class AccommodationFiltersReqQueryDto extends PaginationQueryDto {
   @TransformToBoolean()
   @IsBoolean()
   isQuietArea: boolean | undefined;
+
+  @ApiProperty({
+    name: 'category-names',
+    required: false,
+    type: String,
+  })
+  @IsOptional()
+  @IsString()
+  category?: string;
 }

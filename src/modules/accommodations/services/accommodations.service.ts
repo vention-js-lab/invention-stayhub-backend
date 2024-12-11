@@ -58,6 +58,12 @@ export class AccommodationsService {
       .leftJoinAndSelect('accommodation.images', 'image')
       .where('accommodation.deletedAt is NULL');
 
+    if (filters.category) {
+      queryBuilder
+        .leftJoinAndSelect('accommodation.categories', 'category')
+        .andWhere('category.name = :category', { category: filters.category });
+    }
+
     if (accountId) {
       queryBuilder.leftJoinAndSelect('accommodation.wishlist', 'wishlist', 'wishlist.accountId = :accountId', { accountId });
     }
@@ -67,8 +73,8 @@ export class AccommodationsService {
     addSearchFilters(queryBuilder, filters);
     addApartmentFilters(queryBuilder, filters);
     addAmenityFilters(queryBuilder, filters);
-    const { page, limit } = paginationParams(filters);
 
+    const { page, limit } = paginationParams(filters);
     const { skip, take } = getPaginationOffset(page, limit);
     queryBuilder.skip(skip).take(take);
 

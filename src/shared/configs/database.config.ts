@@ -12,6 +12,7 @@ import { Wishlist } from '#/modules/wishlists/entities/wishlist.entity';
 import { Payment } from '#/modules/payments/entities/payment.entity';
 import { Booking } from '#/modules/bookings/entities/booking.entity';
 import { Review } from '#/modules/reviews/entities/review.entity';
+import { Category } from '#/modules/categories/entities/categories.entity';
 
 export const databaseConfig = (configService: ConfigService<EnvConfig>): DataSourceOptions => ({
   type: 'postgres',
@@ -32,6 +33,7 @@ export const databaseConfig = (configService: ConfigService<EnvConfig>): DataSou
     Wishlist,
     Payment,
     Booking,
+    Category,
   ],
   synchronize: false,
 });

@@ -9,6 +9,8 @@ import {
   UpdateDateColumn,
   ManyToOne,
   DeleteDateColumn,
+  ManyToMany,
+  JoinTable,
 } from 'typeorm';
 import { AccommodationImage } from './accommodation-image.entity';
 import { AccommodationAmenity } from './accommodation-amenity.entity';
@@ -17,6 +19,7 @@ import { Account } from '#/modules/users/entities/account.entity';
 import { Wishlist } from '#/modules/wishlists/entities/wishlist.entity';
 import { Review } from '#/modules/reviews/entities/review.entity';
 import { Booking } from '#/modules/bookings/entities/booking.entity';
+import { Category } from '#/modules/categories/entities/categories.entity';
 
 @Entity('accommodation')
 export class Accommodation {
@@ -88,4 +91,18 @@ export class Accommodation {
 
   @OneToMany(() => Booking, (booking) => booking.accommodation)
   bookings: Booking[];
+
+  @ManyToMany(() => Category, (category) => category.accommodations, { onDelete: 'SET NULL' })
+  @JoinTable({
+    name: 'accommodation_category',
+    joinColumn: {
+      name: 'accommodation_id',
+      referencedColumnName: 'id',
+    },
+    inverseJoinColumn: {
+      name: 'category_id',
+      referencedColumnName: 'id',
+    },
+  })
+  categories: Category[];
 }
