@@ -1,3 +1,4 @@
+import { UpdateBookingStatusDto } from './dto/request/update-booking-status.req';
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Between } from 'typeorm';
@@ -60,7 +61,7 @@ export class BookingsService {
   async getUserBookings(accountId: string) {
     const userBookings = await this.bookingRepository.find({
       where: { accountId },
-      relations: ['accommodation', 'accommodation.address'],
+      relations: ['accommodation', 'accommodation.address', 'accommodation.images'],
     });
 
     const categorizedBookings = categorizeBookings(userBookings);
@@ -77,7 +78,7 @@ export class BookingsService {
     return existingBooking;
   }
 
-  async updateStatus({ bookingId, newStatus }: { bookingId: string; newStatus: BookingStatus }) {
+  async updateStatus(bookingId: string, updateBookingStatusDto: UpdateBookingStatusDto) {
     const existingBooking = await this.bookingRepository.findOneBy({
       id: bookingId,
     });
@@ -86,7 +87,7 @@ export class BookingsService {
       throw new BadRequestException('Booking does not exist');
     }
 
-    existingBooking.status = newStatus;
+    existingBooking.status = updateBookingStatusDto.newStatus;
 
     await this.bookingRepository.save(existingBooking);
   }
