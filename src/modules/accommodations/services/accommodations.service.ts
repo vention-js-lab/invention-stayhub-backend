@@ -146,7 +146,7 @@ export class AccommodationsService {
       throw new ForbiddenException('You are not the owner of this accommodation');
     }
 
-    const { address, amenity, ...accommodationDetails } = updateAccommodationDto;
+    const { address, amenity, images, ...accommodationDetails } = updateAccommodationDto;
 
     const filteredDetaills = Object.entries(updateAccommodationDto).filter(([, value]) => value !== undefined);
     const definedDetails = Object.fromEntries(filteredDetaills);
@@ -163,6 +163,10 @@ export class AccommodationsService {
 
     if (amenity) {
       await this.accommodationAmenityService.update(accommodation.amenity.id, amenity);
+    }
+
+    if (images) {
+      await this.accommodationImageService.update(accommodationId, images);
     }
     return await this.getAccommodationById(accommodationId);
   }
