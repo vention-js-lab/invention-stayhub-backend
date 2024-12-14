@@ -59,7 +59,6 @@ describe('ReviewsService', () => {
           bookingId: '9ae5e450-7c4c-4b58-b244-535f04a06325',
           rating: 5,
           content: 'Great!',
-          accommodationId: '9ae5e450-7c4c-4b58-b244-535f04a06325',
         }),
       ).rejects.toThrow(new NotFoundException('Booking not found.'));
     });
@@ -76,7 +75,6 @@ describe('ReviewsService', () => {
           bookingId: '9ae5e450-7c4c-4b58-b244-535f04a06325',
           rating: 5,
           content: 'Great!',
-          accommodationId: '9ae5e450-7c4c-4b58-b244-535f04a06325',
         }),
       ).rejects.toThrow(new BadRequestException('You can only add a review after your booking has been completed.'));
     });
@@ -93,7 +91,6 @@ describe('ReviewsService', () => {
           bookingId: 'd4f75e3a-dd77-4b86-bab8-f1ad2cc7349c',
           rating: 5,
           content: 'Great!',
-          accommodationId: '9ae5e450-7c4c-4b58-b244-535f04a06325',
         }),
       ).rejects.toThrow(new ForbiddenException('Accommodation not found.'));
     });
@@ -112,7 +109,6 @@ describe('ReviewsService', () => {
           bookingId: 'd4f75e3a-dd77-4b86-bab8-f1ad2cc7349c',
           rating: 5,
           content: 'Great!',
-          accommodationId: '9ae5e450-7c4c-4b58-b244-535f04a06325',
         }),
       ).rejects.toThrow(new NotFoundException('Accommodation not found.'));
     });
@@ -141,7 +137,6 @@ describe('ReviewsService', () => {
         bookingId: '9ae5e450-7c4c-4b58-b244-535f04a06325',
         rating: 5,
         content: 'Great!',
-        accommodationId: '9ae5e450-7c4c-4b58-b244-535f04a06325',
       });
 
       expect(result).toEqual(mockReviewData);
