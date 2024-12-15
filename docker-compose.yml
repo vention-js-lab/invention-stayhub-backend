@@ -33,13 +33,15 @@ services:
       MINIO_PORT: ${MINIO_PORT}
       MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
       MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
+      STRIPE_PRIVATE_API_KEY: ${STRIPE_PRIVATE_API_KEY}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET}
     depends_on:
       - db
       - minio
     networks:
       app-network:
     command: >
-      sh -c "npx typeorm migration:run -d dist/typeorm.config.js && npm run start:prod"
+      sh -c "npx typeorm-ts-node-commonjs migration:run -d dist/typeorm.config.js && npm run start:prod"
 
   db:
     container_name: db
