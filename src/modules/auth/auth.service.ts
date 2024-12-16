@@ -169,7 +169,7 @@ export class AuthService {
   async googleLogin(user: GoogleUser) {
     const { googleId, email, firstName, lastName, picture } = user;
 
-    const existingUser = await this.findByGoogleId(googleId);
+    let existingUser = await this.findByGoogleId(googleId);
 
     if (!existingUser) {
       const newAccount = this.accountRepository.create({
@@ -177,20 +177,35 @@ export class AuthService {
         email,
         type: AccountType.Google,
       });
+
       const newProfile = this.profileRepository.create({
         firstName,
         lastName,
         image: picture,
       });
+
       await this.accountRepository.save(newAccount);
-
       newProfile.accountId = newAccount.id;
-
       await this.profileRepository.save(newProfile);
+
+      existingUser = newAccount;
     }
+
+    const payload = {
+      sub: existingUser.id,
+      userEmail: existingUser.email,
+      userRole: existingUser.role,
+    };
+
+    const accessToken = await this.generateAuthToken(payload, 'access');
+    const refreshToken = await this.generateAuthToken(payload, 'refresh');
+
+    const refreshTokenEntity = this.createRefreshTokenEntity(refreshToken);
+    await this.refreshTokenRepository.insert(refreshTokenEntity);
+
     return {
-      message: 'User info From Google',
-      user,
+      accessToken,
+      refreshToken,
     };
   }
 

@@ -3,6 +3,5 @@ export type GoogleUser = {
   firstName: string;
   lastName?: string;
   picture?: string;
-  accessToken?: string;
   googleId?: string;
 };
