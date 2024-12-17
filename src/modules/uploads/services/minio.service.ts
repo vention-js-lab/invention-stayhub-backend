@@ -8,14 +8,15 @@ export class MinioService {
   private client: Client;
 
   constructor(private readonly configService: ConfigService<EnvConfig, true>) {
-    this.client = new Client({
-      endPoint: this.configService.get('MINIO_ENDPOINT'),
-      port: this.configService.get('MINIO_PORT'),
-      useSSL: false,
-      accessKey: this.configService.get('MINIO_ACCESS_KEY'),
-      secretKey: this.configService.get('MINIO_SECRET_KEY'),
-      // region: this.configService.get('MINIO_REGION'),
-    });
+    const config = {
+      endPoint: this.configService.get('CLOUDFLARE_ENDPOINT'),
+      port: this.configService.get('CLOUDFLARE_PORT'),
+      useSSL: this.configService.get('CLOUDFLARE_USE_SSL'),
+      accessKey: this.configService.get('CLOUDFLARE_ROOT_USER'),
+      secretKey: this.configService.get('CLOUDFLARE_ROOT_PASSWORD'),
+    };
+
+    this.client = new Client(config);
   }
 
   getClient(): Client {
