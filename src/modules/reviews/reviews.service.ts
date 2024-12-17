@@ -1,3 +1,4 @@
+import { UpdateReviewDto } from './dto/request/update-review.req';
 import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { Review } from './entities/review.entity';
 import { CreateReviewDto } from './dto/request/create-review.req';
@@ -14,6 +15,14 @@ export class ReviewsService {
     @InjectRepository(Review) private readonly reviewRepository: Repository<Review>,
     @InjectRepository(Accommodation) private readonly accommodationRepository: Repository<Accommodation>,
   ) {}
+
+  async getUserReviews(accountId: string) {
+    const userReviews = await this.reviewRepository.find({
+      where: { accountId },
+    });
+
+    return userReviews;
+  }
 
   async createReview(accountId: string, createReviewDto: CreateReviewDto): Promise<Review> {
     const { bookingId, rating, content } = createReviewDto;
@@ -61,5 +70,41 @@ export class ReviewsService {
     });
 
     return await this.reviewRepository.save(review);
+  }
+
+  async updateReview(accountId: string, reviewId: string, updateReviewDto: UpdateReviewDto) {
+    const review = await this.reviewRepository.findOne({
+      where: { id: reviewId },
+    });
+    if (!review) {
+      throw new NotFoundException('Review not found');
+    }
+    if (accountId !== review.accountId) {
+      throw new ForbiddenException('Only author can update review');
+    }
+
+    if (updateReviewDto.content) {
+      review.content = updateReviewDto.content;
+    }
+    if (updateReviewDto.rating) {
+      review.rating = updateReviewDto.rating;
+    }
+
+    const savedReview = await this.reviewRepository.save(review);
+    return savedReview;
+  }
+
+  async deleteReview(accountId: string, reviewId: string) {
+    const review = await this.reviewRepository.findOne({
+      where: { id: reviewId },
+    });
+    if (!review) {
+      throw new NotFoundException('Review not found');
+    }
+    if (accountId !== review.accountId) {
+      throw new ForbiddenException('Only author can delete review');
+    }
+
+    await this.reviewRepository.remove(review);
   }
 }
