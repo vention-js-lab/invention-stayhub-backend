@@ -33,6 +33,8 @@ const envConfigSchema = z.object({
 
   STRIPE_PRIVATE_API_KEY: z.string(),
   STRIPE_WEBHOOK_SECRET: z.string(),
+
+  RESEND_API_KEY: z.string(),
 });
 
 export type EnvConfig = z.infer<typeof envConfigSchema>;

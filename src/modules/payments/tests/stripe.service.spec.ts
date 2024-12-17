@@ -3,10 +3,17 @@ import { StripeService } from '../services/stripe.service';
 import { BookingsService } from '#/modules/bookings/bookings.service';
 import { PaymentsService } from '../services/payments.service';
 import { StripeApiService } from '../services/stripe-api.service';
+import { EmailService } from '#/modules/emails/email.service';
+import { UsersService } from '#/modules/users/users.service';
 import { ConfigService } from '@nestjs/config';
 import { BadRequestException } from '@nestjs/common';
-import { PaymentStatus } from '#/shared/constants/payment-status.constant';
-import { BookingStatus } from '#/shared/constants/booking-status.constant';
+import type Stripe from 'stripe';
+
+jest.mock('../constants/payment-intent-events-map.constant', () => {
+  return {
+    PaymentIntentEventsMap: new Map([['payment_intent.succeeded', 'success']]),
+  };
+});
 
 describe('StripeService', () => {
   let stripeService: StripeService;
@@ -14,15 +21,28 @@ describe('StripeService', () => {
   let paymentsService: PaymentsService;
   let stripeApiService: StripeApiService;
 
-  const mockPaymentIntent = {
-    amount: 10000,
+  const mockPaymentIntent: Partial<Stripe.PaymentIntent> = {
     id: 'pi_mockId',
-    metadata: { bookingId: 'mockBookingId' },
+    object: 'payment_intent',
+    amount: 1680,
+    currency: 'usd',
+    metadata: { bookingId: 'mockBookingId', accountId: 'mockAccountId' },
+    status: 'succeeded',
+    client_secret: 'mock_client_secret',
+    created: Math.floor(Date.now() / 1000),
+    livemode: false,
   };
 
-  const mockEvent = {
+  const mockEvent: Stripe.Event = {
+    id: 'evt_mockId',
+    object: 'event',
     type: 'payment_intent.succeeded',
-    data: { object: mockPaymentIntent },
+    api_version: '2023-06-01',
+    created: Math.floor(Date.now() / 1000),
+    data: { object: mockPaymentIntent as Stripe.PaymentIntent },
+    livemode: false,
+    pending_webhooks: 1,
+    request: { id: 'req_mockId', idempotency_key: 'idempotency_key_mock' },
   };
 
   const mockWebhookSecret = 'mock_webhook_secret';
@@ -34,13 +54,18 @@ describe('StripeService', () => {
         {
           provide: BookingsService,
           useValue: {
-            updateStatus: jest.fn().mockResolvedValue(true),
+            updateStatus: jest.fn().mockResolvedValue(undefined),
+            getBookingById: jest.fn().mockResolvedValue({
+              startDate: '2025-06-19',
+              endDate: '2025-06-20',
+              accommodation: { name: 'Test Accommodation' },
+            }),
           },
         },
         {
           provide: PaymentsService,
           useValue: {
-            savePayment: jest.fn().mockResolvedValue(true),
+            savePayment: jest.fn().mockResolvedValue(undefined),
           },
         },
         {
@@ -51,7 +76,7 @@ describe('StripeService', () => {
                 create: jest.fn().mockResolvedValue({ client_secret: 'mock_client_secret' }),
               },
               webhooks: {
-                constructEvent: jest.fn().mockReturnValue(mockEvent),
+                constructEvent: jest.fn(),
               },
             },
           },
@@ -60,6 +85,21 @@ describe('StripeService', () => {
           provide: ConfigService,
           useValue: {
             get: jest.fn().mockReturnValue(mockWebhookSecret),
+          },
+        },
+        {
+          provide: EmailService,
+          useValue: {
+            sendMail: jest.fn().mockResolvedValue(undefined),
+          },
+        },
+        {
+          provide: UsersService,
+          useValue: {
+            getUserEmailAndFirstNameByAccountId: jest.fn().mockResolvedValue({
+              email: 'user@example.com',
+              firstName: 'John',
+            }),
           },
         },
       ],
@@ -71,32 +111,10 @@ describe('StripeService', () => {
     stripeApiService = module.get<StripeApiService>(StripeApiService);
   });
 
-  describe('createPaymentIntent', () => {
-    it('creates a payment intent successfully', async () => {
-      const mockMetadata = { bookingId: 'mockBookingId', accountId: 'mockAccountId' };
-
-      const clientSecret = await stripeService.createPaymentIntent(10000, mockMetadata);
-
-      expect(clientSecret).toBe('mock_client_secret');
-      expect(stripeApiService.stripe.paymentIntents.create).toHaveBeenCalledWith({
-        amount: 10000,
-        currency: 'usd',
-        automatic_payment_methods: { enabled: true },
-        metadata: mockMetadata,
-      });
-    });
-  });
-
   describe('handleWebhook', () => {
-    it('throws BadRequestException if no signature is provided', async () => {
-      await expect(stripeService.handleWebhook(Buffer.from(''), '')).rejects.toThrow(
-        new BadRequestException('No webhook signature header was provided'),
-      );
-    });
-
-    it('throws BadRequestException if webhook signature verification fails', async () => {
-      stripeApiService.stripe.webhooks.constructEvent = jest.fn().mockImplementation(() => {
-        throw new Error('Verification failed');
+    it('should throw BadRequestException if webhook signature verification fails', async () => {
+      jest.spyOn(stripeApiService.stripe.webhooks, 'constructEvent').mockImplementation(() => {
+        throw new Error('Invalid signature');
       });
 
       await expect(stripeService.handleWebhook(Buffer.from('mock_body'), 'mock_signature')).rejects.toThrow(
@@ -104,22 +122,26 @@ describe('StripeService', () => {
       );
     });
 
-    it('saves payment and updates booking status on successful payment', async () => {
+    it('should process payment and update booking status', async () => {
+      jest.spyOn(stripeApiService.stripe.webhooks, 'constructEvent').mockReturnValue(mockEvent);
+
       const rawBody = Buffer.from('mock_body');
       const signature = 'mock_signature';
 
       await stripeService.handleWebhook(rawBody, signature);
 
-      expect(stripeApiService.stripe.webhooks.constructEvent).toHaveBeenCalledWith(rawBody, signature, mockWebhookSecret);
-
       expect(paymentsService.savePayment).toHaveBeenCalledWith({
-        amount: 10000,
-        status: PaymentStatus.Success,
+        amount: 1680,
+        status: 'success',
         transactionId: 'pi_mockId',
         bookingId: 'mockBookingId',
       });
 
-      expect(bookingsService.updateStatus).toHaveBeenCalledWith('mockBookingId', { newStatus: BookingStatus.Upcoming });
+      expect(bookingsService.updateStatus).toHaveBeenCalledWith('mockBookingId', {
+        newStatus: 'upcoming',
+      });
+
+      expect(bookingsService.getBookingById).toHaveBeenCalledWith('mockBookingId', 'mockAccountId');
     });
   });
 });

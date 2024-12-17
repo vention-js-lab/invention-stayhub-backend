@@ -49,6 +49,24 @@ export class UsersService {
     };
   }
 
+  async getUserEmailAndFirstNameByAccountId(accountId: string): Promise<{ email: string; firstName: string }> {
+    const account = await this.accountRepository
+      .createQueryBuilder('account')
+      .leftJoinAndSelect('account.profile', 'profile')
+      .where('account.id = :accountId', { accountId })
+      .select(['account.email', 'profile.firstName'])
+      .getOne();
+
+    if (!account) {
+      throw new NotFoundException('User account not found');
+    }
+
+    return {
+      email: account.email,
+      firstName: account.profile.firstName,
+    };
+  }
+
   async getProfile(accountId: string) {
     const account = await this.accountRepository.findOne({
       where: { id: accountId },

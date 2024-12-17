@@ -13,6 +13,7 @@ import { UploadsModule } from './modules/uploads/uploads.module';
 import { BookingsModule } from './modules/bookings/bookings.module';
 import { ReviewsModule } from './modules/reviews/reviews.module';
 import { CategoriesModule } from './modules/categories/categories.module';
+import { EmailModule } from './modules/emails/email.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { CategoriesModule } from './modules/categories/categories.module';
     PaymentsModule,
     BookingsModule,
     CategoriesModule,
+    EmailModule,
   ],
   providers: [],
 })
