@@ -151,7 +151,7 @@ export class UsersController {
     const result = await this.usersService.softDeleteAccount(deleteActorId, deletingAccountId);
 
     return withBaseResponse({
-      status: 200,
+      status: 204,
       message: 'Account successfully deleted',
       data: result,
     });
