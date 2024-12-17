@@ -30,6 +30,7 @@ const envConfigSchema = z.object({
   MINIO_ACCESS_KEY: z.string(),
   MINIO_SECRET_KEY: z.string(),
   MINIO_PORT: z.coerce.number().int().positive(),
+  MINIO_REGION: z.string(),
 
   STRIPE_PRIVATE_API_KEY: z.string(),
   STRIPE_WEBHOOK_SECRET: z.string(),
