@@ -9,9 +9,14 @@ import { AccommodationAmenityService } from './services/accommodation-amenity.se
 import { AccommodationAmenity } from './entities/accommodation-amenity.entity';
 import { AccommodationAddress } from './entities/accommodation-address.entity';
 import { AccommodationImage } from './entities/accommodation-image.entity';
+import { Category } from '../categories/entities/categories.entity';
+import { CategoriesModule } from '../categories/categories.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Accommodation, AccommodationAmenity, AccommodationAddress, AccommodationImage])],
+  imports: [
+    TypeOrmModule.forFeature([Accommodation, AccommodationAmenity, AccommodationAddress, AccommodationImage, Category]),
+    CategoriesModule,
+  ],
   controllers: [AccommodationsController],
   providers: [AccommodationsService, AccommodationAddressService, AccommodationImageService, AccommodationAmenityService],
   exports: [AccommodationsService],

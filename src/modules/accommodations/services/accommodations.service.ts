@@ -1,7 +1,7 @@
 import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Accommodation } from '../entities/accommodation.entity';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { AccommodationAddressService } from './accommodation-address.service';
 import { AccommodationAmenityService } from './accommodation-amenity.service';
 import { AccommodationImageService } from './accommodation-image.service';
@@ -20,20 +20,24 @@ import { paginationParams } from '../utils/pagination-params.util';
 import { time } from '#/shared/libs/time.lib';
 import { TimeFormat } from '#/shared/constants/time.constant';
 import { addIsSavedToWishlistProperty } from '../utils/is-saved-to-wishlist.util';
+import { Category } from '#/modules/categories/entities/categories.entity';
 
 @Injectable()
 export class AccommodationsService {
   constructor(
     @InjectRepository(Accommodation)
     private accommodationRepository: Repository<Accommodation>,
+    @InjectRepository(Category)
+    private categoryRepository: Repository<Category>,
     private accommodationAddressService: AccommodationAddressService,
     private accommodationAmenityService: AccommodationAmenityService,
     private accommodationImageService: AccommodationImageService,
   ) {}
 
   async create({ createAccommodationDto, ownerId }: CreateAccommodationParams): Promise<Accommodation> {
+    const { categories, ...accommodationData } = createAccommodationDto;
     const accommodation = this.accommodationRepository.create({
-      ...createAccommodationDto,
+      ...accommodationData,
       ownerId,
     });
     const createdAccommodation = await this.accommodationRepository.save(accommodation);
@@ -43,6 +47,14 @@ export class AccommodationsService {
     await this.accommodationAmenityService.create(createdAccommodation.id, createAccommodationDto.amenity);
 
     await this.accommodationImageService.create(createdAccommodation.id, createAccommodationDto.images);
+
+    if (categories.length > 0) {
+      const selectedCategories = await this.categoryRepository.findBy({
+        id: In(categories),
+      });
+      createdAccommodation.categories = selectedCategories;
+      await this.accommodationRepository.save(createdAccommodation);
+    }
 
     return this.accommodationRepository.findOneOrFail({
       where: { id: createdAccommodation.id },
@@ -104,6 +116,7 @@ export class AccommodationsService {
       .leftJoinAndSelect('accommodation.bookings', 'bookings')
       .leftJoinAndSelect('reviews.account', 'account')
       .leftJoinAndSelect('account.profile', 'profile')
+      .leftJoinAndSelect('accommodation.categories', 'categories')
       .where('accommodation.id = :id', { id })
       .andWhere('accommodation.deletedAt IS NULL')
       .getOne();
@@ -133,6 +146,7 @@ export class AccommodationsService {
           photo: review.account.profile.image,
           createdAt: time(review.account.profile.createdAt).format(TimeFormat.CalendarWithTime),
         },
+        categories: accommodation.categories,
       })),
     };
 
@@ -146,7 +160,7 @@ export class AccommodationsService {
       throw new ForbiddenException('You are not the owner of this accommodation');
     }
 
-    const { address, amenity, ...accommodationDetails } = updateAccommodationDto;
+    const { address, amenity, images, ...accommodationDetails } = updateAccommodationDto;
 
     const filteredDetaills = Object.entries(updateAccommodationDto).filter(([, value]) => value !== undefined);
     const definedDetails = Object.fromEntries(filteredDetaills);
@@ -163,6 +177,10 @@ export class AccommodationsService {
 
     if (amenity) {
       await this.accommodationAmenityService.update(accommodation.amenity.id, amenity);
+    }
+
+    if (images) {
+      await this.accommodationImageService.update(accommodationId, images);
     }
     return await this.getAccommodationById(accommodationId);
   }
