@@ -15,9 +15,7 @@ export class UploadsService {
   ) {}
 
   async uploadImage(file: Express.Multer.File) {
-    const protocol = this.configService.get('APP_ENV') === 'production' ? 'https' : 'http';
-    const endpoint = this.configService.get('MINIO_ENDPOINT', { infer: true });
-    const port = this.configService.get('MINIO_PORT', { infer: true });
+    const url = this.configService.get<string>('CLOUDFLARE_IMAGE_URL', { infer: true });
 
     const fileExtension = path.extname(file.originalname);
     const fileName = `${uuidv4()}${fileExtension}`;
@@ -26,7 +24,7 @@ export class UploadsService {
     try {
       const minioClient = this.minioService.getClient();
       await minioClient.putObject(this.bucketName, fileName, file.buffer, file.size, metaData);
-      return `${protocol}://${endpoint}:${port}/${this.bucketName}/${fileName}`;
+      return `${url}/${fileName}`;
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
 
