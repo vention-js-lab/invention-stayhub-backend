@@ -24,12 +24,12 @@ const envConfigSchema = z.object({
   CORS_ALLOWED_ORIGINS: z.string(),
   CORS_ALLOWED_METHODS: z.string(),
 
-  MINIO_ROOT_USER: z.string(),
-  MINIO_ROOT_PASSWORD: z.string(),
-  MINIO_ENDPOINT: z.string(),
-  MINIO_ACCESS_KEY: z.string(),
-  MINIO_SECRET_KEY: z.string(),
-  MINIO_PORT: z.coerce.number().int().positive(),
+  CLOUDFLARE_ROOT_USER: z.string(),
+  CLOUDFLARE_ROOT_PASSWORD: z.string(),
+  CLOUDFLARE_ENDPOINT: z.string(),
+  CLOUDFLARE_PORT: z.coerce.number().int().positive(),
+  CLOUDFLARE_USE_SSL: z.coerce.boolean(),
+  CLOUDFLARE_IMAGE_URL: z.string(),
 
   STRIPE_PRIVATE_API_KEY: z.string(),
   STRIPE_WEBHOOK_SECRET: z.string(),
