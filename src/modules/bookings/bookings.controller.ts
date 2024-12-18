@@ -1,4 +1,5 @@
-import { Controller, Post, Body, UseGuards, Get } from '@nestjs/common/';
+import { UpdateBookingStatusDto } from './dto/request/update-booking-status.req';
+import { Controller, Post, Body, UseGuards, Get, Param, Put } from '@nestjs/common/';
 import { ApiTags, ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { BookingsService } from './bookings.service';
 import { CreateBookingDto } from './dto/request/create-booking.req';
@@ -36,6 +37,25 @@ export class BookingsController {
   @ApiResponse({ status: 401, description: 'Unauthorized request.' })
   async getUserBookings(@GetAccount('accountId') accountId: string) {
     const result = await this.bookingsService.getUserBookings(accountId);
+
+    return withBaseResponse({
+      status: 200,
+      message: 'User bookings successfully received',
+      data: result,
+    });
+  }
+
+  @Put(':bookingId')
+  @ApiBearerAuth()
+  @UseGuards(AccessTokenGuard)
+  @ApiOperation({ summary: 'Update booking status' })
+  @ApiResponse({
+    status: 200,
+    description: 'Booking status successfully updated.',
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized request.' })
+  async updateStatus(@Param('bookingId') bookingId: string, @Body() updateBookingStatusDto: UpdateBookingStatusDto) {
+    const result = await this.bookingsService.updateStatus(bookingId, updateBookingStatusDto);
 
     return withBaseResponse({
       status: 200,

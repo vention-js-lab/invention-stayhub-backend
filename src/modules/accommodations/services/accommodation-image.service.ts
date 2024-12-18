@@ -22,4 +22,24 @@ export class AccommodationImageService {
 
     return createdAccommodationImages;
   }
+
+  async update(accommodationId: string, updateAccommodationImagesDto: AccommodationImageDto[]): Promise<AccommodationImage[]> {
+    const existingImages = await this.accommodationImageRepository.find({
+      where: { accommodationId },
+    });
+
+    if (existingImages.length > 0) {
+      await this.accommodationImageRepository.remove(existingImages);
+    }
+
+    const newAccommodationImages = updateAccommodationImagesDto.map((imageDto) =>
+      this.accommodationImageRepository.create({
+        ...imageDto,
+        accommodationId,
+      }),
+    );
+    const createdAccommodationImages = await this.accommodationImageRepository.save(newAccommodationImages);
+
+    return createdAccommodationImages;
+  }
 }

@@ -1,7 +1,7 @@
-import { IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID, Max, Min } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsOptional, IsString, Max, Min } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
-export class CreateReviewDto {
+export class UpdateReviewDto {
   @ApiProperty({
     description: 'Content of the review.',
   })
@@ -14,17 +14,10 @@ export class CreateReviewDto {
     minimum: 1,
     maximum: 5,
   })
+  @IsOptional()
   @IsNotEmpty({ message: 'Rating is required.' })
   @IsNumber({}, { message: 'Rating must be a number.' })
   @Min(1, { message: 'Rating must be at least 1.' })
   @Max(5, { message: 'Rating must be at most 5.' })
   rating: number;
-
-  @ApiProperty({
-    description: 'ID of the booking associated with the review.',
-  })
-  @IsNotEmpty()
-  @IsUUID('4')
-  @IsString()
-  bookingId: string;
 }
