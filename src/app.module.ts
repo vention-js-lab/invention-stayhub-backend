@@ -14,6 +14,7 @@ import { BookingsModule } from './modules/bookings/bookings.module';
 import { ReviewsModule } from './modules/reviews/reviews.module';
 import { CategoriesModule } from './modules/categories/categories.module';
 import { EmailModule } from './modules/emails/email.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { EmailModule } from './modules/emails/email.module';
       inject: [ConfigService],
       useFactory: databaseConfig,
     }),
+    ScheduleModule.forRoot(),
     ReviewsModule,
     UploadsModule,
     WishlistsModule,

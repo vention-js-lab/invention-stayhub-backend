@@ -1,13 +1,14 @@
 import { UpdateBookingStatusDto } from './dto/request/update-booking-status.req';
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Between } from 'typeorm';
+import { Repository, Between, LessThanOrEqual } from 'typeorm';
 import { Booking } from './entities/booking.entity';
 import { Accommodation } from '#/modules/accommodations/entities/accommodation.entity';
 import { CreateBookingDto } from './dto/request/create-booking.req';
 import { BookingStatus } from '#/shared/constants/booking-status.constant';
 import { time } from '#/shared/libs/time.lib';
 import { categorizeBookings } from './utils/bookings-categorize.util';
+import { Cron, CronExpression } from '@nestjs/schedule';
 
 @Injectable()
 export class BookingsService {
@@ -90,5 +91,34 @@ export class BookingsService {
     existingBooking.status = updateBookingStatusDto.newStatus;
 
     await this.bookingRepository.save(existingBooking);
+  }
+
+  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
+  async updateBookingStatuses() {
+    const today = time().startOf('day').toDate();
+
+    const upcomingBookings = await this.bookingRepository.find({
+      where: {
+        status: BookingStatus.Upcoming,
+        startDate: LessThanOrEqual(today),
+      },
+    });
+
+    for (const booking of upcomingBookings) {
+      booking.status = BookingStatus.Active;
+    }
+    await this.bookingRepository.save(upcomingBookings);
+
+    const activeBookings = await this.bookingRepository.find({
+      where: {
+        status: BookingStatus.Active,
+        endDate: LessThanOrEqual(today),
+      },
+    });
+
+    for (const booking of activeBookings) {
+      booking.status = BookingStatus.Completed;
+    }
+    await this.bookingRepository.save(activeBookings);
   }
 }
