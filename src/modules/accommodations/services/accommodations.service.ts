@@ -46,13 +46,15 @@ export class AccommodationsService {
 
     await this.accommodationAmenityService.create(createdAccommodation.id, createAccommodationDto.amenity);
 
-    await this.accommodationImageService.create(createdAccommodation.id, createAccommodationDto.images);
+    const images = await this.accommodationImageService.create(createdAccommodation.id, createAccommodationDto.images);
 
     if (categories.length > 0) {
       const selectedCategories = await this.categoryRepository.findBy({
         id: In(categories),
       });
       createdAccommodation.categories = selectedCategories;
+      createdAccommodation.images = images;
+
       await this.accommodationRepository.save(createdAccommodation);
     }
 
