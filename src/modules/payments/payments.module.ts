@@ -9,9 +9,11 @@ import { BookingsModule } from '../bookings/bookings.module';
 import { AccommodationsModule } from '../accommodations/accommodations.module';
 import { StripeApiService } from './services/stripe-api.service';
 import { CheckoutService } from './services/checkout.service';
+import { EmailModule } from '../emails/email.module';
+import { UsersModule } from '../users/users.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Payment, Booking]), BookingsModule, AccommodationsModule],
+  imports: [TypeOrmModule.forFeature([Payment, Booking]), BookingsModule, AccommodationsModule, EmailModule, UsersModule],
   controllers: [PaymentsController],
   providers: [PaymentsService, CheckoutService, StripeApiService, StripeService],
 })

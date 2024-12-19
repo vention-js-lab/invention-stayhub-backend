@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsBoolean, IsDateString, IsNumber, Min, ValidateNested } from 'class-validator';
+import { IsString, IsBoolean, IsDateString, IsNumber, Min, ValidateNested, IsArray } from 'class-validator';
 import { AccommodationImageDto } from './create-accommodation-image.req';
 import { AccommodationAmenityDto } from './create-accommodation-amenity.req';
 import { AccommodationAddressDto } from './create-accommodation-address.req';
@@ -49,6 +49,11 @@ export class AccommodationDto {
   @ApiProperty({ description: 'Allowed number of people in the accommodation' })
   @IsNumber()
   allowedNumberOfPeople: number;
+
+  @ApiProperty({ description: 'Categories of the accommodation' })
+  @IsArray()
+  @IsString({ each: true })
+  categories: string[];
 
   @ApiProperty({ description: 'Images related to the accommodation' })
   @ValidateNested({ each: true })

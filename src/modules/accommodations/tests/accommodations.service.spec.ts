@@ -8,11 +8,14 @@ import { AccommodationAmenityService } from '../services/accommodation-amenity.s
 import { AccommodationImageService } from '../services/accommodation-image.service';
 import { time } from '#/shared/libs/time.lib';
 import { TimeFormat } from '#/shared/constants/time.constant';
+import { Category } from '#/modules/categories/entities/categories.entity';
 
 const mockAccommodationRepository = {
   createQueryBuilder: jest.fn(),
 };
-
+const mockCategoryRepository = {
+  findOne: jest.fn(),
+};
 const mockAccommodationAddressService = {
   create: jest.fn(),
   update: jest.fn(),
@@ -33,6 +36,10 @@ describe('AccommodationsService', () => {
         {
           provide: getRepositoryToken(Accommodation),
           useValue: mockAccommodationRepository,
+        },
+        {
+          provide: getRepositoryToken(Category),
+          useValue: mockCategoryRepository,
         },
         {
           provide: AccommodationAddressService,
