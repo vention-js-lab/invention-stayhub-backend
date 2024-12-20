@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Accommodation } from '../entities/accommodation.entity';
@@ -137,14 +138,23 @@ export class AccommodationsService {
         endDate: time(booking.endDate).format(TimeFormat.Calendar),
         status: booking.status,
       })),
-      owner: {
-        id: accommodation.owner.id,
-        firstName: accommodation.owner.profile.firstName,
-        lastName: accommodation.owner.profile.lastName,
-        description: accommodation.owner.profile.description,
-        avatar: accommodation.owner.profile.image,
-        createdAt: time(accommodation.owner.profile.createdAt).format(TimeFormat.CalendarWithTime),
-      },
+      owner: accommodation.owner
+        ? {
+            id: accommodation.owner.id,
+            firstName: accommodation.owner.profile.firstName,
+            lastName: accommodation.owner.profile.lastName,
+            description: accommodation.owner.profile.description,
+            avatar: accommodation.owner.profile.image,
+            createdAt: time(accommodation.owner.profile.createdAt).format(TimeFormat.CalendarWithTime),
+          }
+        : {
+            id: randomUUID(),
+            firstName: 'John',
+            lastName: 'Doe',
+            description: 'Fake user',
+            avatar: null,
+            createdAt: time().format(TimeFormat.CalendarWithTime),
+          },
       reviews: accommodation.reviews.map((review) => ({
         id: review.id,
         content: review.content,
