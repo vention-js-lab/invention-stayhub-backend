@@ -58,8 +58,9 @@ export class AccommodationsController {
   async listAccommodations(
     @Query() filters: AccommodationFiltersReqQueryDto,
     @GetOptionalAccount('accountId') accountId: string | undefined,
+    @Query('showOwnAccommodationsOnly') showOwnAccommodationsOnly: boolean,
   ) {
-    const accommodations = await this.accommodationsService.listAccommodations(filters, accountId);
+    const accommodations = await this.accommodationsService.listAccommodations(filters, accountId, showOwnAccommodationsOnly);
 
     return withBaseResponse({
       status: 200,
