@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Accommodation } from '../entities/accommodation.entity';
@@ -46,13 +47,15 @@ export class AccommodationsService {
 
     await this.accommodationAmenityService.create(createdAccommodation.id, createAccommodationDto.amenity);
 
-    await this.accommodationImageService.create(createdAccommodation.id, createAccommodationDto.images);
+    const images = await this.accommodationImageService.create(createdAccommodation.id, createAccommodationDto.images);
 
     if (categories.length > 0) {
       const selectedCategories = await this.categoryRepository.findBy({
         id: In(categories),
       });
       createdAccommodation.categories = selectedCategories;
+      createdAccommodation.images = images;
+
       await this.accommodationRepository.save(createdAccommodation);
     }
 
@@ -72,6 +75,7 @@ export class AccommodationsService {
       .leftJoinAndSelect('accommodation.address', 'address')
       .leftJoinAndSelect('accommodation.amenity', 'amenity')
       .leftJoinAndSelect('accommodation.images', 'image')
+      .leftJoinAndSelect('accommodation.reviews', 'reviews')
       .where('accommodation.deletedAt is NULL');
 
     if (filters.category) {
@@ -124,8 +128,10 @@ export class AccommodationsService {
       .leftJoinAndSelect('accommodation.images', 'images')
       .leftJoinAndSelect('accommodation.reviews', 'reviews')
       .leftJoinAndSelect('accommodation.bookings', 'bookings')
-      .leftJoinAndSelect('reviews.account', 'account')
-      .leftJoinAndSelect('account.profile', 'profile')
+      .leftJoinAndSelect('reviews.account', 'reviewAccount')
+      .leftJoinAndSelect('reviewAccount.profile', 'reviewProfile')
+      .leftJoinAndSelect('accommodation.owner', 'ownerAccount')
+      .leftJoinAndSelect('ownerAccount.profile', 'ownerProfile')
       .leftJoinAndSelect('accommodation.categories', 'categories')
       .where('accommodation.id = :id', { id })
       .andWhere('accommodation.deletedAt IS NULL')
@@ -142,6 +148,23 @@ export class AccommodationsService {
         endDate: time(booking.endDate).format(TimeFormat.Calendar),
         status: booking.status,
       })),
+      owner: accommodation.owner
+        ? {
+            id: accommodation.owner.id,
+            firstName: accommodation.owner.profile.firstName,
+            lastName: accommodation.owner.profile.lastName,
+            description: accommodation.owner.profile.description,
+            avatar: accommodation.owner.profile.image,
+            createdAt: time(accommodation.owner.profile.createdAt).format(TimeFormat.CalendarWithTime),
+          }
+        : {
+            id: randomUUID(),
+            firstName: 'John',
+            lastName: 'Doe',
+            description: 'Fake user',
+            avatar: null,
+            createdAt: time().format(TimeFormat.CalendarWithTime),
+          },
       reviews: accommodation.reviews.map((review) => ({
         id: review.id,
         content: review.content,
@@ -156,8 +179,8 @@ export class AccommodationsService {
           photo: review.account.profile.image,
           createdAt: time(review.account.profile.createdAt).format(TimeFormat.CalendarWithTime),
         },
-        categories: accommodation.categories,
       })),
+      categories: accommodation.categories,
     };
 
     return result;
