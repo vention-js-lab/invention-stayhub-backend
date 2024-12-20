@@ -65,7 +65,11 @@ export class AccommodationsService {
     });
   }
 
-  async listAccommodations(filters: AccommodationFiltersReqQueryDto, accountId: string | undefined) {
+  async listAccommodations(
+    filters: AccommodationFiltersReqQueryDto,
+    accountId: string | undefined,
+    showOwnAccommodationsOnly: boolean = false,
+  ) {
     const queryBuilder = this.accommodationRepository
       .createQueryBuilder('accommodation')
       .leftJoinAndSelect('accommodation.address', 'address')
@@ -81,7 +85,13 @@ export class AccommodationsService {
     }
 
     if (accountId) {
-      queryBuilder.leftJoinAndSelect('accommodation.wishlist', 'wishlist', 'wishlist.accountId = :accountId', { accountId });
+      queryBuilder.leftJoinAndSelect('accommodation.wishlist', 'wishlist', 'wishlist.accountId = :accountId', {
+        accountId,
+      });
+    }
+
+    if (showOwnAccommodationsOnly && accountId) {
+      queryBuilder.andWhere('accommodation.ownerId = :accountId', { accountId });
     }
 
     addPriceFilters(queryBuilder, filters);

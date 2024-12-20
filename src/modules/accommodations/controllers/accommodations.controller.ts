@@ -1,4 +1,16 @@
-import { Controller, Post, Body, UseGuards, UseInterceptors, Get, Query, Param, Patch, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  UseGuards,
+  UseInterceptors,
+  Get,
+  Query,
+  Param,
+  Patch,
+  Delete,
+  ParseBoolPipe,
+} from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import { AccommodationsService } from '#/modules/accommodations/services/accommodations.service';
 import { Accommodation } from '#/modules/accommodations/entities/accommodation.entity';
@@ -58,8 +70,9 @@ export class AccommodationsController {
   async listAccommodations(
     @Query() filters: AccommodationFiltersReqQueryDto,
     @GetOptionalAccount('accountId') accountId: string | undefined,
+    @Query('showOwnAccommodationsOnly', ParseBoolPipe) showOwnAccommodationsOnly: boolean,
   ) {
-    const accommodations = await this.accommodationsService.listAccommodations(filters, accountId);
+    const accommodations = await this.accommodationsService.listAccommodations(filters, accountId, showOwnAccommodationsOnly);
 
     return withBaseResponse({
       status: 200,
