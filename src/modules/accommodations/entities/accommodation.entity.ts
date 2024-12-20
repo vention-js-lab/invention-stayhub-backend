@@ -69,7 +69,7 @@ export class Accommodation {
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'owner_id' })
-  owner: Account;
+  owner: Account | null;
 
   @Column({ name: 'owner_id' })
   ownerId: string;
