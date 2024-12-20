@@ -70,6 +70,7 @@ export class AccommodationsService {
       .leftJoinAndSelect('accommodation.address', 'address')
       .leftJoinAndSelect('accommodation.amenity', 'amenity')
       .leftJoinAndSelect('accommodation.images', 'image')
+      .leftJoinAndSelect('accommodation.reviews', 'reviews')
       .where('accommodation.deletedAt is NULL');
 
     if (filters.category) {
@@ -116,8 +117,10 @@ export class AccommodationsService {
       .leftJoinAndSelect('accommodation.images', 'images')
       .leftJoinAndSelect('accommodation.reviews', 'reviews')
       .leftJoinAndSelect('accommodation.bookings', 'bookings')
-      .leftJoinAndSelect('reviews.account', 'account')
-      .leftJoinAndSelect('account.profile', 'profile')
+      .leftJoinAndSelect('reviews.account', 'reviewAccount')
+      .leftJoinAndSelect('reviewAccount.profile', 'reviewProfile')
+      .leftJoinAndSelect('accommodation.owner', 'ownerAccount')
+      .leftJoinAndSelect('ownerAccount.profile', 'ownerProfile')
       .leftJoinAndSelect('accommodation.categories', 'categories')
       .where('accommodation.id = :id', { id })
       .andWhere('accommodation.deletedAt IS NULL')
@@ -134,6 +137,14 @@ export class AccommodationsService {
         endDate: time(booking.endDate).format(TimeFormat.Calendar),
         status: booking.status,
       })),
+      owner: {
+        id: accommodation.owner.id,
+        firstName: accommodation.owner.profile.firstName,
+        lastName: accommodation.owner.profile.lastName,
+        description: accommodation.owner.profile.description,
+        avatar: accommodation.owner.profile.image,
+        createdAt: time(accommodation.owner.profile.createdAt).format(TimeFormat.CalendarWithTime),
+      },
       reviews: accommodation.reviews.map((review) => ({
         id: review.id,
         content: review.content,
@@ -148,8 +159,8 @@ export class AccommodationsService {
           photo: review.account.profile.image,
           createdAt: time(review.account.profile.createdAt).format(TimeFormat.CalendarWithTime),
         },
-        categories: accommodation.categories,
       })),
+      categories: accommodation.categories,
     };
 
     return result;

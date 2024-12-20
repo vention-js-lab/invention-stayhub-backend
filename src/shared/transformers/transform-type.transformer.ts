@@ -21,7 +21,7 @@ export function TransformToBoolean() {
 export function TransformToDate() {
   return Transform(
     ({ value }) => {
-      const date = time(value as string);
+      const date = time(value as string).toDate();
       return date;
     },
     {
