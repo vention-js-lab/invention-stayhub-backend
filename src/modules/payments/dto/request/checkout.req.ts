@@ -1,4 +1,4 @@
-import { IsInt, IsPositive, IsUUID } from 'class-validator';
+import { IsNumber, IsPositive, IsUUID } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CheckoutReqDto {
@@ -12,7 +12,7 @@ export class CheckoutReqDto {
   @ApiProperty({
     description: 'Payment amount in cents',
   })
-  @IsInt()
+  @IsNumber()
   @IsPositive()
   amount: number;
 }

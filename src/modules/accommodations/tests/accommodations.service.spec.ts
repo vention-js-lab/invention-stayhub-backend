@@ -67,6 +67,18 @@ describe('AccommodationsService', () => {
         address: { city: 'Test City' },
         amenity: { wifi: true },
         images: [{ url: 'image-url' }],
+        ownerId: 'owner-id',
+        owner: {
+          id: 'owner-id',
+          profile: {
+            accountId: 'owner-id',
+            firstName: 'ownerName',
+            lastName: 'ownerSurname',
+            description: 'ownerDescription',
+            image: 'owner-image-url',
+            createdAt: '2024-01-01T00:00:00Z',
+          },
+        },
         reviews: [
           {
             id: 'review-id',
@@ -98,6 +110,16 @@ describe('AccommodationsService', () => {
             status: 'Confirmed',
           },
         ],
+        categories: [
+          {
+            id: 'category-id',
+            name: 'categoryName',
+            icon: 'someIcon',
+            createdAt: '2024-12-20',
+            updatedAt: '2024-12-20',
+            deletedAt: null,
+          },
+        ],
       };
 
       mockAccommodationRepository.createQueryBuilder.mockReturnValueOnce({
@@ -111,6 +133,14 @@ describe('AccommodationsService', () => {
 
       expect(result).toEqual({
         ...mockAccommodation,
+        owner: {
+          id: 'owner-id',
+          firstName: 'ownerName',
+          lastName: 'ownerSurname',
+          description: 'ownerDescription',
+          avatar: 'owner-image-url',
+          createdAt: time('2024-01-01T00:00:00Z').format(TimeFormat.CalendarWithTime),
+        },
         bookings: [
           {
             startDate: time('2024-12-01').format(TimeFormat.Calendar),

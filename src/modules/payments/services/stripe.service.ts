@@ -44,7 +44,7 @@ export class StripeService {
 
   async createPaymentIntent(amount: number, metadata: PaymentIntentMetadata) {
     const paymentIntent = await this.stripeApiService.stripe.paymentIntents.create({
-      amount,
+      amount: Math.floor(amount),
       currency: 'usd',
       automatic_payment_methods: { enabled: true },
       metadata: { ...metadata },
