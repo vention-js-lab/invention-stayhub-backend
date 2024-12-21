@@ -160,4 +160,17 @@ export class UsersService {
 
     await this.accountRepository.softRemove(deletingAccount);
   }
+
+  async getOwnerProfile(ownerId: string) {
+    const account = await this.accountRepository.findOne({
+      where: { id: ownerId },
+      relations: ['profile', 'accommodations', 'accommodations.address'],
+    });
+
+    if (!account) {
+      throw new NotFoundException('Owner not found');
+    }
+
+    return { ownerProfile: account.profile, ownerAccommodations: account.accommodations };
+  }
 }

@@ -77,6 +77,23 @@ export class UsersController {
     });
   }
 
+  @Get('profile/:ownerId')
+  @ApiOperation({ summary: 'Get owner profile' })
+  @ApiOkResponse({
+    description: 'Owner profile fetched successfully',
+    type: ProfileResDto,
+  })
+  @UseGuards(AccessTokenGuard)
+  async getOwnerProfile(@Param('ownerId', new UUIDValidationPipe()) ownerId: string) {
+    const result = await this.usersService.getOwnerProfile(ownerId);
+
+    return withBaseResponse({
+      status: 200,
+      message: 'Owner Profile successfully received',
+      data: result,
+    });
+  }
+
   @Put('profile')
   @ApiOperation({ summary: 'Update user profile' })
   @ApiOkResponse({
