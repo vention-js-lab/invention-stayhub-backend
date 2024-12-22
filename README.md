@@ -41,4 +41,9 @@ docker compose up -d
 
 ```bash
 docker ps -a
-``
+```
+
+## Seeds
+```bash
+npm run start:seed
+```

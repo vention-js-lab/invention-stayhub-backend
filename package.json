@@ -11,6 +11,7 @@
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/src/main",
+    "start:seed": "npx ts-node -r tsconfig-paths/register database.seed.ts",
     "lint": "npx eslint",
     "lint:fix": "npx eslint --fix",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
