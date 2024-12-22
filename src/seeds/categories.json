@@ -1,0 +1,62 @@
+[
+  {
+    "id": "6d5c379d-ac83-4c58-871c-d23f57faa24d",
+    "name": "Boats",
+    "icon": "https://pub-452aee50cf7a49d8a76d86da323867de.r2.dev/8693458b-1673-44b6-a0f2-567078dcffd0.svg"
+  },
+  {
+    "id": "0ba6a948-89a6-4647-a729-0d2a151c9906",
+    "name": "Beach",
+    "icon": "https://pub-452aee50cf7a49d8a76d86da323867de.r2.dev/05a995f0-e6db-452a-91d0-ec46c5fbc9f0.svg"
+  },
+  {
+    "id": "e2be4665-0cfe-4dc6-a13d-3971855de08e",
+    "name": "Camping",
+    "icon": "https://pub-452aee50cf7a49d8a76d86da323867de.r2.dev/b5d31b2a-bfec-4c2b-b33f-956d72c03626.svg"
+  },
+  {
+    "id": "0ea80b21-58d2-4652-85b5-6c5bf0faec58",
+    "name": "Arctic",
+    "icon": "https://pub-452aee50cf7a49d8a76d86da323867de.r2.dev/4fd8aa24-1873-4c0b-8fe8-d83fc7f9b41c.svg"
+  },
+  {
+    "id": "7d1d6a53-dcb8-4dcd-8d44-8f8e3d026ebb",
+    "name": "Mansions",
+    "icon": "https://pub-452aee50cf7a49d8a76d86da323867de.r2.dev/80f835c7-3613-49cb-b096-514963e0ade1.svg"
+  },
+  {
+    "id": "bbb4b191-1b59-4b87-91c6-59de794445de",
+    "name": "Desert",
+    "icon": "https://pub-452aee50cf7a49d8a76d86da323867de.r2.dev/65cc8a4f-22e1-4ad8-b24c-3d1a90faa153.svg"
+  },
+  {
+    "id": "c9bf039b-4cf1-430e-8a8d-fd51779d8598",
+    "name": "Castle",
+    "icon": "https://pub-452aee50cf7a49d8a76d86da323867de.r2.dev/00f9cafc-6ec9-49bd-9813-c6354216a569.svg"
+  },
+  {
+    "id": "f9990fb2-5f74-44a4-b7d9-699314082e99",
+    "name": "Amazing View",
+    "icon": "https://pub-452aee50cf7a49d8a76d86da323867de.r2.dev/794632bf-8ffc-464a-a6b3-27f6a65383d5.svg"
+  },
+  {
+    "id": "25970e59-3353-4ca9-ad71-eb5d91272b6b",
+    "name": "Mountain",
+    "icon": "https://pub-452aee50cf7a49d8a76d86da323867de.r2.dev/8d426967-c8a2-49f6-867b-d5d06acaf413.svg"
+  },
+  {
+    "id": "9cfea0fc-a959-4d0e-a822-432a9d442fb6",
+    "name": "Luxury",
+    "icon": "https://pub-452aee50cf7a49d8a76d86da323867de.r2.dev/76091da2-2835-4e3f-b022-925a130f4c35.svg"
+  },
+  {
+    "id": "31ba91b4-a3c1-4244-9173-efdc29535b45",
+    "name": "Forest",
+    "icon": "https://pub-452aee50cf7a49d8a76d86da323867de.r2.dev/bfaa83ee-a52a-422c-86a9-887d59c403c3.svg"
+  },
+  {
+    "id": "9020e311-b782-4694-be1f-456ee50c4282",
+    "name": "Surfing",
+    "icon": "https://pub-452aee50cf7a49d8a76d86da323867de.r2.dev/5eef52c3-3909-4c23-834a-e5d8a9843f94.svg"
+  }
+]
