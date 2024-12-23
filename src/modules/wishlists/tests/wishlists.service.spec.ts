@@ -71,7 +71,7 @@ describe('WishlistService', () => {
 
       expect(wishlistRepo.find).toHaveBeenCalledWith({
         where: { accountId: userId },
-        relations: ['accommodation', 'accommodation.address'],
+        relations: ['accommodation', 'accommodation.address', 'accommodation.reviews'],
       });
       expect(result).toEqual(userWishlist);
     });

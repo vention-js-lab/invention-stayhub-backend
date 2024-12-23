@@ -164,7 +164,7 @@ export class UsersService {
   async getOwnerProfile(ownerId: string) {
     const account = await this.accountRepository.findOne({
       where: { id: ownerId },
-      relations: ['profile', 'accommodations', 'accommodations.address'],
+      relations: ['profile', 'accommodations', 'accommodations.address', 'accommodation.reviews'],
     });
 
     if (!account) {
