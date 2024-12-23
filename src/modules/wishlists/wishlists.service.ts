@@ -34,7 +34,7 @@ export class WishlistsService {
   async getUserWishlist(accountId: string) {
     const userWishlist = await this.wishlistRepository.find({
       where: { accountId },
-      relations: ['accommodation', 'accommodation.address'],
+      relations: ['accommodation', 'accommodation.address', 'accommodation.reviews'],
     });
 
     return userWishlist;
